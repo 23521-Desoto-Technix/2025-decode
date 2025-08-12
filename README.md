@@ -1,6 +1,6 @@
 # 23521 DECODE main repo
 <h3 align="center">
-    <img width="300" alt="Logo" src="https://github.com/user-attachments/assets/74fe8585-dd39-4204-b37d-edd4d9a60cc5" />
+    <img width="300" alt="Logo" src="https://github.com/user-attachments/assets/74fe8585-dd39-4204-b37d-edd4d9a60cc5" /><br/>
     <span>2025 DECODE</span>
 </h3>
 ## What's this?
