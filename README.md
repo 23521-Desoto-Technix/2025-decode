@@ -1,7 +1,7 @@
 # 23521 DECODE main repo
 <h3 align="center">
-    <span style="background-color: #F57E25; display: inline-block; padding: 10px">
-        <img width="300" alt="Logo" src="https://usfirststg.prod.acquia-sites.com/sites/default/files/2024-banner/first_age_ftc_decode_logoanimation_gif_800x800%20(1)%20(2).gif" />
+    <span>
+        <img width="300" alt="Logo" src="https://github.com/user-attachments/assets/a1a76332-2440-4bc0-9b25-4ca4d74446d6" />
     </span><br/>
     <span>2025 DECODE</span>
 </h3>
