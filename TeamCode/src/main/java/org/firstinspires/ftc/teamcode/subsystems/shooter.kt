@@ -11,14 +11,13 @@ object shooter : Subsystem {
 
     private var power = 0.0
 
-    private var speed = 0.0
+    var speed = 0.0
 
     private const val MIN_SPEED = 100 //TODO: TUNE THESE TWO!
     private const val STOP_SPEED = 10
 
     override fun periodic() {
         speed = upperShooterMotor.state.velocity
-        ActiveOpMode.telemetry.addData("Shooter flywheel speed", speed)
         upperShooterMotor.power = power
         lowerShooterMotor.power = power
     }

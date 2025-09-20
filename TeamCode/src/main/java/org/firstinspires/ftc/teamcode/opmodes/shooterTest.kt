@@ -28,9 +28,11 @@ class ShooterTest : NextFTCOpMode() {
             .whenBecomesFalse(shooter.spinDown)
     }
     override fun onUpdate() {
+        telemetry.addData("Shooter flywheel speed", shooter.speed)
+        telemetry.update()
         BindingManager.update()
     }
     override fun onStop() {
-        BindingManager.update()
+        BindingManager.reset()
     }
 }
