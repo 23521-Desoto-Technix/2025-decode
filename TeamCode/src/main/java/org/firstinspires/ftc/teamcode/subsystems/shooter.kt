@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystems
 
 import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
-import dev.nextftc.ftc.ActiveOpMode
 import dev.nextftc.hardware.impl.MotorEx
 
 object shooter : Subsystem {
@@ -13,7 +12,7 @@ object shooter : Subsystem {
 
     var speed = 0.0
 
-    private const val MIN_SPEED = 2_600 //TODO: TUNE THESE TWO!
+    private const val MIN_SPEED = 2_600
     private const val STOP_SPEED = 150
 
     override fun periodic() {
