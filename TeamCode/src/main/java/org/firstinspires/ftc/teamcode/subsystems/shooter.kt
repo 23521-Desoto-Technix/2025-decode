@@ -13,8 +13,8 @@ object shooter : Subsystem {
 
     var speed = 0.0
 
-    private const val MIN_SPEED = 100 //TODO: TUNE THESE TWO!
-    private const val STOP_SPEED = 10
+    private const val MIN_SPEED = 2_600 //TODO: TUNE THESE TWO!
+    private const val STOP_SPEED = 150
 
     override fun periodic() {
         speed = upperShooterMotor.state.velocity
