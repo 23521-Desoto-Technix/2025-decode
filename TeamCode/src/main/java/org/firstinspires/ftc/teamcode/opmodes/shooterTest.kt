@@ -3,13 +3,20 @@ package org.firstinspires.ftc.teamcode.opmodes
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
+import dev.nextftc.core.components.BindingsComponent
+import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.ftc.NextFTCOpMode
+import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.subsystems.shooter
 
 @TeleOp
 class ShooterTest : NextFTCOpMode() {
     init {
-        addComponents(/* vararg components */)
+        addComponents(
+            SubsystemComponent(shooter),
+            BulkReadComponent,
+            BindingsComponent
+        )
     }
 
     override fun onInit() { }
