@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.ftc.NextFTCOpMode
 import org.firstinspires.ftc.teamcode.subsystems.shooter
 
+@TeleOp
 class ShooterTest : NextFTCOpMode() {
     init {
         addComponents(/* vararg components */)
