@@ -8,6 +8,7 @@ import kotlin.math.abs
 object Shooter : Subsystem {
     private val upperShooterMotor = MotorEx("upperShooter").brakeMode().reversed()
     private val lowerShooterMotor = MotorEx("lowerShooter").brakeMode()
+    private val shooterEncoder = MotorEx("frontRight")
 
     private var power = 0.0
 
@@ -15,11 +16,11 @@ object Shooter : Subsystem {
     var targetSpeed = 0.0
 
     private const val SPEED_AT_MAX_POWER = 2_600
-    private const val PROPORTIONAL_GAIN = 0.001
+    private const val PROPORTIONAL_GAIN = 0.0 //TODO: cc: nathan mess with this
     private const val SPEED_TOLERANCE = 50
 
     override fun periodic() {
-        speed = upperShooterMotor.state.velocity
+        speed = shooterEncoder.state.velocity
         upperShooterMotor.power = power
         lowerShooterMotor.power = power
     }
