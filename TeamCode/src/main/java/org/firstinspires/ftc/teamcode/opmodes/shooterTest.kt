@@ -22,10 +22,10 @@ class ShooterTest : NextFTCOpMode() {
     override fun onInit() { }
     override fun onWaitForStart() { }
     override fun onStartButtonPressed() {
-        val spinUpToggle = button { gamepad1.a }
-            .toggleOnBecomesTrue()
+        val spinUpToggle = button { gamepad1.circle }
             .whenBecomesTrue(Shooter.setSpeed(2_600.0))
-            .whenBecomesFalse(Shooter.setSpeed(0.0))
+        val stopToggle = button { gamepad1.cross }
+            .whenBecomesTrue(Shooter.setSpeed(0.0))
     }
     override fun onUpdate() {
         telemetry.addData("Shooter flywheel actual", Shooter.speed)
