@@ -15,9 +15,9 @@ object Shooter : Subsystem {
     var speed = 0.0
     var targetSpeed = 0.0
 
-    private const val SPEED_AT_MAX_POWER = 2_500
-    private const val PROPORTIONAL_GAIN = 0.0001
-    private const val SPEED_TOLERANCE = 50
+    private const val SPEED_AT_MAX_POWER = 2_600
+    private const val PROPORTIONAL_GAIN = 0.00015
+    private const val SPEED_TOLERANCE = 100
 
     override fun periodic() {
         speed = shooterEncoder.velocity
