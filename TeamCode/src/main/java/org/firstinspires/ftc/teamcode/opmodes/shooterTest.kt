@@ -23,7 +23,8 @@ class ShooterTest : NextFTCOpMode() {
     override fun onInit() { }
     override fun onWaitForStart() { }
     override fun onStartButtonPressed() {
-        val customSpeed = button { gamepad1.right_bumper } whenTrue { Shooter.setSpeed(abs(gamepad1.right_stick_y * 2_600.0)) } whenFalse { Shooter.setSpeed(0.0) }
+        val bumpSpeedUp = button { gamepad1.right_bumper }.whenBecomesTrue { Shooter.setSpeed(Shooter.targetSpeed + 100.0).schedule() }
+        val bumpSpeedDown = button { gamepad1.left_bumper }.whenBecomesTrue { Shooter.setSpeed((Shooter.targetSpeed - 100.0).coerceAtLeast(0.0)).schedule() }
     }
     override fun onUpdate() {
         telemetry.addData("Shooter actual", Shooter.speed)
