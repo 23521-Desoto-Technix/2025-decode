@@ -35,6 +35,6 @@ object Shooter : Subsystem {
             val proportionalPower = speedError * PROPORTIONAL_GAIN
             power = ((targetSpeed / SPEED_AT_MAX_POWER) + proportionalPower).coerceIn(0.0, 1.0)
         }
-        .setIsDone { (abs(targetSpeed - speed) <= SPEED_TOLERANCE) || power >= 1.0 }
+        .setIsDone { true }
         .requires(this)
 }

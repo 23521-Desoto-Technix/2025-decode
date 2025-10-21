@@ -8,6 +8,7 @@ import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
+import kotlin.math.abs
 
 @TeleOp
 class ShooterTest : NextFTCOpMode() {
@@ -22,12 +23,7 @@ class ShooterTest : NextFTCOpMode() {
     override fun onInit() { }
     override fun onWaitForStart() { }
     override fun onStartButtonPressed() {
-        val spinUpToggle = button { gamepad1.circle }
-            .whenBecomesTrue(Shooter.setSpeed(2_600.0))
-        val stopToggle = button { gamepad1.cross }
-            .whenBecomesTrue(Shooter.setSpeed(0.0))
-        val halfSpeedToggle = button { gamepad1.square }
-            .whenBecomesTrue(Shooter.setSpeed(1_300.0))
+        val customSpeed = button { gamepad1.right_bumper } whenTrue { Shooter.setSpeed(abs(gamepad1.right_stick_y * 2_600.0)) } whenFalse { Shooter.setSpeed(0.0) }
     }
     override fun onUpdate() {
         telemetry.addData("Shooter actual", Shooter.speed)
