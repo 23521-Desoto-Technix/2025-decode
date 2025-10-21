@@ -6,8 +6,8 @@ import dev.nextftc.hardware.impl.MotorEx
 import kotlin.math.abs
 
 object Shooter : Subsystem {
-    private val upperShooterMotor = MotorEx("upperShooter").brakeMode().reversed()
-    private val lowerShooterMotor = MotorEx("lowerShooter").brakeMode()
+    private val upperShooterMotor = MotorEx("leftShooter").brakeMode().reversed()
+    private val lowerShooterMotor = MotorEx("rightShooter").brakeMode()
     private val shooterEncoder = MotorEx("frontRight")
 
     private var power = 0.0
