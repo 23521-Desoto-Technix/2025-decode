@@ -20,7 +20,7 @@ object Shooter : Subsystem {
     private const val SPEED_TOLERANCE = 50
 
     override fun periodic() {
-        speed = shooterEncoder.state.velocity
+        speed = shooterEncoder.velocity
         upperShooterMotor.power = power
         lowerShooterMotor.power = power
     }
