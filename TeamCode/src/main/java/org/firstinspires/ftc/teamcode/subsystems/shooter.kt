@@ -10,7 +10,7 @@ object Shooter : Subsystem {
     private val lowerShooterMotor = MotorEx("rightShooter").brakeMode()
     private val shooterEncoder = MotorEx("backLeft")
 
-    private var power = 0.0
+    var power = 0.0
 
     var speed = 0.0
     var targetSpeed = 0.0
@@ -35,7 +35,7 @@ object Shooter : Subsystem {
             val proportionalPower = speedError * PROPORTIONAL_GAIN
             power = ((targetSpeed / SPEED_AT_MAX_POWER) + proportionalPower).coerceIn(0.0, 1.0)
         }
-                .setIsDone { abs(speed - targetSpeed) < SPEED_TOLERANCE }
+                .setIsDone { true }
         .requires(this)
 
 }
