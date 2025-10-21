@@ -3,17 +3,20 @@ package org.firstinspires.ftc.teamcode.subsystems
 import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.MotorEx
+import kotlin.math.abs
 
-object shooter : Subsystem {
+object Shooter : Subsystem {
     private val upperShooterMotor = MotorEx("upperShooter").brakeMode().reversed()
     private val lowerShooterMotor = MotorEx("lowerShooter").brakeMode()
 
     private var power = 0.0
 
     var speed = 0.0
+    var targetSpeed = 0.0
 
-    private const val MIN_SPEED = 2_600
-    private const val STOP_SPEED = 150
+    private const val SPEED_AT_MAX_POWER = 2_600
+    private const val PROPORTIONAL_GAIN = 0.001
+    private const val SPEED_TOLERANCE = 50
 
     override fun periodic() {
         speed = upperShooterMotor.state.velocity
@@ -21,14 +24,17 @@ object shooter : Subsystem {
         lowerShooterMotor.power = power
     }
 
-    val spinUp = LambdaCommand("spinUp")
+    fun setSpeed(targetSpeed: Double) = LambdaCommand("setSpeed")
         .setStart {
-            power = 1.0
+            power = (targetSpeed / SPEED_AT_MAX_POWER).coerceIn(0.0, 1.0)
+            this.targetSpeed = targetSpeed
         }
-        .setIsDone { speed >= MIN_SPEED }
-    val spinDown = LambdaCommand("spinDown")
-        .setStart {
-            power = 0.0
+        .setUpdate {
+            val speedError = targetSpeed - speed
+            val proportionalPower = speedError * PROPORTIONAL_GAIN
+            power = ((targetSpeed / SPEED_AT_MAX_POWER) + proportionalPower).coerceIn(0.0, 1.0)
         }
-        .setIsDone { speed <= STOP_SPEED }
+                .setIsDone { abs(speed - targetSpeed) < SPEED_TOLERANCE }
+        .requires(this)
+
 }

@@ -7,13 +7,13 @@ import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import org.firstinspires.ftc.teamcode.subsystems.shooter
+import org.firstinspires.ftc.teamcode.subsystems.Shooter
 
 @TeleOp
 class ShooterTest : NextFTCOpMode() {
     init {
         addComponents(
-            SubsystemComponent(shooter),
+            SubsystemComponent(Shooter),
             BulkReadComponent,
             BindingsComponent
         )
@@ -24,11 +24,12 @@ class ShooterTest : NextFTCOpMode() {
     override fun onStartButtonPressed() {
         val spinUpToggle = button { gamepad1.a }
             .toggleOnBecomesTrue()
-            .whenBecomesTrue(shooter.spinUp)
-            .whenBecomesFalse(shooter.spinDown)
+            .whenBecomesTrue(Shooter.setSpeed(2_600.0))
+            .whenBecomesFalse(Shooter.setSpeed(0.0))
     }
     override fun onUpdate() {
-        telemetry.addData("Shooter flywheel speed", shooter.speed)
+        telemetry.addData("Shooter flywheel actual", Shooter.speed)
+        telemetry.addData("Shooter flywheel target speed", Shooter.targetSpeed)
         telemetry.update()
         BindingManager.update()
     }
