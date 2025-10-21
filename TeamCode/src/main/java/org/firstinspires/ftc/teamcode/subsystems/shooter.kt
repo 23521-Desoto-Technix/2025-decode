@@ -8,7 +8,7 @@ import kotlin.math.abs
 object Shooter : Subsystem {
     private val upperShooterMotor = MotorEx("leftShooter").brakeMode().reversed()
     private val lowerShooterMotor = MotorEx("rightShooter").brakeMode()
-    private val shooterEncoder = MotorEx("frontRight")
+    private val shooterEncoder = MotorEx("backLeft")
 
     private var power = 0.0
 
