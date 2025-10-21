@@ -15,8 +15,8 @@ object Shooter : Subsystem {
     var speed = 0.0
     var targetSpeed = 0.0
 
-    private const val SPEED_AT_MAX_POWER = 2_600
-    private const val PROPORTIONAL_GAIN = 0.0 //TODO: cc: nathan mess with this
+    private const val SPEED_AT_MAX_POWER = 2_500
+    private const val PROPORTIONAL_GAIN = 0.0001
     private const val SPEED_TOLERANCE = 50
 
     override fun periodic() {
@@ -35,7 +35,6 @@ object Shooter : Subsystem {
             val proportionalPower = speedError * PROPORTIONAL_GAIN
             power = ((targetSpeed / SPEED_AT_MAX_POWER) + proportionalPower).coerceIn(0.0, 1.0)
         }
-                .setIsDone { true }
+        .setIsDone { (abs(targetSpeed - speed) <= SPEED_TOLERANCE) || power >= 1.0 }
         .requires(this)
-
 }

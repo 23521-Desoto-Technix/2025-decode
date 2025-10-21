@@ -26,6 +26,8 @@ class ShooterTest : NextFTCOpMode() {
             .whenBecomesTrue(Shooter.setSpeed(2_600.0))
         val stopToggle = button { gamepad1.cross }
             .whenBecomesTrue(Shooter.setSpeed(0.0))
+        val halfSpeedToggle = button { gamepad1.square }
+            .whenBecomesTrue(Shooter.setSpeed(1_300.0))
     }
     override fun onUpdate() {
         telemetry.addData("Shooter actual", Shooter.speed)
