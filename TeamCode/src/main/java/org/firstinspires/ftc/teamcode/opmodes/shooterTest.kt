@@ -7,14 +7,14 @@ import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import org.firstinspires.ftc.teamcode.subsystems.Intake
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
-import kotlin.math.abs
 
 @TeleOp
 class ShooterTest : NextFTCOpMode() {
     init {
         addComponents(
-            SubsystemComponent(Shooter),
+            SubsystemComponent(Shooter, Intake),
             BulkReadComponent,
             BindingsComponent
         )
@@ -25,6 +25,7 @@ class ShooterTest : NextFTCOpMode() {
     override fun onStartButtonPressed() {
         val bumpSpeedUp = button { gamepad1.right_bumper }.whenBecomesTrue { Shooter.setSpeed(Shooter.targetSpeed + 100.0).schedule() }
         val bumpSpeedDown = button { gamepad1.left_bumper }.whenBecomesTrue { Shooter.setSpeed((Shooter.targetSpeed - 100.0).coerceAtLeast(0.0)).schedule() }
+        val intake = button { gamepad1.a } whenTrue { Intake.setPower(1.0).schedule() } whenFalse { Intake.setPower(0.0).schedule() }
     }
     override fun onUpdate() {
         telemetry.addData("Shooter actual", Shooter.speed)
