@@ -22,6 +22,7 @@ class CameraTest : LinearOpMode() {
         val portal: VisionPortal = VisionPortal.Builder()
             .setCamera(hardwareMap.get<WebcamName?>(WebcamName::class.java, "turretCamera"))
             .setCameraResolution(Size(RESOLUTION_WIDTH, RESOLUTION_HEIGHT))
+            .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
             .build()
 
         while (!isStopRequested) {
