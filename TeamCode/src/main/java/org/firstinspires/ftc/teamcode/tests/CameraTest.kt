@@ -30,12 +30,14 @@ class CameraTest : LinearOpMode() {
         .setDrawTagOutline(true)
         .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
         .setLensIntrinsics(667.154, 667.154, 438.702, 286.414)
-        // ... these parameters are fx, fy, cx, cy.
+                // ... these parameters are fx, fy, cx, cy.
+        .build()
 
         val portal: VisionPortal = VisionPortal.Builder()
             .setCamera(hardwareMap.get<WebcamName?>(WebcamName::class.java, "turretCamera"))
             .setCameraResolution(Size(RESOLUTION_WIDTH, RESOLUTION_HEIGHT))
             .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+            .addProcessor(aprilTag)
             .build()
 
         while (!isStopRequested) {
