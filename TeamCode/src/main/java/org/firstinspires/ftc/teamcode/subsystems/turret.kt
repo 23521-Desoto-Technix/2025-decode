@@ -17,7 +17,13 @@ object Turret : Subsystem {
 
     fun setPower(power: Double) = LambdaCommand("setTurretPower")
         .setStart {
-        this.power = power
+            if (angle >= 19_000) {
+                this.power = -0.2
+            } else if (angle <= -19_000) {
+                this.power = 0.2
+            } else {
+                this.power = power
+            }
     }
         .setIsDone { true }
         .requires(this)

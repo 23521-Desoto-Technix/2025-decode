@@ -36,7 +36,7 @@ class ShooterTest : NextFTCOpMode() {
         val spinnyLeft = button { gamepad1.dpad_left } whenTrue { Indexer.setPower(1.0).schedule() } whenFalse { Indexer.setPower(0.0).schedule() }
         val spinnyRight = button { gamepad1.dpad_right } whenTrue { Indexer.setPower(-1.0).schedule() } whenFalse { Indexer.setPower(0.0).schedule() }
         val turretStick = button { gamepad1.circle } whenTrue {
-            Turret.setPower(gamepad1.right_stick_x.toDouble()).schedule()
+            Turret.setPower(gamepad1.left_stick_x.toDouble()).schedule()
         } whenFalse {
             Turret.setPower(0.0).schedule()
         }

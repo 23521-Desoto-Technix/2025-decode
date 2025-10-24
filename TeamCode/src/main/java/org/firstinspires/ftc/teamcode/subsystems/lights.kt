@@ -30,8 +30,8 @@ object Lights : Subsystem {
             return
         }
         if (state == LightsState.IDLE) {
-            right.position = right.position + 0.005
-            left.position = left.position + 0.005
+            right.position += 0.02
+            left.position += 0.02
             if (right.position > 0.71) {
                 right.position = 0.28
             }
