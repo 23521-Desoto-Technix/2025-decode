@@ -6,7 +6,7 @@ import dev.nextftc.hardware.impl.MotorEx
 
 object Turret : Subsystem {
     val motor = MotorEx("turret").brakeMode()
-    val encoder = MotorEx("backLeft")
+    val encoder = MotorEx("frontLeft")
     var angle = 0.0
     var power = 0.0
 
