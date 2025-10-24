@@ -38,6 +38,12 @@ object Lights : Subsystem {
             if (left.position > 0.71) {
                 left.position = 0.28
             }
+            if (right.position < 0.28) {
+                right.position = 0.28
+            }
+            if (left.position < 0.28) {
+                left.position = 0.28
+            }
         }
     }
 }
