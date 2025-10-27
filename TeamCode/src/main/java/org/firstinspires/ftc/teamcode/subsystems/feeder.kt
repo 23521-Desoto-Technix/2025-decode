@@ -10,15 +10,15 @@ object Feeder : Subsystem {
 
     fun feed() = LambdaCommand("feed")
         .setStart {
-            leftServo.position = 0.8 //TODO TUNE THIS
-            rightServo.position = 0.2 //TODO TUNE THIS
+            leftServo.position = 0.5 //TODO TUNE THIS
+            rightServo.position = 0.6 //TODO TUNE THIS
         }
         .setIsDone { true }
         .requires(this)
     fun reset() = LambdaCommand("resetFeeder")
         .setStart {
-            leftServo.position = 0.2 //TODO TUNE THIS
-            rightServo.position = 0.8 //TODO TUNE THIS
+            leftServo.position = 0.9 //TODO TUNE THIS
+            rightServo.position = 1.0 //TODO TUNE THIS
         }
         .setIsDone { true }
         .requires(this)
