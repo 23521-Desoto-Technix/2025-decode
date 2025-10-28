@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.components.BindingsComponent
@@ -16,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 
 @TeleOp
-class ShooterTest : NextFTCOpMode() {
+abstract class ShooterTest : NextFTCOpMode() {
     init {
         addComponents(
             SubsystemComponent(Shooter, Intake, Indexer, Lights, Turret, Feeder),
@@ -25,8 +26,18 @@ class ShooterTest : NextFTCOpMode() {
         )
     }
 
+    private lateinit var intakeBreakBeam: DigitalChannel
+    private lateinit var leftBreakBeam: DigitalChannel
+    private lateinit var rightBreakBeam: DigitalChannel
+
     override fun onInit() {
         Lights.state = LightsState.OFF
+        intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
+        intakeBreakBeam.mode = DigitalChannel.Mode.INPUT
+        leftBreakBeam = hardwareMap.get(DigitalChannel::class.java, "leftBreakBeam")
+        leftBreakBeam.mode = DigitalChannel.Mode.INPUT
+        rightBreakBeam = hardwareMap.get(DigitalChannel::class.java, "rightBreakBeam")
+        rightBreakBeam.mode = DigitalChannel.Mode.INPUT
     }
     override fun onWaitForStart() { }
     override fun onStartButtonPressed() {
@@ -50,6 +61,9 @@ class ShooterTest : NextFTCOpMode() {
         telemetry.addData("Shooter target", Shooter.targetSpeed)
         telemetry.addData("Shooter power", Shooter.power)
         telemetry.addData("Turret angle", Turret.angle)
+        telemetry.addData("Intake Break Beam", intakeBreakBeam.state)
+        telemetry.addData("Left Break Beam", leftBreakBeam.state)
+        telemetry.addData("Right Break Beam", rightBreakBeam.state)
         telemetry.update()
         BindingManager.update()
     }
