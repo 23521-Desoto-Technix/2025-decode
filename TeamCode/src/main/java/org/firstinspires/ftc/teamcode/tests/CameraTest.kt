@@ -4,7 +4,11 @@ import android.util.Size
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.vision.VisionPortal
+import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
 import java.util.Locale
 
 @TeleOp(name = "Camera Frame Capture")
@@ -19,9 +23,21 @@ class CameraTest : LinearOpMode() {
 
     override fun runOpMode() {
 
+        val aprilTag =
+            AprilTagProcessor.Builder()
+        .setDrawAxes(true)
+        .setDrawCubeProjection(true)
+        .setDrawTagOutline(true)
+        .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+        .setLensIntrinsics(667.154, 667.154, 438.702, 286.414)
+                // ... these parameters are fx, fy, cx, cy.
+        .build()
+
         val portal: VisionPortal = VisionPortal.Builder()
             .setCamera(hardwareMap.get<WebcamName?>(WebcamName::class.java, "turretCamera"))
             .setCameraResolution(Size(RESOLUTION_WIDTH, RESOLUTION_HEIGHT))
+            .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+            .addProcessor(aprilTag)
             .build()
 
         while (!isStopRequested) {
