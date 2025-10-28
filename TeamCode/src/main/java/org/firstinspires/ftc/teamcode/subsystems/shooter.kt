@@ -16,15 +16,15 @@ object Shooter : Subsystem {
     var targetSpeed = 0.0
 
     private const val SPEED_AT_MAX_POWER = 2_600
-    private const val PROPORTIONAL_GAIN = 0.00015
+    private const val PROPORTIONAL_GAIN = 0.0005
     private const val SPEED_TOLERANCE = 100
 
     override fun periodic() {
+        speed = shooterEncoder.velocity
         val speedError = targetSpeed - speed
         val proportionalPower = speedError * PROPORTIONAL_GAIN
         power = ((targetSpeed / SPEED_AT_MAX_POWER) + proportionalPower).coerceIn(0.0, 1.0)
 
-        speed = shooterEncoder.velocity
         upperShooterMotor.power = power
         lowerShooterMotor.power = power
     }
