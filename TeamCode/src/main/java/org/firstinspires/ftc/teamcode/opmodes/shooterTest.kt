@@ -61,6 +61,9 @@ class ShooterTest : NextFTCOpMode() {
         telemetry.addData("Shooter target", Shooter.targetSpeed)
         telemetry.addData("Shooter power", Shooter.power)
         telemetry.addData("Turret angle", Turret.angle)
+        telemetry.addData("Intake Break Beam", intakeBreakBeam.state)
+        telemetry.addData("Left Break Beam", leftBreakBeam.state)
+        telemetry.addData("Right Break Beam", rightBreakBeam.state)
         telemetry.update()
         BindingManager.update()
     }
