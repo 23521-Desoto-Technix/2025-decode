@@ -7,24 +7,9 @@ import dev.nextftc.hardware.impl.ServoEx
 object Lights : Subsystem {
     val right = ServoEx("rightRGB")
     val left = ServoEx("leftRGB")
-    var state: LightsState = LightsState.OFF
-        set(value) {
-            val stateChanged = field != value
-            field = value
-            if (stateChanged) {
-                animationStartTime = System.currentTimeMillis()
-            }
-        }
-    private var lastUpdateTime: Long = System.currentTimeMillis()
-    private var animationStartTime: Long = System.currentTimeMillis()
-    private var colorPosition: Double = 0.28
+    var state: LightsState = LightsState.ALLIANCE_UNKNOWN
 
     override fun periodic() {
-        val currentTime = System.currentTimeMillis()
-        val elapsedSinceUpdate = currentTime - lastUpdateTime
-        lastUpdateTime = currentTime
-        val elapsedSinceStart = currentTime - animationStartTime
-
         when (state) {
             LightsState.OFF -> {
                 right.position = 0.0
@@ -41,13 +26,6 @@ object Lights : Subsystem {
             LightsState.ALLIANCE_UNKNOWN -> {
                 right.position = 0.388
                 left.position = 0.388
-            }
-            LightsState.IDLE -> {
-                val cycleDuration = 4000L
-                val cycleProgress = (elapsedSinceStart % cycleDuration).toDouble() / cycleDuration
-                colorPosition = 0.28 + (cycleProgress * 0.43)
-                right.position = colorPosition
-                left.position = colorPosition
             }
             LightsState.DEBUG_RED -> {
                 right.position = 0.277
@@ -89,28 +67,6 @@ object Lights : Subsystem {
                 right.position = 1.0
                 left.position = 1.0
             }
-            LightsState.DEBUG_ALTERNATING_RED_BLUE -> {
-                val cycleDuration = 1000L
-                val isFirstHalf = (elapsedSinceStart % cycleDuration) < 500
-                if (isFirstHalf) {
-                    right.position = 0.277
-                    left.position = 0.277
-                } else {
-                    right.position = 0.611
-                    left.position = 0.611
-                }
-            }
-            LightsState.DEBUG_ALTERNATING_RIGHT_LEFT -> {
-                val cycleDuration = 1000L
-                val isFirstHalf = (elapsedSinceStart % cycleDuration) < 500
-                if (isFirstHalf) {
-                    right.position = 0.277
-                    left.position = 1.0
-                } else {
-                    right.position = 1.0
-                    left.position = 0.277
-                }
-            }
         }
     }
 
@@ -127,7 +83,6 @@ enum class LightsState {
     ALLIANCE_RED,
     ALLIANCE_BLUE,
     ALLIANCE_UNKNOWN,
-    IDLE,
     DEBUG_RED,
     DEBUG_ORANGE,
     DEBUG_YELLOW,
@@ -138,6 +93,4 @@ enum class LightsState {
     DEBUG_INDIGO,
     DEBUG_PURPLE,
     DEBUG_WHITE,
-    DEBUG_ALTERNATING_RED_BLUE,
-    DEBUG_ALTERNATING_RIGHT_LEFT,
 }

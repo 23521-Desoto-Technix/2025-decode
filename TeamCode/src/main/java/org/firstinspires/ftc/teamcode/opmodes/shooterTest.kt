@@ -32,7 +32,7 @@ class ShooterTest : NextFTCOpMode() {
     private lateinit var rightBreakBeam: DigitalChannel
 
     override fun onInit() {
-        Lights.setState(LightsState.DEBUG_ALTERNATING_RED_BLUE)
+        Lights.setState(LightsState.ALLIANCE_UNKNOWN)
         intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
         intakeBreakBeam.mode = DigitalChannel.Mode.INPUT
         leftBreakBeam = hardwareMap.get(DigitalChannel::class.java, "leftBreakBeam")
@@ -43,7 +43,7 @@ class ShooterTest : NextFTCOpMode() {
     }
     override fun onWaitForStart() { }
     override fun onStartButtonPressed() {
-        Lights.setState(LightsState.IDLE)
+        Lights.setState(LightsState.ALLIANCE_UNKNOWN)
         val bumpSpeedUp = button { gamepad1.right_bumper }.whenBecomesTrue { Shooter.setSpeed(Shooter.targetSpeed + 100.0).schedule() }
         val bumpSpeedDown = button { gamepad1.left_bumper }.whenBecomesTrue { Shooter.setSpeed((Shooter.targetSpeed - 100.0).coerceAtLeast(0.0)).schedule() }
         val intakeForward = button { gamepad1.circle } whenTrue { Intake.setPower(1.0).schedule() }
@@ -54,8 +54,8 @@ class ShooterTest : NextFTCOpMode() {
         } whenFalse {
             Turret.setPower(0.0).schedule()
         }
-        val spindexerBumpNext = button { gamepad1.dpad_right } whenTrue { SequentialGroup(Lights.setState(LightsState.DEBUG_GREEN), Indexer.toNextSlot(), Lights.setState(LightsState.IDLE)) }
-        val spindexerBumpPrevious = button { gamepad1.dpad_left } whenTrue { SequentialGroup(Lights.setState(LightsState.DEBUG_PURPLE), Indexer.toPreviousSlot(), Lights.setState(LightsState.IDLE)) }
+        val spindexerBumpNext = button { gamepad1.dpad_right } whenTrue { SequentialGroup(Lights.setState(LightsState.DEBUG_GREEN), Indexer.toNextSlot(), Lights.setState(LightsState.ALLIANCE_UNKNOWN)) }
+        val spindexerBumpPrevious = button { gamepad1.dpad_left } whenTrue { SequentialGroup(Lights.setState(LightsState.DEBUG_PURPLE), Indexer.toPreviousSlot(), Lights.setState(LightsState.ALLIANCE_UNKNOWN)) }
         val feed = button { gamepad1.y } whenTrue { Feeder.feed().schedule() } whenFalse { Feeder.reset().schedule() }
     }
     override fun onUpdate() {
