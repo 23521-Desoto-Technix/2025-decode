@@ -33,7 +33,8 @@ object Indexer : Subsystem {
             goalPosition = position
         }
         .setIsDone {
-            spindexerPID.isWithinTolerance(KineticState(100.0, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY))
+            true
+            //spindexerPID.isWithinTolerance(KineticState(100.0, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY))
         }
         .requires(this)
 

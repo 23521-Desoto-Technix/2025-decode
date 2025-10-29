@@ -43,7 +43,6 @@ class ShooterTest : NextFTCOpMode() {
     }
     override fun onWaitForStart() { }
     override fun onStartButtonPressed() {
-        Lights.state = LightsState.ALLIANCE_UNKNOWN
         val bumpSpeedUp = button { gamepad1.right_bumper }.whenBecomesTrue { Shooter.setSpeed(Shooter.targetSpeed + 100.0) }
         val bumpSpeedDown = button { gamepad1.left_bumper }.whenBecomesTrue { Shooter.setSpeed((Shooter.targetSpeed - 100.0).coerceAtLeast(0.0)) }
         val intakeForward = button { gamepad1.circle } whenTrue { Intake.setPower(1.0) }
