@@ -68,7 +68,7 @@ class ShooterTest : NextFTCOpMode() {
               Turret.setPower(0.0).schedule()
             }
     val spindexerBumpNext =
-        button { gamepad1.dpad_right } whenBecomesTrue
+        button { gamepad1.dpad_left } whenBecomesTrue
             {
               SequentialGroup(
                   InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
@@ -77,7 +77,7 @@ class ShooterTest : NextFTCOpMode() {
               ).schedule()
             }
     val spindexerBumpPrevious =
-        button { gamepad1.dpad_left } whenBecomesTrue
+        button { gamepad1.dpad_right } whenBecomesTrue
             {
               SequentialGroup(
                   InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },

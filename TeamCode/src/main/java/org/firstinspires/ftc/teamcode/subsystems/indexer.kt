@@ -38,10 +38,6 @@ object Indexer : Subsystem {
           }
           .requires(this)
 
-  private fun normalizePosition(position: Double): Double {
-    val cycleLength = 2730.0 * 3
-    return ((position % cycleLength) + cycleLength) % cycleLength
-  }
 
   fun toSlot(slot: Int) =
       LambdaCommand("indexerToSlot")
@@ -60,7 +56,7 @@ object Indexer : Subsystem {
                 positions.minByOrNull { kotlin.math.abs(it - goalPosition) } ?: slotPosition
 
             spindexerPID.goal = KineticState(closestPosition, 0.0)
-            goalPosition = normalizePosition(closestPosition)
+            goalPosition = closestPosition
           }
           .setIsDone {
             spindexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
