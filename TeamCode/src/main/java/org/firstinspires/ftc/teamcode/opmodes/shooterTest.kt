@@ -20,63 +20,91 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 
 @TeleOp
 class ShooterTest : NextFTCOpMode() {
-    init {
-        addComponents(
-            SubsystemComponent(Shooter, Intake, Indexer, Lights, Turret, Feeder),
-            BulkReadComponent,
-            BindingsComponent
-        )
-    }
+  init {
+    addComponents(
+        SubsystemComponent(Shooter, Intake, Indexer, Lights, Turret, Feeder),
+        BulkReadComponent,
+        BindingsComponent,
+    )
+  }
 
-    private lateinit var intakeBreakBeam: DigitalChannel
-    private lateinit var leftBreakBeam: DigitalChannel
-    private lateinit var rightBreakBeam: DigitalChannel
+  private lateinit var intakeBreakBeam: DigitalChannel
+  private lateinit var leftBreakBeam: DigitalChannel
+  private lateinit var rightBreakBeam: DigitalChannel
 
-    override fun onInit() {
-        intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
-        intakeBreakBeam.mode = DigitalChannel.Mode.INPUT
-        leftBreakBeam = hardwareMap.get(DigitalChannel::class.java, "leftBreakBeam")
-        leftBreakBeam.mode = DigitalChannel.Mode.INPUT
-        rightBreakBeam = hardwareMap.get(DigitalChannel::class.java, "rightBreakBeam")
-        rightBreakBeam.mode = DigitalChannel.Mode.INPUT
-        SequentialGroup(InstantCommand {Lights.state = LightsState.DEBUG_GREEN }, Indexer.toSlot(0), InstantCommand {Lights.state = LightsState.ALLIANCE_UNKNOWN })
-    }
-    override fun onWaitForStart() { }
-    override fun onStartButtonPressed() {
-        val bumpSpeedUp = button { gamepad1.right_bumper }.whenBecomesTrue { Shooter.setSpeed(Shooter.targetSpeed + 100.0) }
-        val bumpSpeedDown = button { gamepad1.left_bumper }.whenBecomesTrue { Shooter.setSpeed((Shooter.targetSpeed - 100.0).coerceAtLeast(0.0)) }
-        val intakeForward = button { gamepad1.circle } whenTrue { Intake.setPower(1.0) }
-        val intakeReverse = button { gamepad1.square } whenTrue { Intake.setPower(-1.0) }
-        val intakeStop = button { !gamepad1.circle and !gamepad1.square } whenTrue { Intake.setPower(0.0) }
-        val turretStick = button { gamepad1.a } whenTrue {
-            Turret.setPower(gamepad1.left_stick_x.toDouble())
-        } whenFalse {
-            Turret.setPower(0.0)
-        }
-        val spindexerBumpNext = button { gamepad1.dpad_right } whenBecomesTrue { SequentialGroup(
-            InstantCommand {Lights.state = LightsState.DEBUG_PURPLE}, Indexer.toNextSlot(),
-            InstantCommand {Lights.state = LightsState.ALLIANCE_UNKNOWN}) }
-        val spindexerBumpPrevious = button { gamepad1.dpad_left } whenBecomesTrue { SequentialGroup(
-            InstantCommand { Lights.state = LightsState.DEBUG_PURPLE}, Indexer.toPreviousSlot(),
-            InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN}) }
-        val feed = button { gamepad1.y } whenTrue { Feeder.feed() } whenFalse { Feeder.reset() }
-    }
-    override fun onUpdate() {
+  override fun onInit() {
+    intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
+    intakeBreakBeam.mode = DigitalChannel.Mode.INPUT
+    leftBreakBeam = hardwareMap.get(DigitalChannel::class.java, "leftBreakBeam")
+    leftBreakBeam.mode = DigitalChannel.Mode.INPUT
+    rightBreakBeam = hardwareMap.get(DigitalChannel::class.java, "rightBreakBeam")
+    rightBreakBeam.mode = DigitalChannel.Mode.INPUT
+    SequentialGroup(
+        InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
+        Indexer.toSlot(0),
+        InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
+    ).schedule()
+  }
 
-        telemetry.addData("Shooter actual", Shooter.speed)
-        telemetry.addData("Shooter target", Shooter.targetSpeed)
-        telemetry.addData("Shooter power", Shooter.power)
-        telemetry.addData("Turret angle", Turret.angle)
-        telemetry.addData("Intake Break Beam", intakeBreakBeam.state)
-        telemetry.addData("Left Break Beam", leftBreakBeam.state)
-        telemetry.addData("Right Break Beam", rightBreakBeam.state)
-        telemetry.addData("Indexer Position", Indexer.currentPosition)
-        telemetry.addData("Indexer Goal", Indexer.goalPosition)
-        telemetry.addData("Indexer Power", Indexer.power)
-        telemetry.update()
-        BindingManager.update()
-    }
-    override fun onStop() {
-        BindingManager.reset()
-    }
+  override fun onWaitForStart() {}
+
+  override fun onStartButtonPressed() {
+    val bumpSpeedUp =
+        button { gamepad1.right_bumper }
+            .whenBecomesTrue { Shooter.setSpeed(Shooter.targetSpeed + 100.0).schedule() }
+    val bumpSpeedDown =
+        button { gamepad1.left_bumper }
+            .whenBecomesTrue { Shooter.setSpeed((Shooter.targetSpeed - 100.0).coerceAtLeast(0.0)).schedule() }
+    val intakeForward = button { gamepad1.circle } whenTrue { Intake.setPower(1.0).schedule() }
+    val intakeReverse = button { gamepad1.square } whenTrue { Intake.setPower(-1.0).schedule() }
+    val intakeStop =
+        button { !gamepad1.circle and !gamepad1.square } whenTrue { Intake.setPower(0.0).schedule() }
+    val turretStick =
+        button { gamepad1.a } whenTrue
+            {
+              Turret.setPower(gamepad1.left_stick_x.toDouble()).schedule()
+            } whenFalse
+            {
+              Turret.setPower(0.0).schedule()
+            }
+    val spindexerBumpNext =
+        button { gamepad1.dpad_right } whenBecomesTrue
+            {
+              SequentialGroup(
+                  InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
+                  Indexer.toNextSlot(),
+                  InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
+              ).schedule()
+            }
+    val spindexerBumpPrevious =
+        button { gamepad1.dpad_left } whenBecomesTrue
+            {
+              SequentialGroup(
+                  InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
+                  Indexer.toPreviousSlot(),
+                  InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
+              ).schedule()
+            }
+    val feed = button { gamepad1.y } whenTrue { Feeder.feed().schedule() } whenFalse { Feeder.reset().schedule() }
+  }
+
+  override fun onUpdate() {
+
+    telemetry.addData("Shooter actual", Shooter.speed)
+    telemetry.addData("Shooter target", Shooter.targetSpeed)
+    telemetry.addData("Shooter power", Shooter.power)
+    telemetry.addData("Turret angle", Turret.angle)
+    telemetry.addData("Intake Break Beam", intakeBreakBeam.state)
+    telemetry.addData("Left Break Beam", leftBreakBeam.state)
+    telemetry.addData("Right Break Beam", rightBreakBeam.state)
+    telemetry.addData("Indexer Position", Indexer.currentPosition)
+    telemetry.addData("Indexer Goal", Indexer.goalPosition)
+    telemetry.addData("Indexer Power", Indexer.power)
+    telemetry.update()
+    BindingManager.update()
+  }
+
+  override fun onStop() {
+    BindingManager.reset()
+  }
 }
