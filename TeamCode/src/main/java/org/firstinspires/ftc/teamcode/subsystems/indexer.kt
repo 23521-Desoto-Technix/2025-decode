@@ -54,15 +54,9 @@ object Indexer : Subsystem {
         return target
     }
 
+    private fun getCurrentSlot() = ((goalPosition / 2730.0).toInt() % 3 + 3) % 3
+
     fun toSlot(slot: Int) = toPosition(getClosestSlotPosition(slot))
-    fun toNextSlot() {
-        val currentSlot = ((goalPosition / 2730.0).toInt() % 3 + 3) % 3
-        val nextSlot = (currentSlot + 1) % 3
-        toPosition(getClosestSlotPosition(nextSlot))
-    }
-    fun toPreviousSlot() {
-        val currentSlot = ((goalPosition / 2730.0).toInt() % 3 + 3) % 3
-        val previousSlot = (currentSlot - 1 + 3) % 3
-        toPosition(getClosestSlotPosition(previousSlot))
-    }
+    fun toNextSlot() = toPosition(getClosestSlotPosition((getCurrentSlot() + 1) % 3))
+    fun toPreviousSlot() = toPosition(getClosestSlotPosition((getCurrentSlot() - 1 + 3) % 3))
 }
