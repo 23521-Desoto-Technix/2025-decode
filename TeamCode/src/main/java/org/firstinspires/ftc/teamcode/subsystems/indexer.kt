@@ -31,7 +31,7 @@ object Indexer : Subsystem {
       LambdaCommand("indexerToPosition")
           .setStart {
             spindexerPID.goal = KineticState(position, 0.0)
-            goalPosition = normalizePosition(position)
+            goalPosition = position
           }
           .setIsDone {
             spindexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
