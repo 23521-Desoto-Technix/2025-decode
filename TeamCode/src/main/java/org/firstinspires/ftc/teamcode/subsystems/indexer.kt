@@ -13,7 +13,7 @@ object Indexer : Subsystem {
     val servo = CRServoEx("indexer")
     val encoder = MotorEx("backRight").zeroed()
     val latch = ServoEx("latch")
-    val spindexerPID = controlSystem { posPid(0.0001, 0.0, 0.00003) }
+    val spindexerPID = controlSystem { posPid(0.0001, 0.0, 0.000003) }
     lateinit var leftBreakBeam: DigitalChannel
     lateinit var rightBreakBeam: DigitalChannel
     lateinit var intakeBreakBeam: DigitalChannel
@@ -37,7 +37,32 @@ object Indexer : Subsystem {
         }
         .requires(this)
 
-    fun toSlot(slot: Int) = toPosition((slot % 3) * 2730.0)
-    fun toNextSlot() = toPosition((((goalPosition / 2730.0).toInt() + 1) % 3) * 2730.0)
-    fun toPreviousSlot() = toPosition((((goalPosition / 2730.0).toInt() - 1 + 3) % 3) * 2730.0)
+    private fun getClosestSlotPosition(slot: Int): Double {
+        val cycleLength = 2730.0 * 3
+        val targetBase = (slot % 3) * 2730.0
+
+        val current = currentPosition
+        var target = targetBase
+
+        while (target - current > cycleLength / 2) {
+            target -= cycleLength
+        }
+        while (target - current < -cycleLength / 2) {
+            target += cycleLength
+        }
+
+        return target
+    }
+
+    fun toSlot(slot: Int) = toPosition(getClosestSlotPosition(slot))
+    fun toNextSlot() {
+        val currentSlot = ((goalPosition / 2730.0).toInt() % 3 + 3) % 3
+        val nextSlot = (currentSlot + 1) % 3
+        toPosition(getClosestSlotPosition(nextSlot))
+    }
+    fun toPreviousSlot() {
+        val currentSlot = ((goalPosition / 2730.0).toInt() % 3 + 3) % 3
+        val previousSlot = (currentSlot - 1 + 3) % 3
+        toPosition(getClosestSlotPosition(previousSlot))
+    }
 }
