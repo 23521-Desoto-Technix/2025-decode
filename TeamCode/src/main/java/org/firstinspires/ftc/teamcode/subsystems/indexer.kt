@@ -13,22 +13,24 @@ object Indexer : Subsystem {
     val servo = CRServoEx("indexer")
     val encoder = MotorEx("backRight").zeroed()
     val latch = ServoEx("latch")
-    val spindexerPID = controlSystem { posPid(0.00001, 0.0, 0.0) }
+    val spindexerPID = controlSystem { posPid(0.00005, 0.0, 0.0) }
     lateinit var leftBreakBeam: DigitalChannel
     lateinit var rightBreakBeam: DigitalChannel
     lateinit var intakeBreakBeam: DigitalChannel
-    var position = 0.0
+    var currentPosition = 0.0
     var power = 0.0
+    var goalPosition = 0.0
 
     override fun periodic() {
         power = spindexerPID.calculate(KineticState(-encoder.currentPosition, -encoder.velocity))
-        position = encoder.currentPosition.toDouble()
+        currentPosition = encoder.currentPosition.toDouble()
         servo.power = power
 
     }
     fun toPosition(position: Double) = LambdaCommand("indexerToPosition")
         .setStart {
             spindexerPID.goal = KineticState(position, 0.0)
+            goalPosition = position
         }
         .setIsDone {
             spindexerPID.isWithinTolerance(KineticState(50.0, 50.0))
