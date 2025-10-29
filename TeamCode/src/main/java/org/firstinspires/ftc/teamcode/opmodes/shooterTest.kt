@@ -109,6 +109,10 @@ class ShooterTest : NextFTCOpMode() {
             {
               Feeder.reset().schedule()
             }
+      val latch = button { gamepad1.square }
+        .toggleOnBecomesTrue()
+        .whenBecomesTrue { Indexer.latchDown().schedule() }
+        .whenBecomesFalse { Indexer.latchUp().schedule() }
   }
 
   override fun onUpdate() {
