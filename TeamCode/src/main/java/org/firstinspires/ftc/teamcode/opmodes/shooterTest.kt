@@ -40,10 +40,11 @@ class ShooterTest : NextFTCOpMode() {
     rightBreakBeam = hardwareMap.get(DigitalChannel::class.java, "rightBreakBeam")
     rightBreakBeam.mode = DigitalChannel.Mode.INPUT
     SequentialGroup(
-        InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
-        Indexer.toSlot(0),
-        InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
-    ).schedule()
+            InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
+            Indexer.toSlot(0),
+            InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
+        )
+        .schedule()
   }
 
   override fun onWaitForStart() {}
@@ -54,11 +55,14 @@ class ShooterTest : NextFTCOpMode() {
             .whenBecomesTrue { Shooter.setSpeed(Shooter.targetSpeed + 100.0).schedule() }
     val bumpSpeedDown =
         button { gamepad1.left_bumper }
-            .whenBecomesTrue { Shooter.setSpeed((Shooter.targetSpeed - 100.0).coerceAtLeast(0.0)).schedule() }
-    val intakeForward = button { gamepad1.circle } whenTrue { Intake.setPower(1.0).schedule() }
-    val intakeReverse = button { gamepad1.square } whenTrue { Intake.setPower(-1.0).schedule() }
-    val intakeStop =
-        button { !gamepad1.circle and !gamepad1.square } whenTrue { Intake.setPower(0.0).schedule() }
+            .whenBecomesTrue {
+              Shooter.setSpeed((Shooter.targetSpeed - 100.0).coerceAtLeast(0.0)).schedule()
+            }
+    val intakeForward =
+        button { gamepad1.circle }
+            .toggleOnBecomesTrue()
+            .whenBecomesTrue { Intake.setPower(1.0).schedule() }
+            .whenBecomesFalse { Intake.setPower(0.0).schedule() }
     val turretStick =
         button { gamepad1.a } whenTrue
             {
@@ -71,30 +75,40 @@ class ShooterTest : NextFTCOpMode() {
         button { gamepad1.dpad_left } whenBecomesTrue
             {
               SequentialGroup(
-                  InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
-                  Indexer.toNextSlot(),
-                  InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
-              ).schedule()
+                      InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
+                      Indexer.toNextSlot(),
+                      InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
+                  )
+                  .schedule()
             }
     val spindexerBumpPrevious =
         button { gamepad1.dpad_right } whenBecomesTrue
             {
               SequentialGroup(
-                  InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
-                  Indexer.toPreviousSlot(),
-                  InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
-              ).schedule()
+                      InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
+                      Indexer.toPreviousSlot(),
+                      InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
+                  )
+                  .schedule()
             }
-      val spindexerReset =
-          button { gamepad1.dpad_down } whenBecomesTrue
-              {
-                SequentialGroup(
-                    InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
-                    Indexer.toSlot(0),
-                    InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
-                ).schedule()
-              }
-    val feed = button { gamepad1.y } whenTrue { Feeder.feed().schedule() } whenFalse { Feeder.reset().schedule() }
+    val spindexerReset =
+        button { gamepad1.dpad_down } whenBecomesTrue
+            {
+              SequentialGroup(
+                      InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
+                      Indexer.toSlot(0),
+                      InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
+                  )
+                  .schedule()
+            }
+    val feed =
+        button { gamepad1.y } whenTrue
+            {
+              Feeder.feed().schedule()
+            } whenFalse
+            {
+              Feeder.reset().schedule()
+            }
   }
 
   override fun onUpdate() {

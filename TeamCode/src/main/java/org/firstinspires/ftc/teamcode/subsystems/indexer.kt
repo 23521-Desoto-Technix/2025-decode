@@ -38,14 +38,14 @@ object Indexer : Subsystem {
           }
           .requires(this)
 
-
   fun toSlot(slot: Int) =
       LambdaCommand("indexerToSlot")
           .setStart {
             val cycleLength = 2730.0 * 3
             val slotPosition = slot * 2730.0
 
-            val numCycles = kotlin.math.ceil(kotlin.math.abs(goalPosition) / cycleLength).toInt() + 2
+            val numCycles =
+                kotlin.math.ceil(kotlin.math.abs(goalPosition) / cycleLength).toInt() + 2
             val positions = mutableListOf<Double>()
 
             for (cycle in -numCycles..numCycles) {
@@ -66,4 +66,8 @@ object Indexer : Subsystem {
   fun toNextSlot() = toPosition(goalPosition + 2730.0)
 
   fun toPreviousSlot() = toPosition(goalPosition - 2730.0)
+
+  fun latchDown() = LambdaCommand("latchDown").setStart { latch.position = 0.0 }.setIsDone { true }
+
+  fun latchUp() = LambdaCommand("latchUp").setStart { latch.position = 1.0 }.setIsDone { true }
 }
