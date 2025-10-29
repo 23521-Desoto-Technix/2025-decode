@@ -21,7 +21,7 @@ object Indexer : Subsystem {
     var power = 0.0
 
     override fun periodic() {
-        power = spindexerPID.calculate(KineticState(encoder.currentPosition, encoder.velocity))
+        power = spindexerPID.calculate(KineticState(-encoder.currentPosition, -encoder.velocity))
         position = encoder.currentPosition.toDouble()
         servo.power = power
 
