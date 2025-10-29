@@ -9,8 +9,9 @@ object Lights : Subsystem {
     val left = ServoEx("leftRGB")
     var state: LightsState = LightsState.OFF
         set(value) {
-            if (field != value) {
-                field = value
+            val stateChanged = field != value
+            field = value
+            if (stateChanged) {
                 animationStartTime = System.currentTimeMillis()
             }
         }

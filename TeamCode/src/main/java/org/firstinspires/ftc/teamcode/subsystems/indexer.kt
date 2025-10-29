@@ -13,7 +13,7 @@ object Indexer : Subsystem {
     val servo = CRServoEx("indexer")
     val encoder = MotorEx("backRight").zeroed()
     val latch = ServoEx("latch")
-    val spindexerPID = controlSystem { posPid(0.00001, 0.0, 0.0) }
+    val spindexerPID = controlSystem { posPid(0.001, 0.0, 0.0) }
     lateinit var leftBreakBeam: DigitalChannel
     lateinit var rightBreakBeam: DigitalChannel
     lateinit var intakeBreakBeam: DigitalChannel
