@@ -10,53 +10,64 @@ import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.ServoEx
 
 object Indexer : Subsystem {
-    val servo = CRServoEx("indexer")
-    val encoder = MotorEx("backRight").zeroed()
-    val latch = ServoEx("latch")
-    val spindexerPID = controlSystem { posPid(0.0001, 0.0, 0.000003) }
-    lateinit var leftBreakBeam: DigitalChannel
-    lateinit var rightBreakBeam: DigitalChannel
-    lateinit var intakeBreakBeam: DigitalChannel
-    var currentPosition = 0.0
-    var power = 0.0
-    var goalPosition = 0.0
+  val servo = CRServoEx("indexer")
+  val encoder = MotorEx("backRight").zeroed()
+  val latch = ServoEx("latch")
+  val spindexerPID = controlSystem { posPid(0.0001, 0.0, 0.000003) }
+  lateinit var leftBreakBeam: DigitalChannel
+  lateinit var rightBreakBeam: DigitalChannel
+  lateinit var intakeBreakBeam: DigitalChannel
+  var currentPosition = 0.0
+  var power = 0.0
+  var goalPosition = 0.0
 
-    override fun periodic() {
-        power = spindexerPID.calculate(KineticState(-encoder.currentPosition, -encoder.velocity))
-        currentPosition = encoder.currentPosition.toDouble()
-        servo.power = power
+  override fun periodic() {
+    power = spindexerPID.calculate(KineticState(-encoder.currentPosition, -encoder.velocity))
+    currentPosition = encoder.currentPosition.toDouble()
+    servo.power = power
+  }
 
-    }
-    fun toPosition(position: Double) = LambdaCommand("indexerToPosition")
-        .setStart {
+  fun toPosition(position: Double) =
+      LambdaCommand("indexerToPosition")
+          .setStart {
             spindexerPID.goal = KineticState(position, 0.0)
-            goalPosition = position
-        }
-        .setIsDone {
+            goalPosition = normalizePosition(position)
+          }
+          .setIsDone {
             spindexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
-        }
-        .requires(this)
+          }
+          .requires(this)
 
-    private fun getClosestSlotPosition(slot: Int): Double {
-        val cycleLength = 2730.0 * 3
-        val targetBase = (slot % 3) * 2730.0
+  private fun normalizePosition(position: Double): Double {
+    val cycleLength = 2730.0 * 3
+    return ((position % cycleLength) + cycleLength) % cycleLength
+  }
 
-        val current = currentPosition
-        var target = targetBase
+  fun toSlot(slot: Int) =
+      LambdaCommand("indexerToSlot")
+          .setStart {
+            val cycleLength = 2730.0 * 3
+            val slotPosition = slot * 2730.0
 
-        while (target - current > cycleLength / 2) {
-            target -= cycleLength
-        }
-        while (target - current < -cycleLength / 2) {
-            target += cycleLength
-        }
+            val numCycles = kotlin.math.ceil(kotlin.math.abs(goalPosition) / cycleLength).toInt() + 2
+            val positions = mutableListOf<Double>()
 
-        return target
-    }
+            for (cycle in -numCycles..numCycles) {
+              positions.add(slotPosition + cycle * cycleLength)
+            }
 
-    private fun getCurrentSlot() = ((goalPosition / 2730.0).toInt() % 3 + 3) % 3
+            val closestPosition =
+                positions.minByOrNull { kotlin.math.abs(it - goalPosition) } ?: slotPosition
 
-    fun toSlot(slot: Int) = toPosition(getClosestSlotPosition(slot))
-    fun toNextSlot() = toPosition(getClosestSlotPosition((getCurrentSlot() + 1) % 3))
-    fun toPreviousSlot() = toPosition(getClosestSlotPosition((getCurrentSlot() - 1 + 3) % 3))
+            spindexerPID.goal = KineticState(closestPosition, 0.0)
+            goalPosition = normalizePosition(closestPosition)
+          }
+          .setIsDone {
+            spindexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
+          }
+          .requires(this)
+
+  fun toNextSlot() = toPosition(goalPosition + 2730.0)
+
+  fun toPreviousSlot() = toPosition(goalPosition - 2730.0)
 }

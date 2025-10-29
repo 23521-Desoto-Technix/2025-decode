@@ -85,6 +85,15 @@ class ShooterTest : NextFTCOpMode() {
                   InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
               ).schedule()
             }
+      val spindexerReset =
+          button { gamepad1.dpad_down } whenBecomesTrue
+              {
+                SequentialGroup(
+                    InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
+                    Indexer.toSlot(0),
+                    InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
+                ).schedule()
+              }
     val feed = button { gamepad1.y } whenTrue { Feeder.feed().schedule() } whenFalse { Feeder.reset().schedule() }
   }
 
