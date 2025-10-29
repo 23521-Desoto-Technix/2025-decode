@@ -70,12 +70,6 @@ object Lights : Subsystem {
         }
     }
 
-    fun setState(newState: LightsState) : LambdaCommand = LambdaCommand("setLightsState")
-        .setStart {
-            state = newState
-        }
-        .setIsDone { true }
-        .requires(this)
 }
 
 enum class LightsState {
