@@ -13,7 +13,7 @@ object Indexer : Subsystem {
     val servo = CRServoEx("indexer")
     val encoder = MotorEx("backRight").zeroed()
     val latch = ServoEx("latch")
-    val spindexerPID = controlSystem { posPid(0.00035, 0.0, 0.000025) }
+    val spindexerPID = controlSystem { posPid(0.00025, 0.0, 0.00003) }
     lateinit var leftBreakBeam: DigitalChannel
     lateinit var rightBreakBeam: DigitalChannel
     lateinit var intakeBreakBeam: DigitalChannel
@@ -33,7 +33,7 @@ object Indexer : Subsystem {
             goalPosition = position
         }
         .setIsDone {
-            spindexerPID.isWithinTolerance(KineticState(100.0, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY))
+            spindexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
         }
         .requires(this)
 
