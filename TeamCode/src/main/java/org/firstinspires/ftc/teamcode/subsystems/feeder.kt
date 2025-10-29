@@ -10,8 +10,8 @@ object Feeder : Subsystem {
 
     fun feed() = LambdaCommand("feed")
         .setStart {
-            leftServo.position = 0.5 //TODO TUNE THIS
-            rightServo.position = 0.6 //TODO TUNE THIS
+            leftServo.position = 0.61 //TODO TUNE THIS
+            rightServo.position = 0.71 //TODO TUNE THIS
         }
         .setIsDone { true }
         .requires(this)
