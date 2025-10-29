@@ -17,9 +17,14 @@ object Indexer : Subsystem {
     lateinit var leftBreakBeam: DigitalChannel
     lateinit var rightBreakBeam: DigitalChannel
     lateinit var intakeBreakBeam: DigitalChannel
+    var position = 0.0
+    var power = 0.0
 
     override fun periodic() {
-        servo.power = spindexerPID.calculate(KineticState(encoder.currentPosition, encoder.velocity))
+        power = spindexerPID.calculate(KineticState(encoder.currentPosition, encoder.velocity))
+        position = encoder.currentPosition.toDouble()
+        servo.power = power
+
     }
     fun toPosition(position: Double) = LambdaCommand("indexerToPosition")
         .setStart {
