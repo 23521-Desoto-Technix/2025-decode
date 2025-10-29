@@ -32,7 +32,7 @@ class ShooterTest : NextFTCOpMode() {
     private lateinit var rightBreakBeam: DigitalChannel
 
     override fun onInit() {
-        Lights.state = LightsState.OFF
+        Lights.setState(LightsState.DEBUG_ALTERNATING_RED_BLUE)
         intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
         intakeBreakBeam.mode = DigitalChannel.Mode.INPUT
         leftBreakBeam = hardwareMap.get(DigitalChannel::class.java, "leftBreakBeam")
