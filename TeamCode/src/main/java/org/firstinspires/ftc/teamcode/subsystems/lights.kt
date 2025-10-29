@@ -28,8 +28,8 @@ object Lights : Subsystem {
                 left.position = 0.388
             }
             LightsState.DEBUG_RED -> {
-                right.position = 0.277
-                left.position = 0.277
+                right.position = 0.305
+                left.position = 0.305
             }
             LightsState.DEBUG_ORANGE -> {
                 right.position = 0.333
@@ -52,8 +52,8 @@ object Lights : Subsystem {
                 left.position = 0.555
             }
             LightsState.DEBUG_BLUE -> {
-                right.position = 0.611
-                left.position = 0.611
+                right.position = 0.583
+                left.position = 0.583
             }
             LightsState.DEBUG_INDIGO -> {
                 right.position = 0.666
