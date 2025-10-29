@@ -13,7 +13,7 @@ object Indexer : Subsystem {
     val servo = CRServoEx("indexer")
     val encoder = MotorEx("backRight").zeroed()
     val latch = ServoEx("latch")
-    val spindexerPID = controlSystem { posPid(0.00025, 0.0, 0.00003) }
+    val spindexerPID = controlSystem { posPid(0.0001, 0.0, 0.00003) }
     lateinit var leftBreakBeam: DigitalChannel
     lateinit var rightBreakBeam: DigitalChannel
     lateinit var intakeBreakBeam: DigitalChannel
@@ -38,6 +38,6 @@ object Indexer : Subsystem {
         .requires(this)
 
     fun toSlot(slot: Int) = toPosition((slot % 3) * 2730.0)
-    fun toNextSlot() = toPosition((((encoder.currentPosition / 2730.0).toInt() + 1) % 3) * 2730.0)
-    fun toPreviousSlot() = toPosition((((encoder.currentPosition / 2730.0).toInt() - 1 + 3) % 3) * 2730.0)
+    fun toNextSlot() = toPosition((((goalPosition / 2730.0).toInt() + 1) % 3) * 2730.0)
+    fun toPreviousSlot() = toPosition((((goalPosition / 2730.0).toInt() - 1 + 3) % 3) * 2730.0)
 }
