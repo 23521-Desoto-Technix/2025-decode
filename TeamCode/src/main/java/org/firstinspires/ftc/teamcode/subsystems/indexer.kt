@@ -67,7 +67,7 @@ object Indexer : Subsystem {
 
   fun toPreviousSlot() = toPosition(goalPosition - 2730.0)
 
-  fun latchDown() = LambdaCommand("latchDown").setStart { latch.position = 1.0 }.setIsDone { true }
+  fun latchDown() = LambdaCommand("latchDown").setStart { latch.position = 0.95 }.setIsDone { true }
 
-  fun latchUp() = LambdaCommand("latchUp").setStart { latch.position = 0.6 }.setIsDone { true }
+  fun latchUp() = LambdaCommand("latchUp").setStart { latch.position = 0.45 }.setIsDone { true }
 }
