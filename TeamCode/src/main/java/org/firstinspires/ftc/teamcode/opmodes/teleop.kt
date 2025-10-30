@@ -13,6 +13,7 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Feeder
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.Intake
@@ -20,7 +21,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Lights
 import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -29,7 +29,7 @@ class teleop : NextFTCOpMode() {
         SubsystemComponent(Shooter, Intake, Indexer, Lights, Turret, Feeder),
         BulkReadComponent,
         BindingsComponent,
-        PedroComponent(Constants::createFollower)
+        PedroComponent(Constants::createFollower),
     )
   }
 
@@ -56,28 +56,31 @@ class teleop : NextFTCOpMode() {
 
   override fun onStartButtonPressed() {
     val bumpSpeedUp =
-        button { gamepad1.right_bumper }
+        button { gamepad2.right_bumper }
             .whenBecomesTrue { Shooter.setSpeed(Shooter.targetSpeed + 100.0).schedule() }
     val bumpSpeedDown =
-        button { gamepad1.left_bumper }
+        button { gamepad2.left_bumper }
             .whenBecomesTrue {
               Shooter.setSpeed((Shooter.targetSpeed - 100.0).coerceAtLeast(0.0)).schedule()
             }
+    val nominalPower =
+        button { gamepad2.right_trigger > 0.5 }
+            .whenBecomesTrue { Shooter.setPower(0.85).schedule() }
     val intakeForward =
-        button { gamepad1.circle }
+        button { gamepad2.circle }
             .toggleOnBecomesTrue()
             .whenBecomesTrue { Intake.setPower(1.0).schedule() }
             .whenBecomesFalse { Intake.setPower(0.0).schedule() }
     val turretStick =
-        button { gamepad1.a } whenTrue
+        button { gamepad2.cross } whenTrue
             {
-              Turret.setPower(gamepad1.left_stick_x.toDouble()).schedule()
+              Turret.setPower(gamepad2.left_stick_x.toDouble()).schedule()
             } whenFalse
             {
               Turret.setPower(0.0).schedule()
             }
     val spindexerBumpNext =
-        button { gamepad1.dpad_left } whenBecomesTrue
+        button { gamepad2.dpad_left } whenBecomesTrue
             {
               SequentialGroup(
                       InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
@@ -87,7 +90,7 @@ class teleop : NextFTCOpMode() {
                   .schedule()
             }
     val spindexerBumpPrevious =
-        button { gamepad1.dpad_right } whenBecomesTrue
+        button { gamepad2.dpad_right } whenBecomesTrue
             {
               SequentialGroup(
                       InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
@@ -97,7 +100,7 @@ class teleop : NextFTCOpMode() {
                   .schedule()
             }
     val spindexerReset =
-        button { gamepad1.dpad_down } whenBecomesTrue
+        button { gamepad2.dpad_down } whenBecomesTrue
             {
               SequentialGroup(
                       InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
@@ -107,7 +110,7 @@ class teleop : NextFTCOpMode() {
                   .schedule()
             }
     val feed =
-        button { gamepad1.y } whenTrue
+        button { gamepad2.triangle } whenTrue
             {
               Feeder.feed().schedule()
             } whenFalse
@@ -115,7 +118,7 @@ class teleop : NextFTCOpMode() {
               Feeder.reset().schedule()
             }
     val latch =
-        button { gamepad1.square }
+        button { gamepad2.square }
             .toggleOnBecomesTrue()
             .whenBecomesTrue { Indexer.latchDown().schedule() }
             .whenBecomesFalse { Indexer.latchUp().schedule() }
