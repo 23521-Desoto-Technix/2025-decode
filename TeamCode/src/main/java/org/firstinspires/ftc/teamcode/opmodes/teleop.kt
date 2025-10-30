@@ -66,6 +66,9 @@ class teleop : NextFTCOpMode() {
     val nominalPower =
         button { gamepad2.right_trigger > 0.5 }
             .whenBecomesTrue { Shooter.setPower(0.85).schedule() }
+      val noPower =
+        button { gamepad2.left_trigger > 0.5 }
+            .whenBecomesTrue { Shooter.setPower(0.0).schedule() }
     val intakeForward =
         button { gamepad2.circle }
             .toggleOnBecomesTrue()
