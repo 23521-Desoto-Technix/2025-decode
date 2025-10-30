@@ -36,4 +36,7 @@ object Shooter : Subsystem {
         }
         .setIsDone { true }
         .requires(this)
+    fun waitForSpeed() = LambdaCommand("waitForSpeed")
+        .setIsDone { abs(targetSpeed - speed) <= SPEED_TOLERANCE }
+        .requires(this)
 }

@@ -8,6 +8,9 @@ import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.extensions.pedro.PedroComponent
+import dev.nextftc.extensions.pedro.PedroDriverControlled
+import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.subsystems.Feeder
@@ -17,14 +20,16 @@ import org.firstinspires.ftc.teamcode.subsystems.Lights
 import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 
 @TeleOp
-class ShooterTest : NextFTCOpMode() {
+class teleop : NextFTCOpMode() {
   init {
     addComponents(
         SubsystemComponent(Shooter, Intake, Indexer, Lights, Turret, Feeder),
         BulkReadComponent,
         BindingsComponent,
+        PedroComponent(Constants::createFollower)
     )
   }
 
@@ -109,10 +114,19 @@ class ShooterTest : NextFTCOpMode() {
             {
               Feeder.reset().schedule()
             }
-      val latch = button { gamepad1.square }
-        .toggleOnBecomesTrue()
-        .whenBecomesTrue { Indexer.latchDown().schedule() }
-        .whenBecomesFalse { Indexer.latchUp().schedule() }
+    val latch =
+        button { gamepad1.square }
+            .toggleOnBecomesTrue()
+            .whenBecomesTrue { Indexer.latchDown().schedule() }
+            .whenBecomesFalse { Indexer.latchUp().schedule() }
+    val driverControlled =
+        PedroDriverControlled(
+            Gamepads.gamepad1.leftStickY,
+            Gamepads.gamepad1.leftStickX,
+            Gamepads.gamepad1.rightStickX,
+            false,
+        )
+    driverControlled()
   }
 
   override fun onUpdate() {
