@@ -58,7 +58,7 @@ class teleop : NextFTCOpMode() {
 
   private var lastDetectedCenterX: Double = 0.0
   private var lastDetectionTime: Long = 0
-  private val DETECTION_TIMEOUT_MS: Long = 2000
+  private val DETECTION_TIMEOUT_MS: Long = 200
 
   override fun onInit() {
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
@@ -169,16 +169,18 @@ class teleop : NextFTCOpMode() {
 
   override fun onUpdate() {
 
-    telemetry.addData("Shooter actual", Shooter.speed)
-    telemetry.addData("Shooter target", Shooter.targetSpeed)
-    telemetry.addData("Shooter power", Shooter.power)
+    //telemetry.addData("Shooter actual", Shooter.speed)
+    //telemetry.addData("Shooter target", Shooter.targetSpeed)
+    //telemetry.addData("Shooter power", Shooter.power)
     telemetry.addData("Turret angle", Turret.angle)
-    telemetry.addData("Intake Break Beam", intakeBreakBeam.state)
-    telemetry.addData("Left Break Beam", leftBreakBeam.state)
-    telemetry.addData("Right Break Beam", rightBreakBeam.state)
-    telemetry.addData("Indexer Position", Indexer.currentPosition)
-    telemetry.addData("Indexer Goal", Indexer.goalPosition)
-    telemetry.addData("Indexer Power", Indexer.power)
+    telemetry.addData("Turret power", Turret.power)
+    telemetry.addData("Turret PD error", Turret.previousError)
+    //telemetry.addData("Intake Break Beam", intakeBreakBeam.state)
+    //telemetry.addData("Left Break Beam", leftBreakBeam.state)
+    //telemetry.addData("Right Break Beam", rightBreakBeam.state)
+    //telemetry.addData("Indexer Position", Indexer.currentPosition)
+    //telemetry.addData("Indexer Goal", Indexer.goalPosition)
+    //telemetry.addData("Indexer Power", Indexer.power)
 
     var detected = false
 
@@ -192,13 +194,16 @@ class teleop : NextFTCOpMode() {
         detected = true
         lastDetectionTime = System.currentTimeMillis()
         lastDetectedCenterX = detection.center.x
-        lastDetectionTime = System.currentTimeMillis()
-        telemetry.addData("ATag Angle", detection.center.x - (RESOLUTION_WIDTH / 2.0))
-        Turret.cameraTrackPower(detection.center.x - (RESOLUTION_WIDTH / 2.0)).schedule()
+        val pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
+        telemetry.addData("ATag Detected", true)
+        telemetry.addData("ATag Center X", detection.center.x)
+        telemetry.addData("ATag Offset from Center", pixelOffset)
+        Turret.cameraTrackPower(pixelOffset).schedule()
       }
     }
 
     if ((System.currentTimeMillis() - lastDetectionTime > DETECTION_TIMEOUT_MS) && !detected) {
+      telemetry.addData("ATag Detected", false)
       Turret.cameraTrackPower(0.0).schedule()
     }
 
