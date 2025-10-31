@@ -31,7 +31,7 @@ object Turret : Subsystem {
         .requires(this)
     fun cameraTrackPower(targetAngle: Double) = LambdaCommand("turretCameraTrackPower")
     .setStart {
-        val kP = 0.001
+        val kP = 0.0015
         val kD = 0.0001
         val error = targetAngle
         val currentTime = System.currentTimeMillis()

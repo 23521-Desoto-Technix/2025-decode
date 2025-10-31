@@ -3,12 +3,14 @@ package org.firstinspires.ftc.teamcode.subsystems
 import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.MotorEx
+import dev.nextftc.hardware.impl.VoltageCompensatingMotor
 import kotlin.math.abs
 
 object Shooter : Subsystem {
-  private val upperShooterMotor = MotorEx("leftShooter").brakeMode().reversed()
-  private val lowerShooterMotor = MotorEx("rightShooter").brakeMode()
+  private val upperShooterMotor = VoltageCompensatingMotor(MotorEx("leftShooter").brakeMode().reversed())
+  private val lowerShooterMotor = VoltageCompensatingMotor(MotorEx("rightShooter").brakeMode())
   private val shooterEncoder = MotorEx("backLeft")
+
 
   var power = 0.0
 
