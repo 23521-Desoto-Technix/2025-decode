@@ -180,8 +180,6 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Indexer Goal", Indexer.goalPosition)
     telemetry.addData("Indexer Power", Indexer.power)
 
-    var atagAngle = 0.0
-    var detectionFound = false
     for (detection in aprilTag.detections) {
       // telemetry.addLine("-----April Tag Detection-----")
       // telemetry.addData("Tag ID", detection.id)
@@ -189,24 +187,18 @@ class teleop : NextFTCOpMode() {
       // telemetry.addData("Tag Center Y", detection.center.y)
       // BLUE: 20, RED: 24
       if (detection.id == 24) {
+        lastDetectionTime = System.currentTimeMillis()
         lastDetectedCenterX = detection.center.x
         lastDetectionTime = System.currentTimeMillis()
-        detectionFound = true
-        atagAngle = detection.center.x - (RESOLUTION_WIDTH / 2.0)
+        telemetry.addData("ATag Angle", detection.center.x - (RESOLUTION_WIDTH / 2.0))
+        Turret.cameraTrackPower(detection.center.x - (RESOLUTION_WIDTH / 2.0))
       }
     }
 
-    if (!detectionFound) {
-      val timeSinceDetection = System.currentTimeMillis() - lastDetectionTime
-      if (timeSinceDetection < DETECTION_TIMEOUT_MS) {
-        atagAngle = lastDetectedCenterX - (RESOLUTION_WIDTH / 2.0)
-      } else {
-        atagAngle = 0.0
+      if (System.currentTimeMillis() - lastDetectionTime > DETECTION_TIMEOUT_MS) {
+          Turret.cameraTrackPower((RESOLUTION_WIDTH / 2.0))
       }
-    }
 
-    telemetry.addData("ATag Angle", atagAngle)
-    Turret.cameraTrackPower(atagAngle).schedule()
     BindingManager.update()
     telemetry.update()
   }
