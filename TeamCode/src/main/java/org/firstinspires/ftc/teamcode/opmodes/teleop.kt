@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
+import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.extensions.pedro.PedroComponent
@@ -16,21 +17,21 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
-import org.firstinspires.ftc.teamcode.subsystems.Feeder
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
-import org.firstinspires.ftc.teamcode.subsystems.Intake
 import org.firstinspires.ftc.teamcode.subsystems.Lights
 import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.time.Duration.Companion.seconds
+import dev.nextftc.core.commands.delays.Delay
 
 @TeleOp
 class teleop : NextFTCOpMode() {
   init {
     addComponents(
-        SubsystemComponent(Shooter, Intake, Indexer, Lights, Turret, Feeder),
+        SubsystemComponent(Shooter, Indexer, Lights, Turret),
         BulkReadComponent,
         BindingsComponent,
         PedroComponent(Constants::createFollower),
@@ -66,7 +67,7 @@ class teleop : NextFTCOpMode() {
     leftBreakBeam.mode = DigitalChannel.Mode.INPUT
     rightBreakBeam = hardwareMap.get(DigitalChannel::class.java, "rightBreakBeam")
     rightBreakBeam.mode = DigitalChannel.Mode.INPUT
-    Indexer.toSlot(0).schedule()
+    Indexer.indexerToSlot(0).schedule()
     aprilTag =
         AprilTagProcessor.Builder()
             .setDrawAxes(true)
@@ -117,24 +118,33 @@ class teleop : NextFTCOpMode() {
         button { gamepad2.left_trigger > 0.5 }.whenBecomesTrue { Shooter.setPower(0.0).schedule() }
     val intakeForward =
         button { gamepad2.circle }
-            .whenBecomesTrue { Intake.setPower(if (Intake.power == 1.0) 0.0 else 1.0).schedule() }
+            .whenBecomesTrue {
+              Indexer.setIntakePower(if (Indexer.intakePower == 1.0) 0.0 else 1.0).schedule()
+            }
     val intakeReverse =
         button { gamepad2.cross }
-            .whenBecomesTrue { Intake.setPower(if (Intake.power == -1.0) 0.0 else -1.0).schedule() }
+            .whenBecomesTrue {
+              Indexer.setIntakePower(if (Indexer.intakePower == -1.0) 0.0 else -1.0).schedule()
+            }
     val spindexerBumpNext =
         button { gamepad2.dpad_left } whenBecomesTrue { Indexer.toNextSlot().schedule() }
     val spindexerBumpPrevious =
         button { gamepad2.dpad_right } whenBecomesTrue { Indexer.toPreviousSlot().schedule() }
     val spindexerReset =
-        button { gamepad2.dpad_down } whenBecomesTrue { Indexer.toSlot(0).schedule() }
+        button { gamepad2.dpad_down } whenBecomesTrue { Indexer.indexerToSlot(0).schedule() }
 
     val feed =
         button { gamepad2.triangle } whenTrue
             {
-              Feeder.feed().schedule()
+              Indexer.feed().schedule()
             } whenFalse
             {
-              Feeder.reset().schedule()
+              SequentialGroup(
+                      Indexer.unFeed(),
+                      Delay(0.2.seconds),
+                      Indexer.toNextSlot(),
+                  )
+                  .schedule()
             }
     val latch =
         button { gamepad2.square }

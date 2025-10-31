@@ -3,42 +3,65 @@ package org.firstinspires.ftc.teamcode.subsystems
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
+import dev.nextftc.core.commands.delays.Delay
+import dev.nextftc.core.commands.delays.WaitUntil
+import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.CRServoEx
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.ServoEx
+import kotlin.time.Duration.Companion.seconds
 
 object Indexer : Subsystem {
-  val servo = CRServoEx("indexer")
-  val encoder = MotorEx("backRight").zeroed()
-  val latch = ServoEx("latch")
-  val spindexerPID = controlSystem { posPid(0.0001, 0.0, 0.000003) }
+  val indexerServo = CRServoEx("indexer")
+  val indexerEncoder = MotorEx("backRight").zeroed()
+  val latchServo = ServoEx("latch")
+
+  val intakeMotor = MotorEx("intake").brakeMode().reversed()
+
+    val leftFeederServo = ServoEx("leftFeeder")
+    val rightFeederServo = ServoEx("rightFeeder")
+
+  val indexerPID = controlSystem { posPid(0.0001, 0.0, 0.000003) }
   lateinit var leftBreakBeam: DigitalChannel
   lateinit var rightBreakBeam: DigitalChannel
   lateinit var intakeBreakBeam: DigitalChannel
   var currentPosition = 0.0
-  var power = 0.0
+  var indexerPower = 0.0
+  var intakePower = 0.0
   var goalPosition = 0.0
 
   override fun periodic() {
-    power = spindexerPID.calculate(KineticState(-encoder.currentPosition, -encoder.velocity))
-    currentPosition = encoder.currentPosition.toDouble()
-    servo.power = power
+      if (intakePower > 0 && (leftBreakBeam.state || rightBreakBeam.state)) {
+          SequentialGroup(
+              this.latchUp(),
+              this.toNextSlot(),
+              Delay(0.3.seconds),
+              this.latchDown()
+          ).schedule()
+      }
+    indexerPower =
+        indexerPID.calculate(
+            KineticState(-indexerEncoder.currentPosition, -indexerEncoder.velocity)
+        )
+    currentPosition = indexerEncoder.currentPosition.toDouble()
+    indexerServo.power = indexerPower
+    intakeMotor.power = intakePower
   }
 
-  fun toPosition(position: Double) =
+  fun indexerToPosition(position: Double) =
       LambdaCommand("indexerToPosition")
           .setStart {
-            spindexerPID.goal = KineticState(position, 0.0)
+            indexerPID.goal = KineticState(position, 0.0)
             goalPosition = position
           }
           .setIsDone {
-            spindexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
+            indexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
           }
           .requires(this)
 
-  fun toSlot(slot: Int) =
+  fun indexerToSlot(slot: Int) =
       LambdaCommand("indexerToSlot")
           .setStart {
             val cycleLength = 2730.0 * 3
@@ -55,19 +78,41 @@ object Indexer : Subsystem {
             val closestPosition =
                 positions.minByOrNull { kotlin.math.abs(it - goalPosition) } ?: slotPosition
 
-            spindexerPID.goal = KineticState(closestPosition, 0.0)
+            indexerPID.goal = KineticState(closestPosition, 0.0)
             goalPosition = closestPosition
           }
           .setIsDone {
-            spindexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
+            indexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
           }
           .requires(this)
 
-  fun toNextSlot() = toPosition(goalPosition + 2730.0)
+  fun toNextSlot() = indexerToPosition(goalPosition + 2730.0)
 
-  fun toPreviousSlot() = toPosition(goalPosition - 2730.0)
+  fun setIntakePower(power: Double) =
+      LambdaCommand("setIntakePower")
+          .setStart { intakePower = power }
+          .setIsDone { true }
+          .requires(this)
 
-  fun latchDown() = LambdaCommand("latchDown").setStart { latch.position = 0.95 }.setIsDone { true }
+  fun toPreviousSlot() = indexerToPosition(goalPosition - 2730.0)
 
-  fun latchUp() = LambdaCommand("latchUp").setStart { latch.position = 0.45 }.setIsDone { true }
+  fun latchDown() =
+      LambdaCommand("latchDown").setStart { latchServo.position = 0.95 }.setIsDone { true }
+
+  fun latchUp() =
+      LambdaCommand("latchUp").setStart { latchServo.position = 0.45 }.setIsDone { true }
+    fun feed() = LambdaCommand("feed")
+        .setStart {
+            leftFeederServo.position = 0.61
+            rightFeederServo.position = 0.71
+        }
+        .setIsDone { true }
+        .requires(this)
+    fun unFeed() = LambdaCommand("resetFeeder")
+        .setStart {
+            leftFeederServo.position = 0.9
+            rightFeederServo.position = 1.0
+        }
+        .setIsDone { true }
+        .requires(this)
 }
