@@ -12,7 +12,6 @@ object Turret : Subsystem {
     var power = 0.0
     var previousError = 0.0
     var lastTime = System.currentTimeMillis()
-    const val CAMERA_SIDE_BUFFER = 250.0
 
     override fun periodic() {
         motor.power = power
@@ -33,7 +32,10 @@ object Turret : Subsystem {
         .requires(this)
     fun cameraTrackPower(targetAngle: Double) = LambdaCommand("turretCameraTrackPower")
     .setStart {
-        val kP = 0.0015
+        var kP = 0.0015
+        if (abs(targetAngle) > 250.0) {
+            kP = 0.004
+        }
         val kD = 0.0
         val error = targetAngle
         val currentTime = System.currentTimeMillis()
@@ -44,12 +46,8 @@ object Turret : Subsystem {
             this.power = 0.2
         } else if (angle <= -19_000) {
             this.power = -0.2
-        } else if (abs(targetAngle) < CAMERA_SIDE_BUFFER) {
-            this.power = ((error * kP) + (errorRate * kD)).coerceIn(-1.0, 1.0)
-        } else if (targetAngle >= CAMERA_SIDE_BUFFER) {
-            this.power = 1.0
         } else {
-            this.power = -1.0
+            this.power = ((error * kP) + (errorRate * kD)).coerceIn(-1.0, 1.0)
         }
 
         previousError = error
