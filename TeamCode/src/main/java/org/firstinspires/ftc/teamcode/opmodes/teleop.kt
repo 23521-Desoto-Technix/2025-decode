@@ -14,10 +14,12 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
+import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.Lights
 import org.firstinspires.ftc.teamcode.subsystems.LightsState
@@ -25,13 +27,12 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
   init {
     addComponents(
-        SubsystemComponent(Shooter, Indexer, Lights, Turret),
+        SubsystemComponent(Shooter, Indexer, Lights, Turret, Hood),
         BulkReadComponent,
         BindingsComponent,
         PedroComponent(Constants::createFollower),
@@ -154,6 +155,16 @@ class teleop : NextFTCOpMode() {
             .toggleOnBecomesTrue()
             .whenBecomesTrue { Indexer.latchDown().schedule() }
             .whenBecomesFalse { Indexer.latchUp().schedule() }
+    val hoodUp =
+        button { gamepad1.dpad_up }
+            .whenBecomesTrue {
+              Hood.setPosition((Hood.position + 0.1).coerceAtMost(1.0)).schedule()
+            }
+    val hoodDown =
+        button { gamepad1.dpad_down }
+            .whenBecomesTrue {
+              Hood.setPosition((Hood.position - 0.1).coerceAtLeast(0.0)).schedule()
+            }
     val driverControlled =
         PedroDriverControlled(
             -Gamepads.gamepad1.leftStickY,
