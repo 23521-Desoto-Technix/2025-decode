@@ -199,7 +199,7 @@ class teleop : NextFTCOpMode() {
     }
 
     if ((System.currentTimeMillis() - lastDetectionTime > DETECTION_TIMEOUT_MS) && !detected) {
-      Turret.cameraTrackPower((RESOLUTION_WIDTH / 2.0)).schedule()
+      Turret.cameraTrackPower(0.0).schedule()
     }
 
     BindingManager.update()
