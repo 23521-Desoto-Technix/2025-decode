@@ -5,8 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
-import dev.nextftc.core.commands.groups.SequentialGroup
-import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.extensions.pedro.PedroComponent
@@ -58,7 +56,8 @@ class teleop : NextFTCOpMode() {
 
   private var lastDetectedCenterX: Double = 0.0
   private var lastDetectionTime: Long = 0
-  private val DETECTION_TIMEOUT_MS: Long = 200
+
+  var alliance = Alliance.UNKNOWN
 
   override fun onInit() {
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
@@ -67,12 +66,7 @@ class teleop : NextFTCOpMode() {
     leftBreakBeam.mode = DigitalChannel.Mode.INPUT
     rightBreakBeam = hardwareMap.get(DigitalChannel::class.java, "rightBreakBeam")
     rightBreakBeam.mode = DigitalChannel.Mode.INPUT
-    SequentialGroup(
-            InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
-            Indexer.toSlot(0),
-            InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
-        )
-        .schedule()
+    Indexer.toSlot(0).schedule()
     aprilTag =
         AprilTagProcessor.Builder()
             .setDrawAxes(true)
@@ -92,16 +86,29 @@ class teleop : NextFTCOpMode() {
             .build()
   }
 
-  override fun onWaitForStart() {}
+  override fun onWaitForStart() {
+    when (alliance) {
+      Alliance.RED -> Lights.state = LightsState.ALLIANCE_RED
+      Alliance.BLUE -> Lights.state = LightsState.ALLIANCE_BLUE
+      Alliance.UNKNOWN -> Lights.state = LightsState.ALLIANCE_UNKNOWN
+    }
+    if (gamepad1.circle) {
+      alliance = Alliance.RED
+    } else if (gamepad1.cross) {
+      alliance = Alliance.BLUE
+    }
+  }
 
   override fun onStartButtonPressed() {
     val bumpSpeedUp =
         button { gamepad2.right_bumper }
-            .whenBecomesTrue { Shooter.setSpeed(Shooter.targetSpeed + 100.0).schedule() }
+            .whenBecomesTrue {
+              Shooter.setPower((Shooter.power + 0.1).coerceAtMost(1.0)).schedule()
+            }
     val bumpSpeedDown =
         button { gamepad2.left_bumper }
             .whenBecomesTrue {
-              Shooter.setSpeed((Shooter.targetSpeed - 100.0).coerceAtLeast(0.0)).schedule()
+              Shooter.setPower((Shooter.power - 0.1).coerceAtLeast(0.0)).schedule()
             }
     val nominalPower =
         button { gamepad2.right_trigger > 0.5 }
@@ -115,35 +122,12 @@ class teleop : NextFTCOpMode() {
         button { gamepad2.cross }
             .whenBecomesTrue { Intake.setPower(if (Intake.power == -1.0) 0.0 else -1.0).schedule() }
     val spindexerBumpNext =
-        button { gamepad2.dpad_left } whenBecomesTrue
-            {
-              SequentialGroup(
-                      InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
-                      Indexer.toNextSlot(),
-                      InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
-                  )
-                  .schedule()
-            }
+        button { gamepad2.dpad_left } whenBecomesTrue { Indexer.toNextSlot().schedule() }
     val spindexerBumpPrevious =
-        button { gamepad2.dpad_right } whenBecomesTrue
-            {
-              SequentialGroup(
-                      InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
-                      Indexer.toPreviousSlot(),
-                      InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
-                  )
-                  .schedule()
-            }
+        button { gamepad2.dpad_right } whenBecomesTrue { Indexer.toPreviousSlot().schedule() }
     val spindexerReset =
-        button { gamepad2.dpad_down } whenBecomesTrue
-            {
-              SequentialGroup(
-                      InstantCommand { Lights.state = LightsState.DEBUG_PURPLE },
-                      Indexer.toSlot(0),
-                      InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
-                  )
-                  .schedule()
-            }
+        button { gamepad2.dpad_down } whenBecomesTrue { Indexer.toSlot(0).schedule() }
+
     val feed =
         button { gamepad2.triangle } whenTrue
             {
@@ -191,7 +175,11 @@ class teleop : NextFTCOpMode() {
       // telemetry.addData("Tag Center X", detection.center.x)
       // telemetry.addData("Tag Center Y", detection.center.y)
       // BLUE: 20, RED: 24
-      if (detection.id == 24) {
+
+      if (
+          (detection.id == 24 && alliance == Alliance.RED) ||
+              (detection.id == 20 && alliance == Alliance.BLUE)
+      ) {
         lastDetectionTime = System.currentTimeMillis()
         lastDetectedCenterX = detection.center.x
         pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
