@@ -9,6 +9,8 @@ object Turret : Subsystem {
     val encoder = MotorEx("frontLeft")
     var angle = 0.0
     var power = 0.0
+    var previousError = 0.0
+    var lastTime = System.currentTimeMillis()
 
     override fun periodic() {
         motor.power = power
@@ -29,9 +31,17 @@ object Turret : Subsystem {
         .requires(this)
     fun cameraTrackPower(targetAngle: Double) = LambdaCommand("turretCameraTrackPower")
     .setStart {
-        val kP = 0.005
+        val kP = 0.001
+        val kD = 0.0001
         val error = targetAngle
-        this.power =  (error * kP).coerceIn(-0.5, 0.5)
+        val currentTime = System.currentTimeMillis()
+        val dt = (currentTime - lastTime) / 1000.0
+        val errorRate = if (dt > 0) (error - previousError) / dt else 0.0
+
+        this.power = ((error * kP) + (errorRate * kD)).coerceIn(-0.5, 0.5)
+
+        previousError = error
+        lastTime = currentTime
     }
     .setIsDone { true }
     .requires(this)
