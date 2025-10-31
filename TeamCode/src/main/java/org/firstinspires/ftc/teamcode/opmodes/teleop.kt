@@ -194,12 +194,12 @@ class teleop : NextFTCOpMode() {
         lastDetectedCenterX = detection.center.x
         lastDetectionTime = System.currentTimeMillis()
         telemetry.addData("ATag Angle", detection.center.x - (RESOLUTION_WIDTH / 2.0))
-        Turret.cameraTrackPower(detection.center.x - (RESOLUTION_WIDTH / 2.0))
+        Turret.cameraTrackPower(detection.center.x - (RESOLUTION_WIDTH / 2.0)).schedule()
       }
     }
 
     if ((System.currentTimeMillis() - lastDetectionTime > DETECTION_TIMEOUT_MS) && !detected) {
-      Turret.cameraTrackPower((RESOLUTION_WIDTH / 2.0))
+      Turret.cameraTrackPower((RESOLUTION_WIDTH / 2.0)).schedule()
     }
 
     BindingManager.update()
