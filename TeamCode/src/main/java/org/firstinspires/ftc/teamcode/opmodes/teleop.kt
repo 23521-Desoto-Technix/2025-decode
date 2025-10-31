@@ -39,11 +39,11 @@ class teleop : NextFTCOpMode() {
     )
   }
 
-    enum class Alliance {
-        RED,
-        BLUE,
-        UNKNOWN
-    }
+  enum class Alliance {
+    RED,
+    BLUE,
+    UNKNOWN,
+  }
 
   private lateinit var intakeBreakBeam: DigitalChannel
   private lateinit var leftBreakBeam: DigitalChannel
@@ -69,23 +69,23 @@ class teleop : NextFTCOpMode() {
             InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
         )
         .schedule()
-      aprilTag =
-          AprilTagProcessor.Builder()
-              .setDrawAxes(true)
-              .setDrawCubeProjection(true)
-              .setDrawTagOutline(true)
-              .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-              .setLensIntrinsics(667.154, 667.154, 438.702, 286.414)
-              // ... these parameters are fx, fy, cx, cy.
-              .build()
+    aprilTag =
+        AprilTagProcessor.Builder()
+            .setDrawAxes(true)
+            .setDrawCubeProjection(true)
+            .setDrawTagOutline(true)
+            .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+            .setLensIntrinsics(667.154, 667.154, 438.702, 286.414)
+            // ... these parameters are fx, fy, cx, cy.
+            .build()
 
-      portal =
-          VisionPortal.Builder()
-              .setCamera(hardwareMap.get<WebcamName?>(WebcamName::class.java, "turretCamera"))
-              .setCameraResolution(Size(RESOLUTION_WIDTH, RESOLUTION_HEIGHT))
-              .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-              .addProcessor(aprilTag)
-              .build()
+    portal =
+        VisionPortal.Builder()
+            .setCamera(hardwareMap.get<WebcamName?>(WebcamName::class.java, "turretCamera"))
+            .setCameraResolution(Size(RESOLUTION_WIDTH, RESOLUTION_HEIGHT))
+            .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+            .addProcessor(aprilTag)
+            .build()
   }
 
   override fun onWaitForStart() {}
@@ -175,18 +175,22 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Indexer Position", Indexer.currentPosition)
     telemetry.addData("Indexer Goal", Indexer.goalPosition)
     telemetry.addData("Indexer Power", Indexer.power)
-    telemetry.update()
-      for (detection in aprilTag.detections) {
-          telemetry.addLine("-----April Tag Detection-----")
-          telemetry.addData("Tag ID", detection.id)
-          telemetry.addData("Tag Center X", detection.center.x)
-          telemetry.addData("Tag Center Y", detection.center.y)
-          // BLUE: 20, RED: 24
-          if (detection.id == 24) {
-              Turret.cameraTrackPower(detection.center.x).schedule()
-          }
+
+    var atagAngle = 0.0
+    for (detection in aprilTag.detections) {
+      // telemetry.addLine("-----April Tag Detection-----")
+      // telemetry.addData("Tag ID", detection.id)
+      // telemetry.addData("Tag Center X", detection.center.x)
+      // telemetry.addData("Tag Center Y", detection.center.y)
+      // BLUE: 20, RED: 24
+      if (detection.id == 24) {
+        atagAngle = detection.center.x - (RESOLUTION_WIDTH / 2.0)
       }
+    }
+    telemetry.addData("ATag Angle", atagAngle)
+    Turret.cameraTrackPower(atagAngle).schedule()
     BindingManager.update()
+    telemetry.update()
   }
 
   override fun onStop() {
