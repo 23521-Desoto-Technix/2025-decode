@@ -65,23 +65,15 @@ class teleop : NextFTCOpMode() {
             }
     val nominalPower =
         button { gamepad2.right_trigger > 0.5 }
-            .whenBecomesTrue { Shooter.setPower(0.85).schedule() }
-      val noPower =
-        button { gamepad2.left_trigger > 0.5 }
-            .whenBecomesTrue { Shooter.setPower(0.0).schedule() }
+            .whenBecomesTrue { Shooter.setPower(0.90).schedule() }
+    val noPower =
+        button { gamepad2.left_trigger > 0.5 }.whenBecomesTrue { Shooter.setPower(0.0).schedule() }
     val intakeForward =
         button { gamepad2.circle }
-            .toggleOnBecomesTrue()
-            .whenBecomesTrue { Intake.setPower(1.0).schedule() }
-            .whenBecomesFalse { Intake.setPower(0.0).schedule() }
-    val turretStick =
-        button { gamepad2.cross } whenTrue
-            {
-              Turret.setPower(gamepad2.left_stick_x.toDouble()).schedule()
-            } whenFalse
-            {
-              Turret.setPower(0.0).schedule()
-            }
+            .whenBecomesTrue { Intake.setPower(if (Intake.power == 1.0) 0.0 else 1.0).schedule() }
+    val intakeReverse =
+        button { gamepad2.cross }
+            .whenBecomesTrue { Intake.setPower(if (Intake.power == -1.0) 0.0 else -1.0).schedule() }
     val spindexerBumpNext =
         button { gamepad2.dpad_left } whenBecomesTrue
             {
