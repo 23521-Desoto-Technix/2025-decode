@@ -43,7 +43,7 @@ object Turret : Subsystem {
         } else if (angle <= -19_000) {
             this.power = -0.2
         } else {
-            this.power = ((error * kP) + (errorRate * kD)).coerceIn(-0.5, 0.5)
+            this.power = ((error * kP) + (errorRate * kD)).coerceIn(-1.0, 1.0)
         }
 
         previousError = error

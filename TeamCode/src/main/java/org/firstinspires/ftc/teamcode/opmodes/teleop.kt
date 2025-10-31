@@ -169,20 +169,20 @@ class teleop : NextFTCOpMode() {
 
   override fun onUpdate() {
 
-    //telemetry.addData("Shooter actual", Shooter.speed)
-    //telemetry.addData("Shooter target", Shooter.targetSpeed)
-    //telemetry.addData("Shooter power", Shooter.power)
+    // telemetry.addData("Shooter actual", Shooter.speed)
+    // telemetry.addData("Shooter target", Shooter.targetSpeed)
+    // telemetry.addData("Shooter power", Shooter.power)
     telemetry.addData("Turret angle", Turret.angle)
     telemetry.addData("Turret power", Turret.power)
     telemetry.addData("Turret PD error", Turret.previousError)
-    //telemetry.addData("Intake Break Beam", intakeBreakBeam.state)
-    //telemetry.addData("Left Break Beam", leftBreakBeam.state)
-    //telemetry.addData("Right Break Beam", rightBreakBeam.state)
-    //telemetry.addData("Indexer Position", Indexer.currentPosition)
-    //telemetry.addData("Indexer Goal", Indexer.goalPosition)
-    //telemetry.addData("Indexer Power", Indexer.power)
+    // telemetry.addData("Intake Break Beam", intakeBreakBeam.state)
+    // telemetry.addData("Left Break Beam", leftBreakBeam.state)
+    // telemetry.addData("Right Break Beam", rightBreakBeam.state)
+    // telemetry.addData("Indexer Position", Indexer.currentPosition)
+    // telemetry.addData("Indexer Goal", Indexer.goalPosition)
+    // telemetry.addData("Indexer Power", Indexer.power)
 
-    var detected = false
+    var pixelOffset = 0.0
 
     for (detection in aprilTag.detections) {
       // telemetry.addLine("-----April Tag Detection-----")
@@ -191,21 +191,16 @@ class teleop : NextFTCOpMode() {
       // telemetry.addData("Tag Center Y", detection.center.y)
       // BLUE: 20, RED: 24
       if (detection.id == 24) {
-        detected = true
         lastDetectionTime = System.currentTimeMillis()
         lastDetectedCenterX = detection.center.x
-        val pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
+        pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
         telemetry.addData("ATag Detected", true)
         telemetry.addData("ATag Center X", detection.center.x)
         telemetry.addData("ATag Offset from Center", pixelOffset)
-        Turret.cameraTrackPower(pixelOffset).schedule()
       }
     }
 
-    if ((System.currentTimeMillis() - lastDetectionTime > DETECTION_TIMEOUT_MS) && !detected) {
-      telemetry.addData("ATag Detected", false)
-      Turret.cameraTrackPower(0.0).schedule()
-    }
+    Turret.cameraTrackPower(pixelOffset).schedule()
 
     BindingManager.update()
     telemetry.update()
