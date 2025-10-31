@@ -33,7 +33,7 @@ object Indexer : Subsystem {
   var goalPosition = 0.0
 
   override fun periodic() {
-      if (intakePower > 0 && (!leftBreakBeam.state || !rightBreakBeam.state) && latchServo.position == 0.45) {
+      if (intakePower > 0 && (!leftBreakBeam.state || !rightBreakBeam.state) && latchServo.position == 0.95) {
           SequentialGroup(
               this.latchUp(),
               this.toNextSlot(),
