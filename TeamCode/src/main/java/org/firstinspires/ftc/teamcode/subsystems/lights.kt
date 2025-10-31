@@ -26,8 +26,8 @@ object Lights : Subsystem {
                 left.position = 0.0
             }
             LightsState.ALLIANCE_RED -> {
-                right.position = 0.277
-                left.position = 0.277
+                right.position = 0.285
+                left.position = 0.285
             }
             LightsState.ALLIANCE_BLUE -> {
                 right.position = 0.611
