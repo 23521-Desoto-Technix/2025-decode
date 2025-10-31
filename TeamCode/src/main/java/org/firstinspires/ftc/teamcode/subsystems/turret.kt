@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems
 import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.MotorEx
+import kotlin.math.abs
 
 object Turret : Subsystem {
     val motor = MotorEx("turret").zeroed().brakeMode()
@@ -11,6 +12,7 @@ object Turret : Subsystem {
     var power = 0.0
     var previousError = 0.0
     var lastTime = System.currentTimeMillis()
+    const val CAMERA_SIDE_BUFFER = 250.0
 
     override fun periodic() {
         motor.power = power
@@ -31,7 +33,7 @@ object Turret : Subsystem {
         .requires(this)
     fun cameraTrackPower(targetAngle: Double) = LambdaCommand("turretCameraTrackPower")
     .setStart {
-        val kP = 0.0002
+        val kP = 0.0015
         val kD = 0.0
         val error = targetAngle
         val currentTime = System.currentTimeMillis()
@@ -42,8 +44,12 @@ object Turret : Subsystem {
             this.power = 0.2
         } else if (angle <= -19_000) {
             this.power = -0.2
-        } else {
+        } else if (abs(targetAngle) < CAMERA_SIDE_BUFFER) {
             this.power = ((error * kP) + (errorRate * kD)).coerceIn(-1.0, 1.0)
+        } else if (targetAngle >= CAMERA_SIDE_BUFFER) {
+            this.power = 1.0
+        } else {
+            this.power = -1.0
         }
 
         previousError = error
