@@ -35,7 +35,9 @@ object Indexer : Subsystem {
   override fun periodic() {
       if (intakePower > 0 && (!leftBreakBeam.state || !rightBreakBeam.state) && latchServo.position == 0.95) {
           SequentialGroup(
+              Delay(0.05.seconds),
               this.latchUp(),
+              Delay(0.1.seconds),
               this.toNextSlot(),
               Delay(0.3.seconds),
               this.latchDown()
