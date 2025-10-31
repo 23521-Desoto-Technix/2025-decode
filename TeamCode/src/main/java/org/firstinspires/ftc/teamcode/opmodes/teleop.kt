@@ -183,7 +183,7 @@ class teleop : NextFTCOpMode() {
     // telemetry.addData("Indexer Power", Indexer.power)
 
     var pixelOffset = 0.0
-    var rotationComp = gamepad1.right_stick_x * 100.0
+    var rotationComp = gamepad1.right_stick_x * 150.0
 
     for (detection in aprilTag.detections) {
       // telemetry.addLine("-----April Tag Detection-----")
