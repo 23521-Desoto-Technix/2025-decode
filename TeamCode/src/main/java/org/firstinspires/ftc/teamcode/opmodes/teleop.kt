@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
+import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
@@ -25,7 +26,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
 import kotlin.time.Duration.Companion.seconds
-import dev.nextftc.core.commands.delays.Delay
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -67,6 +67,9 @@ class teleop : NextFTCOpMode() {
     leftBreakBeam.mode = DigitalChannel.Mode.INPUT
     rightBreakBeam = hardwareMap.get(DigitalChannel::class.java, "rightBreakBeam")
     rightBreakBeam.mode = DigitalChannel.Mode.INPUT
+    Indexer.intakeBreakBeam = intakeBreakBeam
+    Indexer.leftBreakBeam = leftBreakBeam
+    Indexer.rightBreakBeam = rightBreakBeam
     Indexer.indexerToSlot(0).schedule()
     aprilTag =
         AprilTagProcessor.Builder()
@@ -137,7 +140,7 @@ class teleop : NextFTCOpMode() {
         button { gamepad2.triangle } whenTrue
             {
               Indexer.feed().schedule()
-            } whenFalse
+            } whenBecomesFalse
             {
               SequentialGroup(
                       Indexer.unFeed(),
