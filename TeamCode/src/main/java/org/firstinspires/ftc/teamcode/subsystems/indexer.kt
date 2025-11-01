@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
 import dev.nextftc.core.commands.delays.Delay
-import dev.nextftc.core.commands.delays.WaitUntil
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
@@ -20,8 +19,8 @@ object Indexer : Subsystem {
 
   val intakeMotor = MotorEx("intake").brakeMode().reversed()
 
-    val leftFeederServo = ServoEx("leftFeeder")
-    val rightFeederServo = ServoEx("rightFeeder")
+  val leftFeederServo = ServoEx("leftFeeder")
+  val rightFeederServo = ServoEx("rightFeeder")
 
   val indexerPID = controlSystem { posPid(0.0001, 0.0, 0.000003) }
   lateinit var leftBreakBeam: DigitalChannel
@@ -33,16 +32,21 @@ object Indexer : Subsystem {
   var goalPosition = 0.0
 
   override fun periodic() {
-      if (intakePower > 0 && (!leftBreakBeam.state || !rightBreakBeam.state) && latchServo.position == 0.95) {
-          SequentialGroup(
+    if (
+        intakePower > 0 &&
+            (!leftBreakBeam.state || !rightBreakBeam.state) &&
+            latchServo.position == 0.95
+    ) {
+      SequentialGroup(
               Delay(0.05.seconds),
               this.latchUp(),
               Delay(0.1.seconds),
               this.toNextSlot(),
               Delay(0.3.seconds),
-              this.latchDown()
-          ).schedule()
-      }
+              this.latchDown(),
+          )
+          .schedule()
+    }
     indexerPower =
         indexerPID.calculate(
             KineticState(-indexerEncoder.currentPosition, -indexerEncoder.velocity)
@@ -58,6 +62,13 @@ object Indexer : Subsystem {
             indexerPID.goal = KineticState(position, 0.0)
             goalPosition = position
           }
+          .setIsDone {
+            indexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
+          }
+          .requires(this)
+
+  fun waitForPid() =
+      LambdaCommand("waitForPid")
           .setIsDone {
             indexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
           }
@@ -83,9 +94,7 @@ object Indexer : Subsystem {
             indexerPID.goal = KineticState(closestPosition, 0.0)
             goalPosition = closestPosition
           }
-          .setIsDone {
-            indexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
-          }
+          .setIsDone { true }
           .requires(this)
 
   fun toNextSlot() = indexerToPosition(goalPosition + 2730.0)
@@ -103,18 +112,22 @@ object Indexer : Subsystem {
 
   fun latchUp() =
       LambdaCommand("latchUp").setStart { latchServo.position = 0.45 }.setIsDone { true }
-    fun feed() = LambdaCommand("feed")
-        .setStart {
+
+  fun feed() =
+      LambdaCommand("feed")
+          .setStart {
             leftFeederServo.position = 0.61
             rightFeederServo.position = 0.71
-        }
-        .setIsDone { true }
-        .requires(this)
-    fun unFeed() = LambdaCommand("resetFeeder")
-        .setStart {
+          }
+          .setIsDone { true }
+          .requires(this)
+
+  fun unFeed() =
+      LambdaCommand("resetFeeder")
+          .setStart {
             leftFeederServo.position = 0.9
             rightFeederServo.position = 1.0
-        }
-        .setIsDone { true }
-        .requires(this)
+          }
+          .setIsDone { true }
+          .requires(this)
 }
