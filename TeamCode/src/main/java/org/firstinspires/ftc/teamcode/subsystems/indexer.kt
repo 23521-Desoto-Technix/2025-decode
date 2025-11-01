@@ -32,7 +32,7 @@ object Indexer : Subsystem {
   var goalPosition = 0.0
 
   override fun periodic() {
-    if (
+    /*if (
         intakePower > 0 &&
             (!leftBreakBeam.state || !rightBreakBeam.state) &&
             latchServo.position == 0.95
@@ -46,7 +46,7 @@ object Indexer : Subsystem {
               this.latchDown(),
           )
           .schedule()
-    }
+    }*/
     indexerPower =
         indexerPID.calculate(
             KineticState(-indexerEncoder.currentPosition, -indexerEncoder.velocity)
