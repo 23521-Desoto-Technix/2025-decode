@@ -63,7 +63,7 @@ object Indexer : Subsystem {
             goalPosition = position
           }
           .setIsDone {
-            indexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
+            true
           }
           .requires(this)
 
