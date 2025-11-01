@@ -176,7 +176,7 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Alliance", alliance)
     telemetry.addData("X", PedroComponent.follower.pose.x)
     telemetry.addData("Y", PedroComponent.follower.pose.y)
-    telemetry.addData("Heading", PedroComponent.follower.pose.heading)
+    //telemetry.addData("Heading", PedroComponent.follower.pose.heading)
     PedroComponent.follower.setTeleOpDrive(
         -gamepad1.left_stick_y.toDouble() * speedMultiplier,
         -gamepad1.left_stick_x.toDouble() * speedMultiplier,
