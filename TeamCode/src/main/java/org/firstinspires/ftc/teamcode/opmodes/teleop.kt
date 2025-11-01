@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
 import android.util.Size
+import com.pedropathing.geometry.Pose
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
@@ -90,6 +91,7 @@ class teleop : NextFTCOpMode() {
             .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
             .addProcessor(aprilTag)
             .build()
+      PedroComponent.follower.pose = Pose(0.0, 0.0, 0.0)
   }
 
   override fun onWaitForStart() {
