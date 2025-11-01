@@ -42,7 +42,7 @@ object Indexer : Subsystem {
               this.latchUp(),
               Delay(0.1.seconds),
               this.toNextSlot(),
-              Delay(0.3.seconds),
+              Delay(0.15.seconds),
               this.latchDown(),
           )
           .schedule()
