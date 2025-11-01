@@ -182,6 +182,7 @@ class teleop : NextFTCOpMode() {
             Gamepads.gamepad1.rightStickX.map { -it * speedMultiplier },
             false,
         )
+      driverControlled()
   }
 
   override fun onUpdate() {
