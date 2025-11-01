@@ -16,6 +16,7 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -28,7 +29,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -93,7 +93,7 @@ class teleop : NextFTCOpMode() {
             .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
             .addProcessor(aprilTag)
             .build()
-      PedroComponent.follower.pose = Pose(0.0, 0.0, 0.0)
+    PedroComponent.follower.pose = Pose(0.0, 0.0, 0.0)
   }
 
   override fun onWaitForStart() {
@@ -171,15 +171,17 @@ class teleop : NextFTCOpMode() {
               Hood.setPosition((Hood.position - 0.1).coerceAtLeast(0.0)).schedule()
             }
     val speedToggle =
-        button { gamepad1.right_trigger > 0.5 }
+        Gamepads.gamepad1.rightTrigger
+            .atLeast(0.5)
             .whenBecomesTrue { InstantCommand { speedMultiplier = 0.5 }.schedule() }
             .whenBecomesFalse { InstantCommand { speedMultiplier = 1.0 }.schedule() }
-      val driverControlled = PedroDriverControlled(
-          Gamepads.gamepad1.leftStickY,
-          Gamepads.gamepad1.leftStickX,
-          Gamepads.gamepad1.rightStickX,
-          false
-      )
+    val driverControlled =
+        PedroDriverControlled(
+            Gamepads.gamepad1.leftStickY.map { -it * speedMultiplier },
+            Gamepads.gamepad1.leftStickX.map { -it * speedMultiplier },
+            Gamepads.gamepad1.rightStickX.map { -it * speedMultiplier },
+            false,
+        )
   }
 
   override fun onUpdate() {
