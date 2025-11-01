@@ -12,6 +12,8 @@ import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.extensions.pedro.PedroComponent
+import dev.nextftc.extensions.pedro.PedroDriverControlled
+import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
@@ -172,19 +174,19 @@ class teleop : NextFTCOpMode() {
         button { gamepad1.right_trigger > 0.5 }
             .whenBecomesTrue { InstantCommand { speedMultiplier = 0.5 }.schedule() }
             .whenBecomesFalse { InstantCommand { speedMultiplier = 1.0 }.schedule() }
+      val driverControlled = PedroDriverControlled(
+          Gamepads.gamepad1.leftStickY,
+          Gamepads.gamepad1.leftStickX,
+          Gamepads.gamepad1.rightStickX,
+          false
+      )
   }
 
   override fun onUpdate() {
     telemetry.addData("Alliance", alliance)
     telemetry.addData("X", PedroComponent.follower.pose.x)
     telemetry.addData("Y", PedroComponent.follower.pose.y)
-    //telemetry.addData("Heading", PedroComponent.follower.pose.heading)
-    PedroComponent.follower.setTeleOpDrive(
-        -gamepad1.left_stick_y.toDouble() * speedMultiplier,
-        -gamepad1.left_stick_x.toDouble() * speedMultiplier,
-        -gamepad1.right_stick_x.toDouble() * speedMultiplier,
-        false,
-    )
+    telemetry.addData("Heading", PedroComponent.follower.pose.heading)
     // telemetry.addData("Shooter actual", Shooter.speed)
     // telemetry.addData("Shooter target", Shooter.targetSpeed)
     // telemetry.addData("Shooter power", Shooter.power)
