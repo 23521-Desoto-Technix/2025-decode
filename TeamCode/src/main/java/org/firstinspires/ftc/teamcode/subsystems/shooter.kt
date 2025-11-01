@@ -19,7 +19,7 @@ object Shooter : Subsystem {
 
   var usingPID = true
 
-  private const val SPEED_AT_MAX_POWER = 2_600
+   private const val SPEED_AT_MAX_POWER = 2_600
   private const val PROPORTIONAL_GAIN = 0.0005
   private const val SPEED_TOLERANCE = 100
 

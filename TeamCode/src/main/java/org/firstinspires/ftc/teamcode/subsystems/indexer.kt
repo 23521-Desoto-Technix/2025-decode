@@ -22,7 +22,7 @@ object Indexer : Subsystem {
   val leftFeederServo = ServoEx("leftFeeder")
   val rightFeederServo = ServoEx("rightFeeder")
 
-  val indexerPID = controlSystem { posPid(0.0001, 0.0, 0.000003) }
+  val indexerPID = controlSystem { posPid(0.00012, 0.0, 0.000003) }
   lateinit var leftBreakBeam: DigitalChannel
   lateinit var rightBreakBeam: DigitalChannel
   lateinit var intakeBreakBeam: DigitalChannel
