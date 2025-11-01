@@ -7,14 +7,12 @@ import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.SequentialGroup
+import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.extensions.pedro.PedroComponent
-import dev.nextftc.extensions.pedro.PedroDriverControlled
-import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -27,6 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -58,6 +57,8 @@ class teleop : NextFTCOpMode() {
 
   private var lastDetectedCenterX: Double = 0.0
   private var lastDetectionTime: Long = 0
+
+  var speedMultiplier = 1.0
 
   var alliance = Alliance.UNKNOWN
 
@@ -165,18 +166,23 @@ class teleop : NextFTCOpMode() {
             .whenBecomesTrue {
               Hood.setPosition((Hood.position - 0.1).coerceAtLeast(0.0)).schedule()
             }
-    val driverControlled =
-        PedroDriverControlled(
-            -Gamepads.gamepad1.leftStickY,
-            -Gamepads.gamepad1.leftStickX,
-            -Gamepads.gamepad1.rightStickX,
-            false,
-        )
-    driverControlled()
+    val speedToggle =
+        button { gamepad1.right_trigger > 0.5 }
+            .whenBecomesTrue { InstantCommand { speedMultiplier = 0.5 }.schedule() }
+            .whenBecomesFalse { InstantCommand { speedMultiplier = 1.0 }.schedule() }
   }
 
   override fun onUpdate() {
-
+    telemetry.addData("Alliance", alliance)
+    telemetry.addData("X", PedroComponent.follower.pose.x)
+    telemetry.addData("Y", PedroComponent.follower.pose.y)
+    telemetry.addData("Heading", PedroComponent.follower.pose.heading)
+    PedroComponent.follower.setTeleOpDrive(
+        -gamepad1.left_stick_y.toDouble() * speedMultiplier,
+        -gamepad1.left_stick_x.toDouble() * speedMultiplier,
+        -gamepad1.right_stick_x.toDouble() * speedMultiplier,
+        false,
+    )
     // telemetry.addData("Shooter actual", Shooter.speed)
     // telemetry.addData("Shooter target", Shooter.targetSpeed)
     // telemetry.addData("Shooter power", Shooter.power)
