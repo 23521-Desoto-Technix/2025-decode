@@ -1,55 +1,53 @@
 package org.firstinspires.ftc.teamcode.subsystems
 
+import dev.nextftc.control.KineticState
+import dev.nextftc.control.builder.controlSystem
 import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.MotorEx
 import kotlin.math.abs
 
 object Turret : Subsystem {
-    val motor = MotorEx("turret").zeroed().brakeMode()
-    val encoder = MotorEx("frontLeft")
-    var angle = 0.0
-    var power = 0.0
-    var previousError = 0.0
-    var lastTime = System.currentTimeMillis()
+  val motor = MotorEx("turret").zeroed().brakeMode()
+  val encoder = MotorEx("frontLeft")
+  var angle = 0.0
+  var power = 0.0
+  var previousError = 0.0
+  var lastTime = System.currentTimeMillis()
+  val PID = controlSystem { posPid(0.0015, 0.0, 0.0) }
+  var usingPID = false
 
-    override fun periodic() {
-        motor.power = powesr
-        angle = encoder.currentPosition.toDouble()
+  override fun periodic() {
+    if (usingPID) {
+      motor.power =
+          PID.calculate(KineticState(-encoder.currentPosition.toDouble(), -encoder.velocity))
+    } else {
+      motor.power = power
     }
+    angle = encoder.currentPosition.toDouble()
+  }
 
-    fun setPower(power: Double) = LambdaCommand("setTurretPower")
-        .setStart {
+  fun setAngle(targetAngle: Double) =
+      LambdaCommand("setTurretAngle")
+          .setStart {
+            usingPID = true
+            PID.goal = KineticState(targetAngle.coerceIn(-19_000.0, 19_000.0), 0.0)
+          }
+          .setIsDone { abs(angle - targetAngle) < 50 }
+          .requires(this)
+
+  fun setPower(power: Double) =
+      LambdaCommand("setTurretPower")
+          .setStart {
+            usingPID = false
             if (angle >= 19_000) {
-                this.power = 0.2
+              this.power = 0.2
             } else if (angle <= -19_000) {
-                this.power = -0.2
+              this.power = -0.2
             } else {
-                this.power = power
+              this.power = power
             }
-    }
-        .setIsDone { true }
-        .requires(this)
-    fun cameraTrackPower(targetAngle: Double) = LambdaCommand("turretCameraTrackPower")
-    .setStart {
-        var kP = 0.0015
-        val kD = 0.00001
-        val error = targetAngle
-        val currentTime = System.currentTimeMillis()
-        val dt = (currentTime - lastTime) / 1000.0
-        val errorRate = if (dt > 0) (error - previousError) / dt else 0.0
-
-        if (angle >= 19_000) {
-            this.power = 0.2
-        } else if (angle <= -19_000) {
-            this.power = -0.2
-        } else {
-            this.power = ((error * kP) + (errorRate * kD)).coerceIn(-1.0, 1.0)
-        }
-
-        previousError = error
-        lastTime = currentTime
-    }
-    .setIsDone { true }
-    .requires(this)
+          }
+          .setIsDone { true }
+          .requires(this)
 }
