@@ -11,6 +11,7 @@ import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
+import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
@@ -140,12 +141,12 @@ class teleop : NextFTCOpMode() {
             }
     val turretRight =
         button { gamepad1.dpad_right }
-            .whenBecomesTrue { Turret.setAngle((Turret.targetAngle + 45.0).deg).schedule() }
+            .whenBecomesTrue { Turret.setAngle((Turret.targetAngle + 45.0).deg, true).schedule() }
     val turretLeft =
         button { gamepad1.dpad_left }
-            .whenBecomesTrue { Turret.setAngle((Turret.targetAngle - 45.0).deg).schedule() }
+            .whenBecomesTrue { Turret.setAngle((Turret.targetAngle - 45.0).deg, true).schedule() }
     val turretCenter =
-        button { gamepad1.circle }.whenBecomesTrue { Turret.setAngle(0.0.deg).schedule() }
+        button { gamepad1.circle }.whenBecomesTrue { Turret.setAngle(0.0.deg, true).schedule() }
     val speedToggle =
         Gamepads.gamepad1.rightTrigger
             .atLeast(0.5)
@@ -177,6 +178,7 @@ class teleop : NextFTCOpMode() {
     // telemetry.addData("Indexer Position", Indexer.currentPosition)
     // telemetry.addData("Indexer Goal", Indexer.goalPosition)
     // telemetry.addData("Indexer Power", Indexer.power)
+    Turret.IMUDegrees = PedroComponent.follower.pose.heading.rad.inDeg
 
     BindingManager.update()
     telemetry.update()
