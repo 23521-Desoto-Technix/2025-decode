@@ -137,15 +137,12 @@ class teleop : NextFTCOpMode() {
             .whenBecomesTrue {
               Hood.setPosition((Hood.position - 0.1).coerceAtLeast(0.0)).schedule()
             }
-      val turretRight =
-        button { gamepad1.dpad_right }
-            .whenBecomesTrue { Turret.setAngle(10_000.0).schedule() }
+    val turretRight =
+        button { gamepad1.dpad_right }.whenBecomesTrue { Turret.setAngle(10_000.0).schedule() }
     val turretLeft =
-        button { gamepad1.dpad_left }
-            .whenBecomesTrue { Turret.setAngle(-10_000.0).schedule() }
-      val turretCenter =
-        button { gamepad1.circle }
-            .whenBecomesTrue { Turret.setAngle(0.0).schedule() }
+        button { gamepad1.dpad_left }.whenBecomesTrue { Turret.setAngle(-10_000.0).schedule() }
+    val turretCenter =
+        button { gamepad1.circle }.whenBecomesTrue { Turret.setAngle(0.0).schedule() }
     val speedToggle =
         Gamepads.gamepad1.rightTrigger
             .atLeast(0.5)
@@ -171,7 +168,6 @@ class teleop : NextFTCOpMode() {
     // telemetry.addData("Shooter power", Shooter.power)
     telemetry.addData("Turret angle", Turret.angle)
     telemetry.addData("Turret power", Turret.power)
-    telemetry.addData("Turret PD error", Turret.previousError)
     // telemetry.addData("Intake Break Beam", intakeBreakBeam.state)
     // telemetry.addData("Left Break Beam", leftBreakBeam.state)
     // telemetry.addData("Right Break Beam", rightBreakBeam.state)

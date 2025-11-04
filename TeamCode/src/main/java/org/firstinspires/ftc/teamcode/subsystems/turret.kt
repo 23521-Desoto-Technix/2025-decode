@@ -12,15 +12,13 @@ object Turret : Subsystem {
   val encoder = MotorEx("frontLeft")
   var angle = 0.0
   var power = 0.0
-  var previousError = 0.0
-  var lastTime = System.currentTimeMillis()
   val PID = controlSystem { posPid(0.0015, 0.0, 0.0) }
   var usingPID = false
 
   override fun periodic() {
     if (usingPID) {
       motor.power =
-          PID.calculate(KineticState(-encoder.currentPosition.toDouble(), -encoder.velocity))
+          PID.calculate(KineticState(encoder.currentPosition.toDouble(), encoder.velocity))
     } else {
       motor.power = power
     }
