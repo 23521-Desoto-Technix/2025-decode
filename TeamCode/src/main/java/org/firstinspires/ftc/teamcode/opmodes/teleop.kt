@@ -184,21 +184,26 @@ class teleop : NextFTCOpMode() {
     // telemetry.addData("Indexer Power", Indexer.power)
     Turret.IMUDegrees = PedroComponent.follower.pose.heading.rad.inDeg
 
-    BindingManager.update()
-    telemetry.update()
     if (alliance == Alliance.RED) {
       targetPose = Pose(144.0, 144.0, 0.0)
     } else if (alliance == Alliance.BLUE) {
       targetPose = Pose(0.0, 144.0, 0.0)
     }
-    Turret.setAngle(
+    val goalAngle =
         atan2(
                 PedroComponent.follower.pose.x - targetPose.x,
                 PedroComponent.follower.pose.y - targetPose.y,
             )
-            .rad,
-        true,
-    ).schedule()
+            .rad
+    telemetry.addData("Goal Angle", goalAngle)
+    Turret.setAngle(
+            goalAngle,
+            true,
+        )
+        .schedule()
+
+    BindingManager.update()
+    telemetry.update()
   }
 
   override fun onStop() {
