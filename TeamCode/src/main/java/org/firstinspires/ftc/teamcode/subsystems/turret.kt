@@ -4,6 +4,7 @@ import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
 import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
+import dev.nextftc.core.units.Angle
 import dev.nextftc.hardware.impl.MotorEx
 import kotlin.math.abs
 
@@ -25,7 +26,7 @@ object Turret : Subsystem {
     angle = encoder.currentPosition.toDouble()
   }
 
-  fun setAngle(targetAngle: Double) =
+  fun setTicks(targetAngle: Double) =
       LambdaCommand("setTurretAngle")
           .setStart {
             usingPID = true
@@ -33,6 +34,8 @@ object Turret : Subsystem {
           }
           .setIsDone { abs(angle - targetAngle) < 50 }
           .requires(this)
+
+  fun setAngle(angle: Angle) = setTicks(angle.inDeg * (145 / 24) * 8192 / 360)
 
   fun setPower(power: Double) =
       LambdaCommand("setTurretPower")

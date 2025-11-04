@@ -10,6 +10,7 @@ import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.core.units.deg
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
@@ -138,11 +139,11 @@ class teleop : NextFTCOpMode() {
               Hood.setPosition((Hood.position - 0.1).coerceAtLeast(0.0)).schedule()
             }
     val turretRight =
-        button { gamepad1.dpad_right }.whenBecomesTrue { Turret.setAngle(10_000.0).schedule() }
+        button { gamepad1.dpad_right }.whenBecomesTrue { Turret.setAngle(90.0.deg).schedule() }
     val turretLeft =
-        button { gamepad1.dpad_left }.whenBecomesTrue { Turret.setAngle(-10_000.0).schedule() }
+        button { gamepad1.dpad_left }.whenBecomesTrue { Turret.setAngle(-90.0.deg).schedule() }
     val turretCenter =
-        button { gamepad1.circle }.whenBecomesTrue { Turret.setAngle(0.0).schedule() }
+        button { gamepad1.circle }.whenBecomesTrue { Turret.setAngle(0.0.deg).schedule() }
     val speedToggle =
         Gamepads.gamepad1.rightTrigger
             .atLeast(0.5)
