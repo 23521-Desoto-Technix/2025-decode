@@ -10,7 +10,6 @@ import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
-import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
@@ -24,6 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Lights
 import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
+import kotlin.math.atan2
 import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
@@ -46,6 +46,8 @@ class teleop : NextFTCOpMode() {
   private lateinit var intakeBreakBeam: DigitalChannel
   private lateinit var leftBreakBeam: DigitalChannel
   private lateinit var rightBreakBeam: DigitalChannel
+
+  var targetPose = Pose(72.0, 144.0, 0.0)
 
   var speedMultiplier = 1.0
 
@@ -139,6 +141,7 @@ class teleop : NextFTCOpMode() {
             .whenBecomesTrue {
               Hood.setPosition((Hood.position - 0.1).coerceAtLeast(0.0)).schedule()
             }
+    /*
     val turretRight =
         button { gamepad1.dpad_right }
             .whenBecomesTrue { Turret.setAngle((Turret.targetAngle + 45.0).deg, true).schedule() }
@@ -147,6 +150,7 @@ class teleop : NextFTCOpMode() {
             .whenBecomesTrue { Turret.setAngle((Turret.targetAngle - 45.0).deg, true).schedule() }
     val turretCenter =
         button { gamepad1.circle }.whenBecomesTrue { Turret.setAngle(0.0.deg, true).schedule() }
+        */
     val speedToggle =
         Gamepads.gamepad1.rightTrigger
             .atLeast(0.5)
@@ -182,6 +186,19 @@ class teleop : NextFTCOpMode() {
 
     BindingManager.update()
     telemetry.update()
+    if (alliance == Alliance.RED) {
+      targetPose = Pose(144.0, 144.0, 0.0)
+    } else if (alliance == Alliance.BLUE) {
+      targetPose = Pose(0.0, 144.0, 0.0)
+    }
+    Turret.setAngle(
+        atan2(
+                PedroComponent.follower.pose.x - targetPose.x,
+                PedroComponent.follower.pose.y - targetPose.y,
+            )
+            .rad,
+        true,
+    )
   }
 
   override fun onStop() {
