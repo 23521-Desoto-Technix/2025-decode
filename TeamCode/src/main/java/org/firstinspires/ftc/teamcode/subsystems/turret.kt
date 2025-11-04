@@ -12,7 +12,7 @@ object Turret : Subsystem {
   val encoder = MotorEx("frontLeft")
   var angle = 0.0
   var power = 0.0
-  val PID = controlSystem { posPid(0.0015, 0.0, 0.0) }
+  val PID = controlSystem { posPid(0.0013, 0.0, 0.00001) }
   var usingPID = false
 
   override fun periodic() {
