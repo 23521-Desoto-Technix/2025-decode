@@ -16,7 +16,6 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
@@ -24,6 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Lights
 import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
+import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -140,10 +140,10 @@ class teleop : NextFTCOpMode() {
             }
     val turretRight =
         button { gamepad1.dpad_right }
-            .whenBecomesTrue { Turret.setAngle((Turret.angle + 90.0).deg).schedule() }
+            .whenBecomesTrue { Turret.setAngle((Turret.targetAngle + 45.0).deg).schedule() }
     val turretLeft =
         button { gamepad1.dpad_left }
-            .whenBecomesTrue { Turret.setAngle((Turret.angle - 90.0).deg).schedule() }
+            .whenBecomesTrue { Turret.setAngle((Turret.targetAngle - 45.0).deg).schedule() }
     val turretCenter =
         button { gamepad1.circle }.whenBecomesTrue { Turret.setAngle(0.0.deg).schedule() }
     val speedToggle =

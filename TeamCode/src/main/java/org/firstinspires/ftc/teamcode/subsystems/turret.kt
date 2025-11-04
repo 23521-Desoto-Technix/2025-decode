@@ -15,6 +15,7 @@ object Turret : Subsystem {
   var power = 0.0
   val PID = controlSystem { posPid(0.0006, 0.0, 0.00002) }
   var usingPID = false
+  var targetAngle = 0.0
 
   override fun periodic() {
     if (usingPID) {
@@ -44,7 +45,9 @@ object Turret : Subsystem {
         while (normalizedAngle < -180) {
           normalizedAngle += 360
         }
-        setTicks(normalizedAngle * (145 / 24) * 8192 / 360).schedule()
+        normalizedAngle = normalizedAngle * (145 / 24) * 8192 / 360
+        targetAngle = normalizedAngle
+        setTicks(normalizedAngle).schedule()
       }
 
   fun setPower(power: Double) =
