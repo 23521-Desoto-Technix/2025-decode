@@ -19,6 +19,7 @@ object Turret : Subsystem {
   var targetAngle = 0.0
   var IMUDegrees = 0.0
   var goal = KineticState(0.0, 0.0)
+  var baseAngle = 0.0
 
   private fun normalizeAngle(angleDeg: Double): Double {
     var normalized = angleDeg
@@ -43,20 +44,22 @@ object Turret : Subsystem {
     return ticks / 8192 * 360 * (24 / 145.0)
   }
 
-  private fun setGoalSafe(angleDeg: Double) {
+  private fun setGoalSafe(angleDeg: Double, updateBase: Boolean = true) {
     val normalized = normalizeAngle(angleDeg)
     val ticks = degreesToTicks(normalized)
     val limited = applyTickLimits(ticks)
     PID.goal = KineticState(limited, 0.0)
+    goal = KineticState(limited, 0.0)
     targetAngle = normalized
+    if (updateBase) {
+      baseAngle = normalized
+    }
   }
 
   override fun periodic() {
     if (usingIMU) {
-      val imuTicks = degreesToTicks(IMUDegrees)
-      val newGoalTicks = goal.position + imuTicks
-      val newGoalDegrees = ticksToDegrees(newGoalTicks)
-      setGoalSafe(newGoalDegrees)
+      val adjustedAngle = baseAngle + IMUDegrees
+      setGoalSafe(adjustedAngle, false)
     }
     if (usingPID) {
       motor.power =

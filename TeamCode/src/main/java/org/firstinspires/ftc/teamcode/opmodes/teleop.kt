@@ -195,7 +195,7 @@ class teleop : NextFTCOpMode() {
                 PedroComponent.follower.pose.y - targetPose.y,
             )
             .rad
-    telemetry.addData("Goal Angle", goalAngle)
+    telemetry.addData("Goal Angle", goalAngle.inDeg)
     Turret.setAngle(
             goalAngle,
             true,
