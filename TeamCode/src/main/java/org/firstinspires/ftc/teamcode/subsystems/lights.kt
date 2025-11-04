@@ -9,23 +9,41 @@ object Lights : Subsystem {
     val left = ServoEx("leftRGB")
     var state: LightsState = LightsState.ALLIANCE_UNKNOWN
 
+    private var blinkStartTime = 0L
+    private val BLINK_CYCLE_TIME = 750L
+    private val ALLIANCE_UNKNOWN_ON = 0.388
+    private val ALLIANCE_UNKNOWN_OFF = 0.0
+
     override fun periodic() {
+        // Initialize blink timer when entering ALLIANCE_UNKNOWN state
+        if (state == LightsState.ALLIANCE_UNKNOWN && blinkStartTime == 0L) {
+            blinkStartTime = System.currentTimeMillis()
+        }
+
         when (state) {
             LightsState.OFF -> {
                 right.position = 0.0
                 left.position = 0.0
             }
             LightsState.ALLIANCE_RED -> {
-                right.position = 0.277
-                left.position = 0.277
+                right.position = 0.285
+                left.position = 0.285
             }
             LightsState.ALLIANCE_BLUE -> {
                 right.position = 0.611
                 left.position = 0.611
             }
             LightsState.ALLIANCE_UNKNOWN -> {
-                right.position = 0.388
-                left.position = 0.388
+                val currentTime = System.currentTimeMillis()
+                val elapsedTime = currentTime - blinkStartTime
+                val positionInCycle = elapsedTime % BLINK_CYCLE_TIME
+                val position = if (positionInCycle < BLINK_CYCLE_TIME / 2) {
+                    ALLIANCE_UNKNOWN_ON
+                } else {
+                    ALLIANCE_UNKNOWN_OFF
+                }
+                right.position = position
+                left.position = position
             }
             LightsState.DEBUG_RED -> {
                 right.position = 0.305
