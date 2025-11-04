@@ -13,7 +13,7 @@ object Turret : Subsystem {
   val encoder = MotorEx("frontLeft").zeroed()
   var angle = 0.0
   var power = 0.0
-  val PID = controlSystem { posPid(0.0006, 0.0, 0.0) }
+  val PID = controlSystem { posPid(0.0006, 0.0, 0.00002) }
   var usingPID = false
 
   override fun periodic() {
@@ -23,7 +23,7 @@ object Turret : Subsystem {
     } else {
       motor.power = power
     }
-    angle = encoder.currentPosition.toDouble()
+    angle = encoder.currentPosition.toDouble() / 8192 * 360 * (24 / 145.0)
   }
 
   fun setTicks(targetAngle: Double) =
@@ -35,7 +35,17 @@ object Turret : Subsystem {
           .setIsDone { abs(angle - targetAngle) < 50 }
           .requires(this)
 
-  fun setAngle(angle: Angle) = setTicks(angle.inDeg * (145 / 24) * 8192 / 360)
+  fun setAngle(angle: Angle) =
+      LambdaCommand().setStart {
+        var normalizedAngle = angle.inDeg
+        while (normalizedAngle > 180) {
+          normalizedAngle -= 360
+        }
+        while (normalizedAngle < -180) {
+          normalizedAngle += 360
+        }
+        setTicks(normalizedAngle * (145 / 24) * 8192 / 360).schedule()
+      }
 
   fun setPower(power: Double) =
       LambdaCommand("setTurretPower")
