@@ -45,8 +45,8 @@ object Turret : Subsystem {
         while (normalizedAngle < -180) {
           normalizedAngle += 360
         }
+          targetAngle = normalizedAngle
         normalizedAngle = normalizedAngle * (145 / 24) * 8192 / 360
-        targetAngle = normalizedAngle
         setTicks(normalizedAngle).schedule()
       }
 
