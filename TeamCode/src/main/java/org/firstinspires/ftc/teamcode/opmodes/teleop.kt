@@ -198,7 +198,7 @@ class teleop : NextFTCOpMode() {
             )
             .rad,
         true,
-    )
+    ).schedule()
   }
 
   override fun onStop() {
