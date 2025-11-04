@@ -14,7 +14,7 @@ object Turret : Subsystem {
     var lastTime = System.currentTimeMillis()
 
     override fun periodic() {
-        motor.power = power
+        motor.power = powesr
         angle = encoder.currentPosition.toDouble()
     }
 
