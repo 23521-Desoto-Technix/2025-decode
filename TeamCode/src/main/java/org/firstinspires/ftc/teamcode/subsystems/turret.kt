@@ -9,10 +9,10 @@ import kotlin.math.abs
 
 object Turret : Subsystem {
   val motor = MotorEx("turret").zeroed().brakeMode()
-  val encoder = MotorEx("frontLeft")
+  val encoder = MotorEx("frontLeft").zeroed()
   var angle = 0.0
   var power = 0.0
-  val PID = controlSystem { posPid(0.0013, 0.0, 0.00001) }
+  val PID = controlSystem { posPid(0.0006, 0.0, 0.0) }
   var usingPID = false
 
   override fun periodic() {
