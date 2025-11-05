@@ -86,12 +86,12 @@ class teleop : NextFTCOpMode() {
     val bumpSpeedUp =
         button { gamepad2.right_bumper }
             .whenBecomesTrue {
-              Shooter.setPower((Shooter.power + 0.1).coerceAtMost(1.0)).schedule()
+              Shooter.setPower((Shooter.power + 0.01).coerceAtMost(1.0)).schedule()
             }
     val bumpSpeedDown =
         button { gamepad2.left_bumper }
             .whenBecomesTrue {
-              Shooter.setPower((Shooter.power - 0.1).coerceAtLeast(0.0)).schedule()
+              Shooter.setPower((Shooter.power - 0.01).coerceAtLeast(0.0)).schedule()
             }
     val nominalPower =
         button { gamepad2.right_trigger > 0.5 }
@@ -201,8 +201,9 @@ class teleop : NextFTCOpMode() {
             .rad
     telemetry.addData("Relative X", offsetX)
     telemetry.addData("Relative Y", offsetY)
-    telemetry.addData("Distance", sqrt((offsetX * offsetX) + (offsetY * offsetY)))
+    telemetry.addData("Relative Distance", sqrt((offsetX * offsetX) + (offsetY * offsetY)))
     telemetry.addData("Goal Angle", goalAngle.inDeg)
+    telemetry.addData("Shooter Power", Shooter.power)
     Turret.setAngle(
             goalAngle,
             true,
