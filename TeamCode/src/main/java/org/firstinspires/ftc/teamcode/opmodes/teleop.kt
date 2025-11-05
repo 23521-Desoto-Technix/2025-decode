@@ -16,6 +16,9 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.atan2
+import kotlin.math.sqrt
+import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
@@ -23,8 +26,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Lights
 import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -190,14 +191,17 @@ class teleop : NextFTCOpMode() {
     } else if (alliance == Alliance.BLUE) {
       targetPose = Pose(142.0, 2.0, 0.0)
     }
+    val offsetX = targetPose.x + PedroComponent.follower.pose.x - 144
+    val offsetY = targetPose.y - PedroComponent.follower.pose.y
     val goalAngle =
         atan2(
-                targetPose.y - PedroComponent.follower.pose.y,
-                targetPose.x + PedroComponent.follower.pose.x -144,
+                offsetY,
+                offsetX,
             )
             .rad
-    telemetry.addData("Relative X", targetPose.x + PedroComponent.follower.pose.x -144)
-    telemetry.addData("Relative Y", targetPose.y - PedroComponent.follower.pose.y)
+    telemetry.addData("Relative X", offsetX)
+    telemetry.addData("Relative Y", offsetY)
+    telemetry.addData("Distance", sqrt((offsetX * offsetX) + (offsetY * offsetY)))
     telemetry.addData("Goal Angle", goalAngle.inDeg)
     Turret.setAngle(
             goalAngle,
