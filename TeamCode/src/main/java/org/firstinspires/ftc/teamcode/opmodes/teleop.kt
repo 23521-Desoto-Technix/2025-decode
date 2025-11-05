@@ -186,9 +186,9 @@ class teleop : NextFTCOpMode() {
     Turret.IMUDegrees = PedroComponent.follower.pose.heading.rad.inDeg
 
     if (alliance == Alliance.RED) {
-      targetPose = Pose(144.0, 142.0, 0.0)
+      targetPose = Pose(142.0, 142.0, 0.0)
     } else if (alliance == Alliance.BLUE) {
-      targetPose = Pose(0.0, 144.0, 0.0)
+      targetPose = Pose(142.0, 2.0, 0.0)
     }
     val goalAngle =
         atan2(
