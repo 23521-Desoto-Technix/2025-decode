@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
+import dev.nextftc.bindings.range
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
@@ -78,7 +79,7 @@ class teleop : NextFTCOpMode() {
     Indexer.leftBreakBeam = leftBreakBeam
     Indexer.rightBreakBeam = rightBreakBeam
     Indexer.indexerToSlot(0).schedule()
-    PedroComponent.follower.pose = Pose(72.0, 72.0, 0.0)
+    PedroComponent.follower.pose = Pose(134.7, 81.1, 0.0)
     PedroComponent.follower.breakFollowing()
 
     aprilTag =
@@ -192,9 +193,9 @@ class teleop : NextFTCOpMode() {
             .whenBecomesFalse { InstantCommand { speedMultiplier = 1.0 }.schedule() }
     val driverControlled =
         PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.map { -it * speedMultiplier },
-            Gamepads.gamepad1.leftStickX.map { -it * speedMultiplier },
-            Gamepads.gamepad1.rightStickX.map { -it * speedMultiplier },
+            Gamepads.gamepad1.leftStickY.mapToRange { -it * speedMultiplier },
+            Gamepads.gamepad1.leftStickX.mapToRange { -it * speedMultiplier },
+            Gamepads.gamepad1.rightStickX.mapToRange { -it * speedMultiplier },
             false,
         )
     driverControlled()
@@ -226,7 +227,7 @@ class teleop : NextFTCOpMode() {
           hasLock = true
           pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
           if (detection.ftcPose != null) {
-            telemetry.addData("pose", detection.ftcPose.toString())
+            telemetry.addData("pose", detection.ftcPose.range)
           } else {
             telemetry.addData("pose", "null")
           }
