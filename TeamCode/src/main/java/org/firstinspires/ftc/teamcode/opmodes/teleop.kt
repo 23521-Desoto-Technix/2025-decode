@@ -193,9 +193,9 @@ class teleop : NextFTCOpMode() {
             .whenBecomesFalse { InstantCommand { speedMultiplier = 1.0 }.schedule() }
     val driverControlled =
         PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.mapToRange { -it * speedMultiplier },
-            Gamepads.gamepad1.leftStickX.mapToRange { -it * speedMultiplier },
-            Gamepads.gamepad1.rightStickX.mapToRange { -it * speedMultiplier },
+            range { -gamepad1.left_stick_y.toDouble() * speedMultiplier },
+            range { -gamepad1.left_stick_x.toDouble() * speedMultiplier },
+            range { -gamepad1.right_stick_x.toDouble() * speedMultiplier },
             false,
         )
     driverControlled()
