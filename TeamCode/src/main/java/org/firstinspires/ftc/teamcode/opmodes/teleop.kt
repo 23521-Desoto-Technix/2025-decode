@@ -17,9 +17,6 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.atan2
-import kotlin.math.sqrt
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -32,6 +29,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.math.atan2
+import kotlin.math.sqrt
+import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -218,7 +218,7 @@ class teleop : NextFTCOpMode() {
       targetAprilTag = 20
     }
     for (detection in aprilTag.detections) {
-      if (detection.id == targetAprilTag) {
+      if (detection.id == targetAprilTag && detection != null && detection.rawPose != null) {
         hasLock = true
         pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
         telemetry.addData("pose", detection.rawPose.R.toString())
