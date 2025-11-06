@@ -13,7 +13,7 @@ object Turret : Subsystem {
   val encoder = MotorEx("frontLeft").zeroed()
   var angle = 0.0
   var power = 0.0
-  val PID = controlSystem { posPid(0.0006, 0.0, 0.000002) }
+  val PID = controlSystem { posPid(0.0003, 0.0, 0.000002) }
   var usingPID = false
   var usingIMU = false
   var targetAngle = 0.0

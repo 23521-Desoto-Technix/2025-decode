@@ -28,6 +28,7 @@ import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
+import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
 import kotlin.math.atan2
 import kotlin.time.Duration.Companion.seconds
@@ -87,7 +88,7 @@ class teleop : NextFTCOpMode() {
             .setDrawTagOutline(true)
             .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
             .setLensIntrinsics(667.154, 667.154, 438.702, 286.414)
-
+            .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
             // ... these parameters are fx, fy, cx, cy.
             .build()
     aprilTag.setPoseSolver(AprilTagProcessor.PoseSolver.APRILTAG_BUILTIN)
@@ -224,8 +225,8 @@ class teleop : NextFTCOpMode() {
         if (detection.id == targetAprilTag) {
           hasLock = true
           pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
-          if (detection.rawPose != null) {
-            telemetry.addData("pose", detection.rawPose.R.toString())
+          if (detection.ftcPose != null) {
+            telemetry.addData("pose", detection.ftcPose.toString())
           } else {
             telemetry.addData("pose", "null")
           }
@@ -253,7 +254,7 @@ class teleop : NextFTCOpMode() {
     // telemetry.addData("Shooter Power", Shooter.power)
     telemetry.addData("Has Lock", hasLock)
     if (hasLock) {
-      Turret.cameraTrackPower(pixelOffset, rotationComp).schedule()
+      Turret.cameraTrackPower(pixelOffset).schedule()
     } else {
       Turret.setAngle(
               goalAngle,
