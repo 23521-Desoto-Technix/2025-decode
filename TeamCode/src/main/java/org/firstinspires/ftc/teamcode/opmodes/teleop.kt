@@ -17,6 +17,8 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.atan2
+import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -29,8 +31,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -218,15 +218,17 @@ class teleop : NextFTCOpMode() {
     if (alliance == Alliance.BLUE) {
       targetAprilTag = 20
     }
-    for (detection in aprilTag.freshDetections) {
+    if (aprilTag.freshDetections != null) {
+      for (detection in aprilTag.freshDetections) {
         telemetry.addData("Detected Tag ID", detection.id)
-      if (detection.id == targetAprilTag) {
-        hasLock = true
-        pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
-        if (detection.rawPose != null) {
-          telemetry.addData("pose", detection.rawPose.R.toString())
-        } else {
-          telemetry.addData("pose", "null")
+        if (detection.id == targetAprilTag) {
+          hasLock = true
+          pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
+          if (detection.rawPose != null) {
+            telemetry.addData("pose", detection.rawPose.R.toString())
+          } else {
+            telemetry.addData("pose", "null")
+          }
         }
       }
     }
