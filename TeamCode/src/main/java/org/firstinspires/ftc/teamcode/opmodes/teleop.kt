@@ -17,8 +17,6 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -31,6 +29,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.math.atan2
+import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -218,8 +218,8 @@ class teleop : NextFTCOpMode() {
     if (alliance == Alliance.BLUE) {
       targetAprilTag = 20
     }
-    if (aprilTag.freshDetections != null && aprilTag.freshDetections.isNotEmpty()) {
-      for (detection in aprilTag.freshDetections) {
+    if (aprilTag.detections.isNotEmpty()) {
+      for (detection in aprilTag.detections) {
         telemetry.addData("Detected Tag ID", detection.id)
         if (detection.id == targetAprilTag) {
           hasLock = true
