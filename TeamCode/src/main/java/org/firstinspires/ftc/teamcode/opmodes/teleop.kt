@@ -219,7 +219,8 @@ class teleop : NextFTCOpMode() {
       targetAprilTag = 20
     }
     for (detection in aprilTag.freshDetections) {
-      if (detection.id == targetAprilTag && detection != null) {
+        telemetry.addData("Detected Tag ID", detection.id)
+      if (detection.id == targetAprilTag) {
         hasLock = true
         pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
         if (detection.rawPose != null) {
