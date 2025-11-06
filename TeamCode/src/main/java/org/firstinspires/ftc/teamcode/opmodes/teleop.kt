@@ -30,7 +30,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
 import kotlin.math.atan2
-import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
@@ -238,11 +237,12 @@ class teleop : NextFTCOpMode() {
                 offsetX,
             )
             .rad
-    telemetry.addData("Relative X", offsetX)
-    telemetry.addData("Relative Y", offsetY)
-    telemetry.addData("Relative Distance", sqrt((offsetX * offsetX) + (offsetY * offsetY)))
-    telemetry.addData("Goal Angle", goalAngle.inDeg)
-    telemetry.addData("Shooter Power", Shooter.power)
+    // telemetry.addData("Relative X", offsetX)
+    // telemetry.addData("Relative Y", offsetY)
+    // telemetry.addData("Relative Distance", sqrt((offsetX * offsetX) + (offsetY * offsetY)))
+    // telemetry.addData("Goal Angle", goalAngle.inDeg)
+    // telemetry.addData("Shooter Power", Shooter.power)
+    telemetry.addData("Has Lock", hasLock)
     if (hasLock) {
       Turret.cameraTrackPower(pixelOffset, rotationComp).schedule()
     } else {

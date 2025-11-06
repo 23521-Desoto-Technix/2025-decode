@@ -83,11 +83,14 @@ object Turret : Subsystem {
           .requires(this)
 
   fun setAngle(angle: Angle, useIMU: Boolean = false) =
-      LambdaCommand("setTurretAngle").setStart {
-        usingIMU = useIMU
-        setGoalSafe(angle.inDeg)
-        usingPID = true
-      }
+      LambdaCommand("setTurretAngle")
+          .setStart {
+            usingIMU = useIMU
+            setGoalSafe(angle.inDeg)
+            usingPID = true
+          }
+          .setIsDone { true }
+          .requires(this)
 
   fun setPower(power: Double) =
       LambdaCommand("setTurretPower")
