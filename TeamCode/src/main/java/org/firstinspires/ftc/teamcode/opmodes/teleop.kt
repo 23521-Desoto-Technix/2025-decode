@@ -87,8 +87,10 @@ class teleop : NextFTCOpMode() {
             .setDrawTagOutline(true)
             .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
             .setLensIntrinsics(667.154, 667.154, 438.702, 286.414)
+
             // ... these parameters are fx, fy, cx, cy.
             .build()
+    aprilTag.setPoseSolver(AprilTagProcessor.PoseSolver.APRILTAG_BUILTIN)
 
     portal =
         VisionPortal.Builder()
@@ -216,11 +218,15 @@ class teleop : NextFTCOpMode() {
     if (alliance == Alliance.BLUE) {
       targetAprilTag = 20
     }
-    for (detection in aprilTag.detections) {
-      if (detection.id == targetAprilTag && detection != null && detection.rawPose != null) {
+    for (detection in aprilTag.freshDetections) {
+      if (detection.id == targetAprilTag && detection != null) {
         hasLock = true
         pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
-        telemetry.addData("pose", detection.rawPose.R.toString())
+        if (detection.rawPose != null) {
+          telemetry.addData("pose", detection.rawPose.R.toString())
+        } else {
+          telemetry.addData("pose", "null")
+        }
       }
     }
 
