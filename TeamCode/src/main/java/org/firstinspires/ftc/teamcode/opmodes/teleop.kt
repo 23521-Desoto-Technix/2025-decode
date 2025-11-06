@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
-import android.util.Size
 import com.pedropathing.geometry.Pose
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DigitalChannel
@@ -11,14 +10,15 @@ import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
+import kotlin.math.atan2
+import kotlin.math.sqrt
+import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
@@ -26,9 +26,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Lights
 import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
-import org.firstinspires.ftc.vision.VisionPortal
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -51,15 +48,7 @@ class teleop : NextFTCOpMode() {
   private lateinit var leftBreakBeam: DigitalChannel
   private lateinit var rightBreakBeam: DigitalChannel
 
-  val RESOLUTION_WIDTH: Int = 800
-  val RESOLUTION_HEIGHT: Int = 600
-
-  lateinit var aprilTag: AprilTagProcessor
-
-  lateinit var portal: VisionPortal
-
-  private var lastDetectedCenterX: Double = 0.0
-  private var lastDetectionTime: Long = 0
+  var targetPose = Pose(72.0, 144.0, 0.0)
 
   var speedMultiplier = 1.0
 
@@ -76,24 +65,8 @@ class teleop : NextFTCOpMode() {
     Indexer.leftBreakBeam = leftBreakBeam
     Indexer.rightBreakBeam = rightBreakBeam
     Indexer.indexerToSlot(0).schedule()
-    aprilTag =
-        AprilTagProcessor.Builder()
-            .setDrawAxes(true)
-            .setDrawCubeProjection(true)
-            .setDrawTagOutline(true)
-            .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-            .setLensIntrinsics(667.154, 667.154, 438.702, 286.414)
-            // ... these parameters are fx, fy, cx, cy.
-            .build()
-
-    portal =
-        VisionPortal.Builder()
-            .setCamera(hardwareMap.get<WebcamName?>(WebcamName::class.java, "turretCamera"))
-            .setCameraResolution(Size(RESOLUTION_WIDTH, RESOLUTION_HEIGHT))
-            .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-            .addProcessor(aprilTag)
-            .build()
-    PedroComponent.follower.pose = Pose(0.0, 0.0, 0.0)
+    PedroComponent.follower.pose = Pose(72.0, 72.0, 0.0)
+    PedroComponent.follower.breakFollowing()
   }
 
   override fun onWaitForStart() {
@@ -113,16 +86,16 @@ class teleop : NextFTCOpMode() {
     val bumpSpeedUp =
         button { gamepad2.right_bumper }
             .whenBecomesTrue {
-              Shooter.setPower((Shooter.power + 0.1).coerceAtMost(1.0)).schedule()
+              Shooter.setPower((Shooter.power + 0.01).coerceAtMost(1.0)).schedule()
             }
     val bumpSpeedDown =
         button { gamepad2.left_bumper }
             .whenBecomesTrue {
-              Shooter.setPower((Shooter.power - 0.1).coerceAtLeast(0.0)).schedule()
+              Shooter.setPower((Shooter.power - 0.01).coerceAtLeast(0.0)).schedule()
             }
     val nominalPower =
         button { gamepad2.right_trigger > 0.5 }
-            .whenBecomesTrue { Shooter.setPower(0.90).schedule() }
+            .whenBecomesTrue { Shooter.setPower(0.9).schedule() }
     val noPower =
         button { gamepad2.left_trigger > 0.5 }.whenBecomesTrue { Shooter.setPower(0.0).schedule() }
     val intakeForward =
@@ -170,6 +143,16 @@ class teleop : NextFTCOpMode() {
             .whenBecomesTrue {
               Hood.setPosition((Hood.position - 0.1).coerceAtLeast(0.0)).schedule()
             }
+    /*
+    val turretRight =
+        button { gamepad1.dpad_right }
+            .whenBecomesTrue { Turret.setAngle((Turret.targetAngle + 45.0).deg, true).schedule() }
+    val turretLeft =
+        button { gamepad1.dpad_left }
+            .whenBecomesTrue { Turret.setAngle((Turret.targetAngle - 45.0).deg, true).schedule() }
+    val turretCenter =
+        button { gamepad1.circle }.whenBecomesTrue { Turret.setAngle(0.0.deg, true).schedule() }
+        */
     val speedToggle =
         Gamepads.gamepad1.rightTrigger
             .atLeast(0.5)
@@ -193,40 +176,39 @@ class teleop : NextFTCOpMode() {
     // telemetry.addData("Shooter actual", Shooter.speed)
     // telemetry.addData("Shooter target", Shooter.targetSpeed)
     // telemetry.addData("Shooter power", Shooter.power)
-    telemetry.addData("Turret angle", Turret.angle)
-    telemetry.addData("Turret power", Turret.power)
-    telemetry.addData("Turret PD error", Turret.previousError)
+    telemetry.addData("Turret Actual angle", Turret.angle)
+    telemetry.addData("Turret target angle", Turret.targetAngle)
     // telemetry.addData("Intake Break Beam", intakeBreakBeam.state)
     // telemetry.addData("Left Break Beam", leftBreakBeam.state)
     // telemetry.addData("Right Break Beam", rightBreakBeam.state)
     // telemetry.addData("Indexer Position", Indexer.currentPosition)
     // telemetry.addData("Indexer Goal", Indexer.goalPosition)
     // telemetry.addData("Indexer Power", Indexer.power)
+    Turret.IMUDegrees = PedroComponent.follower.pose.heading.rad.inDeg
 
-    var pixelOffset = 0.0
-    var rotationComp = gamepad1.right_stick_x * 150.0
-
-    for (detection in aprilTag.detections) {
-      // telemetry.addLine("-----April Tag Detection-----")
-      // telemetry.addData("Tag ID", detection.id)
-      // telemetry.addData("Tag Center X", detection.center.x)
-      // telemetry.addData("Tag Center Y", detection.center.y)
-      // BLUE: 20, RED: 24
-
-      if (
-          (detection.id == 24 && alliance == Alliance.RED) ||
-              (detection.id == 20 && alliance == Alliance.BLUE)
-      ) {
-        lastDetectionTime = System.currentTimeMillis()
-        lastDetectedCenterX = detection.center.x
-        pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
-        telemetry.addData("ATag Detected", true)
-        telemetry.addData("ATag Center X", detection.center.x)
-        telemetry.addData("ATag Offset from Center", pixelOffset)
-      }
+    if (alliance == Alliance.RED) {
+      targetPose = Pose(142.0, 142.0, 0.0)
+    } else if (alliance == Alliance.BLUE) {
+      targetPose = Pose(142.0, 2.0, 0.0)
     }
-
-    Turret.cameraTrackPower(pixelOffset + rotationComp).schedule()
+    val offsetX = targetPose.x + PedroComponent.follower.pose.x - 144
+    val offsetY = targetPose.y - PedroComponent.follower.pose.y
+    val goalAngle =
+        atan2(
+                offsetY,
+                offsetX,
+            )
+            .rad
+    telemetry.addData("Relative X", offsetX)
+    telemetry.addData("Relative Y", offsetY)
+    telemetry.addData("Relative Distance", sqrt((offsetX * offsetX) + (offsetY * offsetY)))
+    telemetry.addData("Goal Angle", goalAngle.inDeg)
+    telemetry.addData("Shooter Power", Shooter.power)
+    Turret.setAngle(
+            goalAngle,
+            true,
+        )
+        .schedule()
 
     BindingManager.update()
     telemetry.update()
