@@ -37,7 +37,7 @@ object Turret : Subsystem {
   }
 
   private fun degreesToTicks(degrees: Double): Double {
-    return degrees * (145 / 24) * 8192 / 360
+    return degrees * (145.0 / 24.0) * 8192 / 360
   }
 
   private fun ticksToDegrees(ticks: Double): Double {
@@ -77,11 +77,11 @@ object Turret : Subsystem {
             PID.goal = KineticState(limited, 0.0)
             usingPID = true
           }
-          .setIsDone { abs(angle - targetTicks) < 50 }
+          .setIsDone { abs(encoder.currentPosition.toDouble() - targetTicks) < 50 }
           .requires(this)
 
   fun setAngle(angle: Angle, useIMU: Boolean = false) =
-      LambdaCommand().setStart {
+      LambdaCommand("setTurretAngle").setStart {
         usingIMU = useIMU
         setGoalSafe(angle.inDeg)
         usingPID = true
