@@ -218,7 +218,7 @@ class teleop : NextFTCOpMode() {
     if (alliance == Alliance.BLUE) {
       targetAprilTag = 20
     }
-    if (aprilTag.freshDetections != null) {
+    if (aprilTag.freshDetections != null && aprilTag.freshDetections.isNotEmpty()) {
       for (detection in aprilTag.freshDetections) {
         telemetry.addData("Detected Tag ID", detection.id)
         if (detection.id == targetAprilTag) {
