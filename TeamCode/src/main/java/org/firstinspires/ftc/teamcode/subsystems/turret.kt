@@ -20,6 +20,8 @@ object Turret : Subsystem {
   var IMUDegrees = 0.0
   var goal = KineticState(0.0, 0.0)
   var baseAngle = 0.0
+  var previousError = 0.0
+  var lastTime = System.currentTimeMillis()
 
   private fun normalizeAngle(angleDeg: Double): Double {
     var normalized = angleDeg
@@ -98,6 +100,32 @@ object Turret : Subsystem {
             } else {
               this.power = power
             }
+          }
+          .setIsDone { true }
+          .requires(this)
+
+  fun cameraTrackPower(cameraError: Double, gamepadComp: Double = 0.0) =
+      LambdaCommand("turretCameraTrackPower")
+          .setStart {
+            usingPID = false
+
+            var kP = 0.0015
+            val kD = 0.00001
+            val error = cameraError + (gamepadComp * 150.0)
+            val currentTime = System.currentTimeMillis()
+            val dt = (currentTime - lastTime) / 1000.0
+            val errorRate = if (dt > 0) (error - previousError) / dt else 0.0
+
+            if (angle >= 19_000) {
+              this.power = 0.2
+            } else if (angle <= -19_000) {
+              this.power = -0.2
+            } else {
+              this.power = ((error * kP) + (errorRate * kD)).coerceIn(-1.0, 1.0)
+            }
+
+            previousError = error
+            lastTime = currentTime
           }
           .setIsDone { true }
           .requires(this)
