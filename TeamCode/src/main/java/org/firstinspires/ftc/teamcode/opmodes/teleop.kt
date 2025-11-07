@@ -119,18 +119,17 @@ class teleop : NextFTCOpMode() {
   override fun onStartButtonPressed() {
     val bumpSpeedUp =
         button { gamepad2.right_bumper }
-            .whenBecomesTrue {
-              Shooter.setPower((Shooter.power + 0.01).coerceAtMost(1.0)).schedule()
-            }
+            .whenBecomesTrue { Shooter.setSpeed((Shooter.targetSpeed + 100.0)).schedule() }
     val bumpSpeedDown =
         button { gamepad2.left_bumper }
             .whenBecomesTrue {
-              Shooter.setPower((Shooter.power - 0.01).coerceAtLeast(0.0)).schedule()
+              Shooter.setSpeed((Shooter.targetSpeed - 100.0).coerceAtLeast(0.0)).schedule()
             }
-    val nominalPower =
-        button { gamepad2.right_trigger > 0.5 }.whenBecomesTrue { Shooter.setPower(0.9).schedule() }
+    val nominalSpeed =
+        button { gamepad2.right_trigger > 0.5 }
+            .whenBecomesTrue { Shooter.setSpeed(1000.0).schedule() }
     val noPower =
-        button { gamepad2.left_trigger > 0.5 }.whenBecomesTrue { Shooter.setPower(0.0).schedule() }
+        button { gamepad2.left_trigger > 0.5 }.whenBecomesTrue { Shooter.setSpeed(0.0).schedule() }
     val intakeForward =
         button { gamepad2.circle }
             .whenBecomesTrue {
@@ -202,12 +201,11 @@ class teleop : NextFTCOpMode() {
   }
 
   override fun onUpdate() {
-    telemetry.addData("Alliance", alliance)
     telemetry.addData("X", PedroComponent.follower.pose.x)
     telemetry.addData("Y", PedroComponent.follower.pose.y)
     telemetry.addData("Heading", PedroComponent.follower.pose.heading)
-    telemetry.addData("Turret Actual angle", Turret.angle)
-    telemetry.addData("Turret target angle", Turret.targetAngle)
+    telemetry.addData("Shooter Actual", Shooter.speed)
+    telemetry.addData("Shooter Target", Shooter.targetSpeed)
     Turret.IMUDegrees = PedroComponent.follower.pose.heading.rad.inDeg
 
     var pixelOffset = 0.0
@@ -222,7 +220,6 @@ class teleop : NextFTCOpMode() {
     }
     if (aprilTag.detections.isNotEmpty()) {
       for (detection in aprilTag.detections) {
-        telemetry.addData("Detected Tag ID", detection.id)
         if (detection.id == targetAprilTag) {
           hasLock = true
           pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
@@ -240,7 +237,7 @@ class teleop : NextFTCOpMode() {
     } else if (alliance == Alliance.BLUE) {
       targetPose = Pose(144.0, 0.0, 0.0)
     }
-    val offsetX = targetPose.x + PedroComponent.follower.pose.x - 144
+    val offsetX = targetPose.x - (144.0 - PedroComponent.follower.pose.x)
     val offsetY = targetPose.y - PedroComponent.follower.pose.y
     val goalAngle =
         atan2(
@@ -248,11 +245,6 @@ class teleop : NextFTCOpMode() {
                 offsetX,
             )
             .rad
-    // telemetry.addData("Relative X", offsetX)
-    // telemetry.addData("Relative Y", offsetY)
-    // telemetry.addData("Relative Distance", sqrt((offsetX * offsetX) + (offsetY * offsetY)))
-    // telemetry.addData("Goal Angle", goalAngle.inDeg)
-    // telemetry.addData("Shooter Power", Shooter.power)
     telemetry.addData("Has Lock", hasLock)
     if (hasLock) {
       Turret.cameraTrackPower(pixelOffset).schedule()
