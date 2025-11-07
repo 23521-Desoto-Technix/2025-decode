@@ -5,6 +5,7 @@ import dev.nextftc.control.builder.controlSystem
 import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
+import dev.nextftc.core.units.deg
 import dev.nextftc.hardware.impl.MotorEx
 import kotlin.math.abs
 
@@ -22,6 +23,7 @@ object Turret : Subsystem {
   var baseAngle = 0.0
   var previousError = 0.0
   var lastTime = System.currentTimeMillis()
+  val IMU_OFFSET = 90.0.deg
 
   private fun normalizeAngle(angleDeg: Double): Double {
     var normalized = angleDeg
@@ -60,7 +62,7 @@ object Turret : Subsystem {
 
   override fun periodic() {
     if (usingIMU) {
-      val adjustedAngle = baseAngle + IMUDegrees
+      val adjustedAngle = baseAngle + IMUDegrees + IMU_OFFSET.inDeg
       setGoalSafe(adjustedAngle, false)
     }
     if (usingPID) {

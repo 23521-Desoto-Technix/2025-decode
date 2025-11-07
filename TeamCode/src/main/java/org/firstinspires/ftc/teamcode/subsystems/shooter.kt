@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems
 
+import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
+import dev.nextftc.control.feedforward.FeedforwardElement
 import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.MotorEx
@@ -8,13 +10,20 @@ import dev.nextftc.hardware.impl.VoltageCompensatingMotor
 import kotlin.math.abs
 
 object Shooter : Subsystem {
-  private val upperShooterMotor =
-      VoltageCompensatingMotor(MotorEx("leftShooter").brakeMode().reversed())
-  private val lowerShooterMotor = VoltageCompensatingMotor(MotorEx("rightShooter").brakeMode())
+
+  class ShooterFeedforward : FeedforwardElement {
+    override fun calculate(reference: KineticState): Double {
+      return targetSpeed * 0.0003
+    }
+  }
+
+  private val upperShooterMotor = VoltageCompensatingMotor(MotorEx("leftShooter").brakeMode())
+  private val lowerShooterMotor =
+      VoltageCompensatingMotor(MotorEx("rightShooter").brakeMode().reversed())
   private val shooterEncoder = MotorEx("backLeft")
   val PID = controlSystem {
-      velPid(0.0, 0.0, 0.0)
-      basicFF(0.1,0.0,0.0)
+    velPid(0.0, 0.0, 0.0)
+    feedforward(ShooterFeedforward())
   }
 
   var power = 0.0
@@ -29,10 +38,10 @@ object Shooter : Subsystem {
   override fun periodic() {
     this.speed = shooterEncoder.velocity
     if (this.usingPID) {
-      PID.goal = dev.nextftc.control.KineticState(Double.POSITIVE_INFINITY, this.targetSpeed, 0.0)
+      PID.goal = KineticState(Double.POSITIVE_INFINITY, this.targetSpeed, 0.0)
       val pidOutput =
           PID.calculate(
-              dev.nextftc.control.KineticState(
+              KineticState(
                   Double.POSITIVE_INFINITY,
                   this.speed,
                   shooterEncoder.state.acceleration,
