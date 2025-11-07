@@ -18,6 +18,8 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.atan2
+import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -31,8 +33,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -190,6 +190,11 @@ class teleop : NextFTCOpMode() {
             range { -gamepad1.right_stick_x.toDouble() * speedMultiplier },
             false,
         )
+    val headingReset =
+        button { gamepad1.right_bumper }
+            .whenBecomesTrue {
+              InstantCommand { PedroComponent.follower.pose.heading = 0.0 }.schedule()
+            }
     driverControlled()
   }
 
