@@ -211,10 +211,6 @@ class teleop : NextFTCOpMode() {
     if (alliance == Alliance.BLUE) {
       targetAprilTag = 20
     }
-    if (gamepad1.right_bumper) {
-      PedroComponent.follower.pose =
-          Pose(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 0.0)
-    }
     if (aprilTag.detections.isNotEmpty()) {
       for (detection in aprilTag.detections) {
         if (detection.id == targetAprilTag) {
