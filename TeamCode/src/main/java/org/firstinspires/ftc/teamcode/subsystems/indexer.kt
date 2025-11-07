@@ -3,14 +3,11 @@ package org.firstinspires.ftc.teamcode.subsystems
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
-import dev.nextftc.core.commands.delays.Delay
-import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.CRServoEx
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.ServoEx
-import kotlin.time.Duration.Companion.seconds
 
 object Indexer : Subsystem {
   val indexerServo = CRServoEx("indexer")
@@ -22,7 +19,7 @@ object Indexer : Subsystem {
   val leftFeederServo = ServoEx("leftFeeder")
   val rightFeederServo = ServoEx("rightFeeder")
 
-  val indexerPID = controlSystem { posPid(0.00012, 0.0, 0.000003) }
+  val indexerPID = controlSystem { posPid(0.0003, 0.0, 0.00001) }
   lateinit var leftBreakBeam: DigitalChannel
   lateinit var rightBreakBeam: DigitalChannel
   lateinit var intakeBreakBeam: DigitalChannel
@@ -62,9 +59,7 @@ object Indexer : Subsystem {
             indexerPID.goal = KineticState(position, 0.0)
             goalPosition = position
           }
-          .setIsDone {
-            true
-          }
+          .setIsDone { true }
           .requires(this)
 
   fun waitForPid() =
@@ -108,7 +103,7 @@ object Indexer : Subsystem {
   fun toPreviousSlot() = indexerToPosition(goalPosition - 2730.0)
 
   fun latchDown() =
-      LambdaCommand("latchDown").setStart { latchServo.position = 0.95 }.setIsDone { true }
+      LambdaCommand("latchDown").setStart { latchServo.position = 0.90 }.setIsDone { true }
 
   fun latchUp() =
       LambdaCommand("latchUp").setStart { latchServo.position = 0.45 }.setIsDone { true }
