@@ -118,7 +118,7 @@ class teleop : NextFTCOpMode() {
 
   override fun onStartButtonPressed() {
     val shooterFar =
-        button { gamepad2.right_bumper }.whenBecomesTrue { Shooter.setSpeed(2_200.0).schedule() }
+        button { gamepad2.right_bumper }.whenBecomesTrue { Shooter.setSpeed(2_300.0).schedule() }
     val shooterClose =
         button { gamepad2.left_bumper }.whenBecomesTrue { Shooter.setSpeed(2_100.0).schedule() }
     val shooterOff =
