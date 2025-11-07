@@ -23,7 +23,7 @@ object Turret : Subsystem {
   var baseAngle = 0.0
   var previousError = 0.0
   var lastTime = System.currentTimeMillis()
-  val IMU_OFFSET = 90.0.deg
+  val IMU_OFFSET = -(90.0).deg
 
   private fun normalizeAngle(angleDeg: Double): Double {
     var normalized = angleDeg

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystems
 
 import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
-import dev.nextftc.control.feedforward.FeedforwardElement
 import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.MotorEx
@@ -11,19 +10,13 @@ import kotlin.math.abs
 
 object Shooter : Subsystem {
 
-  class ShooterFeedforward : FeedforwardElement {
-    override fun calculate(reference: KineticState): Double {
-      return targetSpeed * 0.0003
-    }
-  }
-
   private val upperShooterMotor = VoltageCompensatingMotor(MotorEx("leftShooter").brakeMode())
   private val lowerShooterMotor =
       VoltageCompensatingMotor(MotorEx("rightShooter").brakeMode().reversed())
   private val shooterEncoder = MotorEx("backLeft")
   val PID = controlSystem {
     velPid(0.0, 0.0, 0.0)
-    feedforward(ShooterFeedforward())
+    basicFF(0.1)
   }
 
   var power = 0.0
