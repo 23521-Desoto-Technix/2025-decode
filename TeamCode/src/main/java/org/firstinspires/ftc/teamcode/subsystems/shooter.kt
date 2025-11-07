@@ -15,8 +15,8 @@ object Shooter : Subsystem {
       VoltageCompensatingMotor(MotorEx("rightShooter").brakeMode().reversed())
   private val shooterEncoder = MotorEx("backLeft")
   val PID = controlSystem {
-    velPid(0.0, 0.0, 0.0)
-    basicFF(0.0001)
+    velPid(0.01, 0.0, 0.0)
+    basicFF(0.0004)
   }
 
   var power = 0.0
