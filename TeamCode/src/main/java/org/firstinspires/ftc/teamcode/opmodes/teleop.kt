@@ -92,7 +92,6 @@ class teleop : NextFTCOpMode() {
             .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
             // ... these parameters are fx, fy, cx, cy.
             .build()
-    aprilTag.setPoseSolver(AprilTagProcessor.PoseSolver.APRILTAG_BUILTIN)
 
     portal =
         VisionPortal.Builder()
@@ -185,9 +184,9 @@ class teleop : NextFTCOpMode() {
             .whenBecomesFalse { InstantCommand { speedMultiplier = 1.0 }.schedule() }
     val driverControlled =
         PedroDriverControlled(
-            range { gamepad1.left_stick_y.toDouble() * speedMultiplier },
-            range { gamepad1.left_stick_x.toDouble() * speedMultiplier },
-            range { gamepad1.right_stick_x.toDouble() * speedMultiplier },
+            range { gamepad1.left_stick_y.toDouble() * -speedMultiplier },
+            range { gamepad1.left_stick_x.toDouble() * -speedMultiplier },
+            range { gamepad1.right_stick_x.toDouble() * -speedMultiplier },
             false,
         )
     driverControlled()
