@@ -69,6 +69,11 @@ object Indexer : Subsystem {
           }
           .requires(this)
 
+  fun waitForSlotBreakbeam() =
+      LambdaCommand("waitForSlotBreakbeam").setIsDone {
+        (!leftBreakBeam.state || !rightBreakBeam.state)
+      }
+
   fun indexerToSlot(slot: Int) =
       LambdaCommand("indexerToSlot")
           .setStart {

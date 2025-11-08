@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.core.commands.delays.Delay
+import dev.nextftc.core.commands.groups.ParallelRaceGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -18,9 +19,6 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -28,7 +26,6 @@ import org.firstinspires.ftc.teamcode.opmodes.teleop
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
-import org.firstinspires.ftc.teamcode.subsystems.Intake
 import org.firstinspires.ftc.teamcode.subsystems.Lights
 import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
@@ -36,6 +33,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.math.atan2
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Autonomous
 class ERCompat : NextFTCOpMode() {
@@ -73,14 +73,22 @@ class ERCompat : NextFTCOpMode() {
 
   val redStart = Pose(80.1, 8.6, 0.0)
   val blueStart = Pose(0.0, 0.0, 0.0)
-  val redSpikeOne = Pose(105.0, 35.0, 0.0)
+  val redSpikeOneStart = Pose(103.0, 37.0, 0.0)
+  val redSpikeOneEnd = Pose(120.0, 37.0, 0.0)
   lateinit var startToRedSpikeOne: PathChain
+  lateinit var redSpikeIntake: PathChain
 
   override fun onInit() {
     startToRedSpikeOne =
         PedroComponent.follower
             .pathBuilder()
-            .addPath(Path(BezierLine(redStart, redSpikeOne)))
+            .addPath(Path(BezierLine(redStart, redSpikeOneStart)))
+            .setConstantHeadingInterpolation(0.0)
+            .build()
+    redSpikeIntake =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(Path(BezierLine(redSpikeOneStart, redSpikeOneEnd)))
             .setConstantHeadingInterpolation(0.0)
             .build()
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
@@ -211,8 +219,21 @@ class ERCompat : NextFTCOpMode() {
             Delay(waitForIndexer),
             shoot,
             Indexer.setIntakePower(1.0),
+            Indexer.indexerToSlot(0),
             FollowPath(startToRedSpikeOne),
-            InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
+            InstantCommand { PedroComponent.follower.setMaxPower(0.4) },
+            ParallelRaceGroup(
+                FollowPath(redSpikeIntake),
+                SequentialGroup(
+                    Indexer.waitForSlotBreakbeam(),
+                    Indexer.indexerToSlot(1),
+                    Indexer.waitForSlotBreakbeam(),
+                    Indexer.indexerToSlot(2),
+                    Indexer.waitForSlotBreakbeam(),
+                ),
+            ),
+            InstantCommand { PedroComponent.follower.setMaxPower(1.0) },
+            InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
             Delay(5.seconds),
         )
         .schedule()
