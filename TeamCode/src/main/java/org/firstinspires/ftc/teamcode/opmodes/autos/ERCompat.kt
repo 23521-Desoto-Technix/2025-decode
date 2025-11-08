@@ -82,6 +82,7 @@ class ERCompat : NextFTCOpMode() {
     PedroComponent.follower.breakFollowing()
 
     Indexer.unFeed().schedule()
+      Indexer.indexerToSlot(0).schedule()
 
     aprilTag =
         AprilTagProcessor.Builder()
