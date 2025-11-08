@@ -79,7 +79,7 @@ class teleop : NextFTCOpMode() {
     Indexer.leftBreakBeam = leftBreakBeam
     Indexer.rightBreakBeam = rightBreakBeam
     Indexer.indexerToSlot(0).schedule()
-    PedroComponent.follower.pose = Pose(134.7, 81.1, 0.0)
+    PedroComponent.follower.pose = Pose(72.0, 72.0, 0.0)
     PedroComponent.follower.breakFollowing()
 
     aprilTag =
