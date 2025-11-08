@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
+import dev.nextftc.core.commands.groups.ParallelDeadlineGroup
 import dev.nextftc.core.commands.groups.ParallelRaceGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
@@ -74,7 +75,7 @@ class ERCompat : NextFTCOpMode() {
   val redStart = Pose(80.1, 8.6, 0.0)
   val blueStart = Pose(0.0, 0.0, 0.0)
   val redSpikeOneStart = Pose(97.0, 35.0, 0.0)
-  val redSpikeOneEnd = Pose(140.0, 35.0, 0.0)
+  val redSpikeOneEnd = Pose(130.0, 35.0, 0.0)
   lateinit var startToRedSpikeOne: PathChain
   lateinit var redSpikeIntake: PathChain
   lateinit var redSpikeReturn: PathChain
@@ -108,8 +109,7 @@ class ERCompat : NextFTCOpMode() {
             Indexer.setIntakePower(1.0),
             Indexer.indexerToSlot(0),
             FollowPath(startToRedSpikeOne, true, 1.0),
-            ParallelRaceGroup(
-                FollowPath(redSpikeIntake, true, 0.25),
+            ParallelDeadlineGroup(
                 SequentialGroup(
                     Indexer.latchDown(),
                     Indexer.waitForSlotBreakbeam(),
@@ -129,10 +129,11 @@ class ERCompat : NextFTCOpMode() {
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.latchUp(),
                 ),
+                FollowPath(redSpikeIntake, true, 0.3),
             ),
             InstantCommand { PedroComponent.follower.breakFollowing() },
             Indexer.setIntakePower(-1.0),
-            Indexer.indexerToSlot(2),
+            Indexer.indexerToSlot(0),
             FollowPath(redSpikeReturn, true, 1.0),
             Indexer.setIntakePower(0.0),
             InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
