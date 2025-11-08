@@ -8,6 +8,7 @@ import com.pedropathing.paths.PathChain
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
+import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelRaceGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
@@ -77,6 +78,60 @@ class ERCompat : NextFTCOpMode() {
   val redSpikeOneEnd = Pose(140.0, 35.0, 0.0)
   lateinit var startToRedSpikeOne: PathChain
   lateinit var redSpikeIntake: PathChain
+
+  val waitForFeeder = 200.milliseconds
+  val waitForIndexer = 750.milliseconds
+
+  val shoot: Command
+    get() =
+        SequentialGroup(
+            Indexer.feed(),
+            Delay(waitForFeeder),
+            Indexer.unFeed(),
+            Delay(waitForFeeder),
+        )
+
+  val routine: Command
+    get() =
+        SequentialGroup(
+            Indexer.latchUp(),
+            Shooter.setSpeed(2_300.0),
+            Shooter.waitForSpeed(),
+            shoot,
+            Indexer.indexerToSlot(1),
+            Delay(waitForIndexer),
+            shoot,
+            Indexer.indexerToSlot(2),
+            Delay(waitForIndexer),
+            shoot,
+            Indexer.setIntakePower(1.0),
+            Indexer.indexerToSlot(0),
+            FollowPath(startToRedSpikeOne),
+            ParallelRaceGroup(
+                FollowPath(redSpikeIntake, true, 0.25),
+                SequentialGroup(
+                    Indexer.latchDown(),
+                    Indexer.waitForSlotBreakbeam(),
+                    Indexer.latchUp(),
+                    Delay(100.milliseconds),
+                    Indexer.indexerToSlot(1),
+                    Delay(100.milliseconds),
+                    Indexer.latchDown(),
+                    Delay(500.milliseconds),
+                    Indexer.waitForSlotBreakbeam(),
+                    Indexer.latchUp(),
+                    Delay(100.milliseconds),
+                    Indexer.indexerToSlot(2),
+                    Delay(100.milliseconds),
+                    Indexer.latchDown(),
+                    Delay(500.milliseconds),
+                    Indexer.waitForSlotBreakbeam(),
+                    Indexer.latchUp(),
+                ),
+            ),
+            InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
+            Delay(5.seconds),
+        )
 
   override fun onInit() {
     startToRedSpikeOne =
@@ -197,56 +252,7 @@ class ERCompat : NextFTCOpMode() {
   }
 
   override fun onStartButtonPressed() {
-    val waitForFeeder = 200.milliseconds
-    val waitForIndexer = 750.milliseconds
-    val shoot =
-        SequentialGroup(
-            Indexer.feed(),
-            Delay(waitForFeeder),
-            Indexer.unFeed(),
-            Delay(waitForFeeder),
-        )
-
-    SequentialGroup(
-            Indexer.latchUp(),
-            Shooter.setSpeed(2_300.0),
-            Shooter.waitForSpeed(),
-            shoot,
-            Indexer.indexerToSlot(1),
-            Delay(waitForIndexer),
-            shoot,
-            Indexer.indexerToSlot(2),
-            Delay(waitForIndexer),
-            shoot,
-            Indexer.setIntakePower(1.0),
-            Indexer.indexerToSlot(0),
-            FollowPath(startToRedSpikeOne),
-            ParallelRaceGroup(
-                FollowPath(redSpikeIntake, true, 0.25),
-                SequentialGroup(
-                    Indexer.latchDown(),
-                    Indexer.waitForSlotBreakbeam(),
-                    Indexer.latchUp(),
-                    Delay(100.milliseconds),
-                    Indexer.indexerToSlot(1),
-                    Delay(100.milliseconds),
-                    Indexer.latchDown(),
-                    Delay(500.milliseconds),
-                    Indexer.waitForSlotBreakbeam(),
-                    Indexer.latchUp(),
-                    Delay(100.milliseconds),
-                    Indexer.indexerToSlot(2),
-                    Delay(100.milliseconds),
-                    Indexer.latchDown(),
-                    Delay(500.milliseconds),
-                    Indexer.waitForSlotBreakbeam(),
-                    Indexer.latchUp(),
-                ),
-            ),
-            InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
-            Delay(5.seconds),
-        )
-        .schedule()
+    routine()
   }
 
   override fun onStop() {
