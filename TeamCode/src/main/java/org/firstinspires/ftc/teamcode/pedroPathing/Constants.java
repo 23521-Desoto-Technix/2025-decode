@@ -16,15 +16,15 @@ public class Constants {
 
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(13.6)
-            .forwardZeroPowerAcceleration(-41.278)
-            .lateralZeroPowerAcceleration(-59.7819)
+            .forwardZeroPowerAcceleration(-26.4525)
+            .lateralZeroPowerAcceleration(-69.0246)
             .useSecondaryTranslationalPIDF(false)
             .useSecondaryHeadingPIDF(false)
             .useSecondaryDrivePIDF(false)
             .centripetalScaling(0.0005)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.01, 0))
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.2, 0, 0.02, 0.03))
             .headingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.1, 0))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.1, 0, 0, 0.6, 0));
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.005, 0, 0.0002, 0.6, 0));
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .leftFrontMotorName("frontLeft")
@@ -35,15 +35,15 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(57.8741)
-            .yVelocity(52.295)
+            .xVelocity(75.6466)
+            .yVelocity(61.039)
             .useBrakeModeInTeleOp(true);
 
     public static PinpointConstants localizerConstants =
             new PinpointConstants()
                     .hardwareMapName("pinpoint")
-                    .strafePodX(-1.345054)
-                    .forwardPodY(+6.640748)
+                    .strafePodX(+1.345054)
+                    .forwardPodY(-6.640748)
                     .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
                     .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
                     .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
@@ -51,7 +51,7 @@ public class Constants {
     public static PathConstraints pathConstraints = new PathConstraints(
             0.995,
             500,
-            1,
+            3,
             1
     );
 
