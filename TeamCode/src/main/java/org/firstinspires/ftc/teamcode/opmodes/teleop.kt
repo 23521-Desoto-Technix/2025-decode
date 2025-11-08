@@ -230,7 +230,7 @@ class teleop : NextFTCOpMode() {
     } else if (alliance == Alliance.BLUE) {
       targetPose = Pose(144.0, 0.0, 0.0)
     }
-    val offsetX = targetPose.x + PedroComponent.follower.pose.x - 144.0
+    val offsetX = targetPose.x - PedroComponent.follower.pose.x
     val offsetY = targetPose.y - PedroComponent.follower.pose.y
     val goalAngle =
         atan2(
