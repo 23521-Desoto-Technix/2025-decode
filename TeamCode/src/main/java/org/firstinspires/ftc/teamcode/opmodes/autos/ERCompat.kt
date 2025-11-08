@@ -19,9 +19,6 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -36,6 +33,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.math.atan2
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Autonomous
 class ERCompat : NextFTCOpMode() {
@@ -220,11 +220,9 @@ class ERCompat : NextFTCOpMode() {
             shoot,
             Indexer.setIntakePower(1.0),
             Indexer.indexerToSlot(0),
-            InstantCommand { PedroComponent.follower.setMaxPower(1.0) }, FollowPath
-                (startToRedSpikeOne),
-            InstantCommand { PedroComponent.follower.setMaxPower(0.4) },
+            FollowPath(startToRedSpikeOne),
             ParallelRaceGroup(
-                FollowPath(redSpikeIntake),
+                FollowPath(redSpikeIntake, true, 0.4),
                 SequentialGroup(
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.indexerToSlot(1),
@@ -233,7 +231,6 @@ class ERCompat : NextFTCOpMode() {
                     Indexer.waitForSlotBreakbeam(),
                 ),
             ),
-            InstantCommand { PedroComponent.follower.setMaxPower(1.0) },
             InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
             Delay(5.seconds),
         )
