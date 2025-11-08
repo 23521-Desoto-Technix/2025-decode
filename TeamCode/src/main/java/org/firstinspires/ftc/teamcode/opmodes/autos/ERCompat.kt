@@ -64,8 +64,8 @@ class ERCompat : NextFTCOpMode() {
 
   var alliance = teleop.Alliance.UNKNOWN
 
-  val redStart = Pose(8.7, 64.5, 0.0)
-  val blueStart = Pose(9.6, 81.7, 0.0)
+  val redStart = Pose(80.1, 8.6, 0.0)
+  val blueStart = Pose(0.0, 0.0, 0.0)
 
   override fun onInit() {
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
@@ -151,8 +151,8 @@ class ERCompat : NextFTCOpMode() {
     } else if (alliance == teleop.Alliance.BLUE) {
       targetPose = Pose(144.0, 0.0, 0.0)
     }
-    val offsetX = targetPose.x - PedroComponent.follower.pose.x
-    val offsetY = targetPose.y - PedroComponent.follower.pose.y
+      val offsetX = targetPose.x - (144 - PedroComponent.follower.pose.x)
+      val offsetY = targetPose.y - (144 - PedroComponent.follower.pose.y)
     val goalAngle =
         atan2(
                 offsetY,
