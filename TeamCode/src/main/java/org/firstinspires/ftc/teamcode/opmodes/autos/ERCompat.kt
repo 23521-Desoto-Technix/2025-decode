@@ -73,8 +73,8 @@ class ERCompat : NextFTCOpMode() {
 
   val redStart = Pose(80.1, 8.6, 0.0)
   val blueStart = Pose(0.0, 0.0, 0.0)
-  val redSpikeOneStart = Pose(97.0, 37.0, 0.0)
-  val redSpikeOneEnd = Pose(140.0, 37.0, 0.0)
+  val redSpikeOneStart = Pose(97.0, 39.0, 0.0)
+  val redSpikeOneEnd = Pose(140.0, 39.0, 0.0)
   lateinit var startToRedSpikeOne: PathChain
   lateinit var redSpikeIntake: PathChain
 
@@ -223,13 +223,14 @@ class ERCompat : NextFTCOpMode() {
             Indexer.latchDown(),
             FollowPath(startToRedSpikeOne),
             ParallelRaceGroup(
-                FollowPath(redSpikeIntake, true, 0.4),
+                FollowPath(redSpikeIntake, true, 0.2),
                 SequentialGroup(
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.indexerToSlot(1),
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.indexerToSlot(2),
                     Indexer.waitForSlotBreakbeam(),
+                    Indexer.latchUp(),
                 ),
             ),
             InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
