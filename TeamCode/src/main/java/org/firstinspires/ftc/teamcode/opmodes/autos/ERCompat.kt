@@ -5,6 +5,7 @@ import com.pedropathing.geometry.Pose
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
+import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
@@ -12,7 +13,6 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.atan2
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -27,8 +27,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.math.atan2
 import kotlin.time.Duration.Companion.milliseconds
-import dev.nextftc.core.commands.delays.Delay
 
 @Autonomous
 class ERCompat : NextFTCOpMode() {
@@ -151,8 +151,8 @@ class ERCompat : NextFTCOpMode() {
     } else if (alliance == teleop.Alliance.BLUE) {
       targetPose = Pose(144.0, 0.0, 0.0)
     }
-    val offsetX = targetPose.x - PedroComponent.follower.pose.x
-    val offsetY = targetPose.y - PedroComponent.follower.pose.y
+    val offsetX = targetPose.x + PedroComponent.follower.pose.x - 144
+    val offsetY = targetPose.y + PedroComponent.follower.pose.y - 144
     val goalAngle =
         atan2(
                 offsetY,
@@ -176,29 +176,31 @@ class ERCompat : NextFTCOpMode() {
     val waitForFeeder = 200.milliseconds
     val waitForIndexer = 500.milliseconds
     val shoot =
-      SequentialGroup(
-        Indexer.feed(),
-        Delay(waitForFeeder),
-        Indexer.unFeed(),
-        Delay(waitForFeeder),
-      )
+        SequentialGroup(
+            Indexer.feed(),
+            Delay(waitForFeeder),
+            Indexer.unFeed(),
+            Delay(waitForFeeder),
+        )
     val nextSlot =
-      SequentialGroup(
-        Indexer.toNextSlot(),
-        Delay(waitForIndexer),
-      )
+        SequentialGroup(
+            Indexer.toNextSlot(),
+            Delay(waitForIndexer),
+        )
 
     SequentialGroup(
-      Indexer.latchUp(),
-      Shooter.setSpeed(2_300.0),
-      Shooter.waitForSpeed(),
-      shoot,
-        nextSlot,
-      shoot,
-        nextSlot,
-      shoot,
-    ).schedule()
+            Indexer.latchUp(),
+            Shooter.setSpeed(2_300.0),
+            Shooter.waitForSpeed(),
+            shoot,
+            nextSlot,
+            shoot,
+            nextSlot,
+            shoot,
+        )
+        .schedule()
   }
+
   override fun onStop() {
     BindingManager.reset()
   }
