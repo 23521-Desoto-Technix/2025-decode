@@ -46,9 +46,9 @@ object Indexer : Subsystem {
     }*/
     indexerPower =
         indexerPID.calculate(
-            KineticState(-indexerEncoder.currentPosition, -indexerEncoder.velocity)
+            KineticState(indexerEncoder.currentPosition, indexerEncoder.velocity)
         )
-    currentPosition = indexerEncoder.currentPosition.toDouble()
+    currentPosition = -indexerEncoder.currentPosition.toDouble()
     indexerServo.power = indexerPower
     intakeMotor.power = intakePower
   }

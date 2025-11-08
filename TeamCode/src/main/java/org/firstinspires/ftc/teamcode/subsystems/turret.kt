@@ -67,11 +67,11 @@ object Turret : Subsystem {
     }
     if (usingPID) {
       motor.power =
-          PID.calculate(KineticState(encoder.currentPosition.toDouble(), encoder.velocity))
+          PID.calculate(KineticState(-encoder.currentPosition.toDouble(), -encoder.velocity))
     } else {
       motor.power = power
     }
-    angle = ticksToDegrees(encoder.currentPosition.toDouble())
+    angle = ticksToDegrees(-encoder.currentPosition.toDouble())
   }
 
   fun setTicks(targetTicks: Double): LambdaCommand {
@@ -83,7 +83,7 @@ object Turret : Subsystem {
           goal = KineticState(limitedTicks, 0.0)
           usingPID = true
         }
-        .setIsDone { abs(encoder.currentPosition.toDouble() - limitedTicks) < 50 }
+        .setIsDone { abs(-encoder.currentPosition.toDouble() - limitedTicks) < 50 }
         .requires(this)
   }
 
@@ -101,7 +101,7 @@ object Turret : Subsystem {
       LambdaCommand("setTurretPower")
           .setStart {
             usingPID = false
-            val currentTicks = encoder.currentPosition.toDouble()
+            val currentTicks = -encoder.currentPosition.toDouble()
             if (currentTicks >= 19_000) {
               this.power = 0.2
             } else if (currentTicks <= -19_000) {
@@ -125,7 +125,7 @@ object Turret : Subsystem {
             val dt = (currentTime - lastTime) / 1000.0
             val errorRate = if (dt > 0) (error - previousError) / dt else 0.0
 
-            val currentTicks = encoder.currentPosition.toDouble()
+            val currentTicks = -encoder.currentPosition.toDouble()
             if (currentTicks >= 19_000) {
               this.power = 0.2
             } else if (currentTicks <= -19_000) {
