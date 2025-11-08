@@ -81,6 +81,8 @@ class ERCompat : NextFTCOpMode() {
     PedroComponent.follower.pose = Pose(72.0, 72.0, 0.0)
     PedroComponent.follower.breakFollowing()
 
+    Indexer.unFeed().schedule()
+
     aprilTag =
         AprilTagProcessor.Builder()
             .setDrawAxes(true)
@@ -173,26 +175,15 @@ class ERCompat : NextFTCOpMode() {
   override fun onStartButtonPressed() {
     val waitForFeeder = 200.milliseconds
     val waitForIndexer = 500.milliseconds
-    val shootAll =
+    val shoot =
       SequentialGroup(
         Indexer.feed(),
         Delay(waitForFeeder),
         Indexer.unFeed(),
         Delay(waitForFeeder),
-        Indexer.toNextSlot(),
-        Delay(waitForIndexer),
-
-        Indexer.feed(),
-        Delay(waitForFeeder),
-        Indexer.unFeed(),
-        Delay(waitForFeeder),
-        Indexer.toNextSlot(),
-        Delay(waitForIndexer),
-
-        Indexer.feed(),
-        Delay(waitForFeeder),
-        Indexer.unFeed(),
-        Delay(waitForFeeder),
+      )
+    val nextSlot =
+      SequentialGroup(
         Indexer.toNextSlot(),
         Delay(waitForIndexer),
       )
@@ -201,7 +192,11 @@ class ERCompat : NextFTCOpMode() {
       Indexer.latchUp(),
       Shooter.setSpeed(2_300.0),
       Shooter.waitForSpeed(),
-      shootAll,
+      shoot,
+        nextSlot,
+      shoot,
+        nextSlot,
+      shoot,
     ).schedule()
   }
   override fun onStop() {
