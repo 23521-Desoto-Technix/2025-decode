@@ -1,20 +1,23 @@
 package org.firstinspires.ftc.teamcode.opmodes.autos
 
 import android.util.Size
+import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
+import com.pedropathing.paths.Path
+import com.pedropathing.paths.PathChain
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.SequentialGroup
+import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.rad
+import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -22,6 +25,7 @@ import org.firstinspires.ftc.teamcode.opmodes.teleop
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
+import org.firstinspires.ftc.teamcode.subsystems.Intake
 import org.firstinspires.ftc.teamcode.subsystems.Lights
 import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
@@ -29,6 +33,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.math.atan2
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Autonomous
 class ERCompat : NextFTCOpMode() {
@@ -66,6 +73,13 @@ class ERCompat : NextFTCOpMode() {
 
   val redStart = Pose(80.1, 8.6, 0.0)
   val blueStart = Pose(0.0, 0.0, 0.0)
+  val redSpikeOne = Pose(95.0, 25.0, 0.0)
+  val startToRedSpikeOne: PathChain =
+      PedroComponent.follower
+          .pathBuilder()
+          .addPath(Path(BezierLine(redStart, redSpikeOne)))
+          .setConstantHeadingInterpolation(0.0)
+          .build()
 
   override fun onInit() {
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
@@ -183,11 +197,6 @@ class ERCompat : NextFTCOpMode() {
             Indexer.unFeed(),
             Delay(waitForFeeder),
         )
-    val nextSlot =
-        SequentialGroup(
-            Indexer.toNextSlot(),
-            Delay(waitForIndexer),
-        )
 
     SequentialGroup(
             Indexer.latchUp(),
@@ -200,6 +209,10 @@ class ERCompat : NextFTCOpMode() {
             Indexer.indexerToSlot(2),
             Delay(waitForIndexer),
             shoot,
+            Intake.setPower(1.0),
+            FollowPath(startToRedSpikeOne),
+            InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
+            Delay(5.seconds),
         )
         .schedule()
   }
