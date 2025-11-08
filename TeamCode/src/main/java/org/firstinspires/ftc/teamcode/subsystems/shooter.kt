@@ -29,7 +29,7 @@ object Shooter : Subsystem {
   private const val SPEED_TOLERANCE = 100
 
   override fun periodic() {
-    this.speed = -shooterEncoder.velocity
+    this.speed = shooterEncoder.velocity
     if (this.usingPID) {
       PID.goal = KineticState(Double.POSITIVE_INFINITY, this.targetSpeed, 0.0)
       val pidOutput =
@@ -37,7 +37,7 @@ object Shooter : Subsystem {
               KineticState(
                   Double.POSITIVE_INFINITY,
                   this.speed,
-                  shooterEncoder.state.acceleration,
+                  -shooterEncoder.state.acceleration,
               )
           )
       upperShooterMotor.power = pidOutput.coerceIn(0.0, 1.0)
