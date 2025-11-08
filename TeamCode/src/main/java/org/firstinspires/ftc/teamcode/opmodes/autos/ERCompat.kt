@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.autos
 
 import android.util.Size
 import com.pedropathing.geometry.Pose
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.core.commands.groups.SequentialGroup
@@ -29,6 +30,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
 import kotlin.time.Duration.Companion.milliseconds
 import dev.nextftc.core.commands.delays.Delay
 
+@Autonomous
 class ERCompat : NextFTCOpMode() {
   init {
     addComponents(
