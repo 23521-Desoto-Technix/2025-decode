@@ -15,14 +15,12 @@ import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -37,6 +35,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.math.atan2
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Autonomous
 class ERCompat : NextFTCOpMode() {
@@ -68,8 +69,6 @@ class ERCompat : NextFTCOpMode() {
   var targetPose = Pose(72.0, 144.0, 0.0)
   var targetAprilTag = 0
 
-  var speedMultiplier = 1.0
-
   var alliance = teleop.Alliance.UNKNOWN
 
   val redStart = Pose(80.1, 8.6, 0.0)
@@ -78,6 +77,7 @@ class ERCompat : NextFTCOpMode() {
   val redSpikeOneEnd = Pose(140.0, 35.0, 0.0)
   lateinit var startToRedSpikeOne: PathChain
   lateinit var redSpikeIntake: PathChain
+  lateinit var redSpikeReturn: PathChain
 
   val waitForFeeder = 200.milliseconds
   val waitForIndexer = 750.milliseconds
@@ -95,18 +95,18 @@ class ERCompat : NextFTCOpMode() {
     get() =
         SequentialGroup(
             Indexer.latchUp(),
+            Turret.setAngle(70.0.deg, true),
             Shooter.setSpeed(2_300.0),
             Shooter.waitForSpeed(),
             shoot,
-            Indexer.indexerToSlot(1),
+            Indexer.toNextSlot(),
             Delay(waitForIndexer),
             shoot,
-            Indexer.indexerToSlot(2),
+            Indexer.toNextSlot(),
             Delay(waitForIndexer),
             shoot,
             Indexer.setIntakePower(1.0),
-            Indexer.indexerToSlot(0),
-            FollowPath(startToRedSpikeOne),
+            FollowPath(startToRedSpikeOne, true, 1.0),
             ParallelRaceGroup(
                 FollowPath(redSpikeIntake, true, 0.25),
                 SequentialGroup(
@@ -114,14 +114,14 @@ class ERCompat : NextFTCOpMode() {
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.latchUp(),
                     Delay(100.milliseconds),
-                    Indexer.indexerToSlot(1),
+                    Indexer.toNextSlot(),
                     Delay(100.milliseconds),
                     Indexer.latchDown(),
                     Delay(500.milliseconds),
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.latchUp(),
                     Delay(100.milliseconds),
-                    Indexer.indexerToSlot(2),
+                    Indexer.toNextSlot(),
                     Delay(100.milliseconds),
                     Indexer.latchDown(),
                     Delay(500.milliseconds),
@@ -129,6 +129,9 @@ class ERCompat : NextFTCOpMode() {
                     Indexer.latchUp(),
                 ),
             ),
+            Indexer.setIntakePower(-1.0),
+            FollowPath(redSpikeReturn, true, 1.0),
+            Indexer.setIntakePower(0.0),
             InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
             Delay(5.seconds),
         )
@@ -144,6 +147,12 @@ class ERCompat : NextFTCOpMode() {
         PedroComponent.follower
             .pathBuilder()
             .addPath(Path(BezierLine(redSpikeOneStart, redSpikeOneEnd)))
+            .setConstantHeadingInterpolation(0.0)
+            .build()
+    redSpikeReturn =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(Path(BezierLine(redSpikeOneEnd, redStart)))
             .setConstantHeadingInterpolation(0.0)
             .build()
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
@@ -240,13 +249,13 @@ class ERCompat : NextFTCOpMode() {
             .rad
     telemetry.addData("Has Lock", hasLock)
     if (hasLock) {
-      Turret.cameraTrackPower(pixelOffset).schedule()
+      /*Turret.cameraTrackPower(pixelOffset).schedule()*/
     } else {
-      Turret.setAngle(
+      /*Turret.setAngle(
               goalAngle,
               true,
           )
-          .schedule()
+          .schedule()*/
     }
     BindingManager.update()
   }
