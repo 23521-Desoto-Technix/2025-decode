@@ -73,7 +73,7 @@ class ERCompat : NextFTCOpMode() {
 
   val redStart = Pose(80.1, 8.6, 0.0)
   val blueStart = Pose(0.0, 0.0, 0.0)
-  val redSpikeOne = Pose(95.0, 25.0, 0.0)
+  val redSpikeOne = Pose(105.0, 35.0, 0.0)
   lateinit var startToRedSpikeOne: PathChain
 
   override fun onInit() {
@@ -210,7 +210,7 @@ class ERCompat : NextFTCOpMode() {
             Indexer.indexerToSlot(2),
             Delay(waitForIndexer),
             shoot,
-            Intake.setPower(1.0),
+            Indexer.setIntakePower(1.0),
             FollowPath(startToRedSpikeOne),
             InstantCommand { Lights.state = LightsState.ALLIANCE_UNKNOWN },
             Delay(5.seconds),
