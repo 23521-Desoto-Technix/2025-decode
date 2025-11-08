@@ -13,6 +13,8 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.atan2
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -27,8 +29,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous
 class ERCompat : NextFTCOpMode() {
@@ -77,7 +77,6 @@ class ERCompat : NextFTCOpMode() {
     Indexer.intakeBreakBeam = intakeBreakBeam
     Indexer.leftBreakBeam = leftBreakBeam
     Indexer.rightBreakBeam = rightBreakBeam
-    Indexer.indexerToSlot(0).schedule()
     PedroComponent.follower.pose = Pose(72.0, 72.0, 0.0)
     PedroComponent.follower.breakFollowing()
 
@@ -175,7 +174,7 @@ class ERCompat : NextFTCOpMode() {
   }
 
   override fun onStartButtonPressed() {
-    val waitForFeeder = 500.milliseconds
+    val waitForFeeder = 200.milliseconds
     val waitForIndexer = 750.milliseconds
     val shoot =
         SequentialGroup(
@@ -195,9 +194,11 @@ class ERCompat : NextFTCOpMode() {
             Shooter.setSpeed(2_300.0),
             Shooter.waitForSpeed(),
             shoot,
-            nextSlot,
+            Indexer.indexerToSlot(1),
+            Delay(waitForIndexer),
             shoot,
-            nextSlot,
+            Indexer.indexerToSlot(2),
+            Delay(waitForIndexer),
             shoot,
         )
         .schedule()
