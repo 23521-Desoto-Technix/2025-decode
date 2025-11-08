@@ -18,6 +18,9 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.atan2
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -33,9 +36,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @Autonomous
 class ERCompat : NextFTCOpMode() {
@@ -74,14 +74,15 @@ class ERCompat : NextFTCOpMode() {
   val redStart = Pose(80.1, 8.6, 0.0)
   val blueStart = Pose(0.0, 0.0, 0.0)
   val redSpikeOne = Pose(95.0, 25.0, 0.0)
-  val startToRedSpikeOne: PathChain =
-      PedroComponent.follower
-          .pathBuilder()
-          .addPath(Path(BezierLine(redStart, redSpikeOne)))
-          .setConstantHeadingInterpolation(0.0)
-          .build()
+  lateinit var startToRedSpikeOne: PathChain
 
   override fun onInit() {
+    startToRedSpikeOne =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(Path(BezierLine(redStart, redSpikeOne)))
+            .setConstantHeadingInterpolation(0.0)
+            .build()
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
     intakeBreakBeam.mode = DigitalChannel.Mode.INPUT
     leftBreakBeam = hardwareMap.get(DigitalChannel::class.java, "leftBreakBeam")
