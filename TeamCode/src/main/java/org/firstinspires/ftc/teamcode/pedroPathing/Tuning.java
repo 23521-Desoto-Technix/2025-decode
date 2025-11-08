@@ -527,7 +527,7 @@ class LateralVelocityTuner extends OpMode {
  */
 class ForwardZeroPowerAccelerationTuner extends OpMode {
     private final ArrayList<Double> accelerations = new ArrayList<>();
-    public static double VELOCITY = -30;
+    public static double VELOCITY = 30;
 
     private double previousVelocity;
     private long previousTimeNano;
@@ -578,7 +578,7 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
         Vector heading = new Vector(1.0, follower.getPose().getHeading());
         if (!end) {
             if (!stopping) {
-                if (follower.getVelocity().dot(heading) < VELOCITY) {
+                if (follower.getVelocity().dot(heading) > VELOCITY) {
                     previousVelocity = follower.getVelocity().dot(heading);
                     previousTimeNano = System.nanoTime();
                     stopping = true;
