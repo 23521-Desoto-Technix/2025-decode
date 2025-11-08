@@ -108,7 +108,7 @@ class ERCompat : NextFTCOpMode() {
             shoot,
             Indexer.setIntakePower(1.0),
             Indexer.indexerToSlot(0),
-            FollowPath(startToRedSpikeOne, true, 1.0),
+            FollowPath(startToRedSpikeOne, false, 1.0),
             ParallelDeadlineGroup(
                 SequentialGroup(
                     Indexer.latchDown(),
@@ -129,12 +129,11 @@ class ERCompat : NextFTCOpMode() {
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.latchUp(),
                 ),
-                FollowPath(redSpikeIntake, true, 0.3),
+                FollowPath(redSpikeIntake, false, 0.3),
             ),
-            InstantCommand { PedroComponent.follower.breakFollowing() },
             Indexer.setIntakePower(-1.0),
             Indexer.indexerToSlot(0),
-            FollowPath(redSpikeReturn, true, 1.0),
+            FollowPath(redSpikeReturn, false, 1.0),
             Indexer.setIntakePower(0.0),
             InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
             Delay(5.seconds),
