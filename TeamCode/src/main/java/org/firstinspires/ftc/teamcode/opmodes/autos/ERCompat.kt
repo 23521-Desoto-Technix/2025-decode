@@ -222,7 +222,7 @@ class ERCompat : NextFTCOpMode() {
             Indexer.indexerToSlot(0),
             FollowPath(startToRedSpikeOne),
             ParallelRaceGroup(
-                FollowPath(redSpikeIntake, true, 0.2),
+                FollowPath(redSpikeIntake, true, 0.25),
                 SequentialGroup(
                     Indexer.latchDown(),
                     Indexer.waitForSlotBreakbeam(),
@@ -231,12 +231,14 @@ class ERCompat : NextFTCOpMode() {
                     Indexer.indexerToSlot(1),
                     Delay(100.milliseconds),
                     Indexer.latchDown(),
+                    Delay(500.milliseconds),
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.latchUp(),
                     Delay(100.milliseconds),
                     Indexer.indexerToSlot(2),
                     Delay(100.milliseconds),
                     Indexer.latchDown(),
+                    Delay(500.milliseconds),
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.latchUp(),
                 ),
