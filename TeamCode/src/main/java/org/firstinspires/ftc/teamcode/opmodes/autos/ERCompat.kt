@@ -151,8 +151,8 @@ class ERCompat : NextFTCOpMode() {
     } else if (alliance == teleop.Alliance.BLUE) {
       targetPose = Pose(144.0, 0.0, 0.0)
     }
-      val offsetX = targetPose.x - (144 - PedroComponent.follower.pose.x)
-      val offsetY = targetPose.y - (144 - PedroComponent.follower.pose.y)
+    val offsetX = targetPose.x - (144 - PedroComponent.follower.pose.x)
+    val offsetY = targetPose.y - (144 - PedroComponent.follower.pose.y)
     val goalAngle =
         atan2(
                 offsetY,
@@ -193,9 +193,11 @@ class ERCompat : NextFTCOpMode() {
             Shooter.setSpeed(2_300.0),
             Shooter.waitForSpeed(),
             shoot,
-            nextSlot,
+            Indexer.indexerToSlot(1),
+            Delay(waitForIndexer),
             shoot,
-            nextSlot,
+            Indexer.indexerToSlot(2),
+            Delay(waitForIndexer),
             shoot,
         )
         .schedule()
