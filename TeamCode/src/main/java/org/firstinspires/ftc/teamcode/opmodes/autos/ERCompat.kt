@@ -74,6 +74,7 @@ class ERCompat : NextFTCOpMode() {
   var alliance = teleop.Alliance.UNKNOWN
 
   val redStart = Pose(80.1, 8.6, 0.0)
+    val redShoot = Pose(82.0, 10.0, 0.0)
   val blueStart = Pose(0.0, 0.0, 0.0)
   val redSpikeOneStart = Pose(97.0, 35.0, 0.0)
   val redSpikeOneEnd = Pose(130.0, 35.0, 0.0)
@@ -92,21 +93,26 @@ class ERCompat : NextFTCOpMode() {
             Indexer.unFeed(),
             Delay(waitForFeeder),
         )
+    val shootAll: Command
+        get() =
+            SequentialGroup(
+                shoot,
+                Indexer.indexerToSlot(1),
+                Delay(waitForIndexer),
+                shoot,
+                Indexer.indexerToSlot(2),
+                Delay(waitForIndexer),
+                shoot,
+            )
 
   val routine: Command
     get() =
         SequentialGroup(
             Indexer.latchUp(),
-            Turret.setAngle(70.0.deg, true),
+            Turret.setAngle(25.0.deg, true),
             Shooter.setSpeed(2_300.0),
             Shooter.waitForSpeed(),
-            shoot,
-            Indexer.indexerToSlot(1),
-            Delay(waitForIndexer),
-            shoot,
-            Indexer.indexerToSlot(2),
-            Delay(waitForIndexer),
-            shoot,
+            shootAll,
             Indexer.setIntakePower(1.0),
             Indexer.indexerToSlot(0),
             FollowPath(startToRedSpikeOne, false, 1.0),
@@ -135,9 +141,10 @@ class ERCompat : NextFTCOpMode() {
             Indexer.setIntakePower(-1.0),
             Indexer.indexerToSlot(0),
             FollowPath(redSpikeReturn, false, 1.0),
+            shootAll,
             Indexer.setIntakePower(0.0),
             InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
-            Delay(5.seconds),
+            Delay(30.seconds),
         )
 
   override fun onInit() {
@@ -156,7 +163,7 @@ class ERCompat : NextFTCOpMode() {
     redSpikeReturn =
         PedroComponent.follower
             .pathBuilder()
-            .addPath(Path(BezierLine(redSpikeOneEnd, redStart)))
+            .addPath(Path(BezierLine(redSpikeOneEnd, redShoot)))
             .setConstantHeadingInterpolation(0.0)
             .build()
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
