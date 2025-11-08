@@ -198,6 +198,7 @@ class ERCompat : NextFTCOpMode() {
       )
 
     SequentialGroup(
+      Indexer.latchUp(),
       Shooter.setSpeed(2_300.0),
       Shooter.waitForSpeed(),
       shootAll,
