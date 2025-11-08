@@ -11,6 +11,7 @@ import dev.nextftc.bindings.BindingManager
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelDeadlineGroup
+import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.ParallelRaceGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
@@ -109,7 +110,7 @@ class ERCompat : NextFTCOpMode() {
             Indexer.setIntakePower(1.0),
             Indexer.indexerToSlot(0),
             FollowPath(startToRedSpikeOne, false, 1.0),
-            ParallelDeadlineGroup(
+            ParallelGroup(
                 SequentialGroup(
                     Indexer.latchDown(),
                     Indexer.waitForSlotBreakbeam(),
