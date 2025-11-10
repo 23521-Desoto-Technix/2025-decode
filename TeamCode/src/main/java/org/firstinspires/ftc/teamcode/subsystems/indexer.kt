@@ -27,6 +27,7 @@ object Indexer : Subsystem {
   var indexerPower = 0.0
   var intakePower = 0.0
   var goalPosition = 0.0
+  var latched = false
 
   override fun periodic() {
     /*if (
@@ -108,10 +109,20 @@ object Indexer : Subsystem {
   fun toPreviousSlot() = indexerToPosition(goalPosition - 2730.0)
 
   fun latchDown() =
-      LambdaCommand("latchDown").setStart { latchServo.position = 0.90 }.setIsDone { true }
+      LambdaCommand("latchDown")
+          .setStart {
+            latchServo.position = 0.90
+            latched = false
+          }
+          .setIsDone { true }
 
   fun latchUp() =
-      LambdaCommand("latchUp").setStart { latchServo.position = 0.45 }.setIsDone { true }
+      LambdaCommand("latchUp")
+          .setStart {
+            latchServo.position = 0.45
+            latched = true
+          }
+          .setIsDone { true }
 
   fun feed() =
       LambdaCommand("feed")
