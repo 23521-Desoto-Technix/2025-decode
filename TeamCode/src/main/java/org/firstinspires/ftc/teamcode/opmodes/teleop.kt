@@ -19,8 +19,6 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -34,6 +32,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.math.atan2
+import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -199,9 +199,16 @@ class teleop : NextFTCOpMode() {
     val normalized = intakeColor.normalizedColors
     val r = normalized.red
     val g = normalized.green
-    val b = normalized.blue
+    val b = normalized.blue // 215 +- 15 for purp, 160 +- 10 for green
 
     val hsv = rgbToHsv(r, g, b)
+    if (hsv[0] > 200 && hsv[0] < 245 && hsv[1] > 140) {
+      Lights.state = LightsState.ARTIFACT_PURPLE
+    } else if (hsv[0] > 150 && hsv[0] < 170 && hsv[1] > 140) {
+      Lights.state = LightsState.ARTIFACT_GREEN
+    } else {
+      Lights.state = LightsState.OFF
+    }
     telemetry.addData("Status", intakeColor.status())
     telemetry.addData("Color H", String.format("%.1f", hsv[0]))
     telemetry.addData("Color S", String.format("%.0f", hsv[1]))

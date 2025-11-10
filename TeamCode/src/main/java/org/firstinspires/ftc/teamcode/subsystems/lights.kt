@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems
 
-import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.ServoEx
 
@@ -15,7 +14,6 @@ object Lights : Subsystem {
     private val ALLIANCE_UNKNOWN_OFF = 0.0
 
     override fun periodic() {
-        // Initialize blink timer when entering ALLIANCE_UNKNOWN state
         if (state == LightsState.ALLIANCE_UNKNOWN && blinkStartTime == 0L) {
             blinkStartTime = System.currentTimeMillis()
         }
@@ -61,7 +59,7 @@ object Lights : Subsystem {
                 right.position = 0.444
                 left.position = 0.444
             }
-            LightsState.DEBUG_GREEN -> {
+            LightsState.ARTIFACT_GREEN -> {
                 right.position = 0.500
                 left.position = 0.500
             }
@@ -77,11 +75,11 @@ object Lights : Subsystem {
                 right.position = 0.666
                 left.position = 0.666
             }
-            LightsState.DEBUG_PURPLE -> {
+            LightsState.ARTIFACT_PURPLE -> {
                 right.position = 0.722
                 left.position = 0.722
             }
-            LightsState.DEBUG_WHITE -> {
+            LightsState.ARTIFACT_FULL -> {
                 right.position = 1.0
                 left.position = 1.0
             }
@@ -99,10 +97,10 @@ enum class LightsState {
     DEBUG_ORANGE,
     DEBUG_YELLOW,
     DEBUG_SAGE,
-    DEBUG_GREEN,
+    ARTIFACT_GREEN,
     DEBUG_AZURE,
     DEBUG_BLUE,
     DEBUG_INDIGO,
-    DEBUG_PURPLE,
-    DEBUG_WHITE,
+    ARTIFACT_PURPLE,
+    ARTIFACT_FULL,
 }
