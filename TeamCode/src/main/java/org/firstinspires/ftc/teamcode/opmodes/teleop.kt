@@ -79,7 +79,7 @@ class teleop : NextFTCOpMode() {
     Indexer.leftBreakBeam = leftBreakBeam
     Indexer.rightBreakBeam = rightBreakBeam
     Indexer.indexerToSlot(0).schedule()
-    PedroComponent.follower.pose = Pose(134.7, 81.1, 0.0)
+    PedroComponent.follower.pose = Pose(72.0, 72.0, 0.0)
     PedroComponent.follower.breakFollowing()
 
     aprilTag =
@@ -92,7 +92,6 @@ class teleop : NextFTCOpMode() {
             .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
             // ... these parameters are fx, fy, cx, cy.
             .build()
-    aprilTag.setPoseSolver(AprilTagProcessor.PoseSolver.APRILTAG_BUILTIN)
 
     portal =
         VisionPortal.Builder()
@@ -230,8 +229,8 @@ class teleop : NextFTCOpMode() {
     } else if (alliance == Alliance.BLUE) {
       targetPose = Pose(144.0, 0.0, 0.0)
     }
-    val offsetX = targetPose.x + PedroComponent.follower.pose.x - 144.0
-    val offsetY = targetPose.y - PedroComponent.follower.pose.y
+    val offsetX = targetPose.x - (144 - PedroComponent.follower.pose.x)
+    val offsetY = targetPose.y - (144 - PedroComponent.follower.pose.y)
     val goalAngle =
         atan2(
                 offsetY,
@@ -248,7 +247,8 @@ class teleop : NextFTCOpMode() {
           )
           .schedule()
     }
-
+    telemetry.addData("Relative X", offsetX)
+    telemetry.addData("Relative Y", offsetY)
     BindingManager.update()
     telemetry.update()
   }

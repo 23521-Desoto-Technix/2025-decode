@@ -74,15 +74,18 @@ object Turret : Subsystem {
     angle = ticksToDegrees(encoder.currentPosition.toDouble())
   }
 
-  fun setTicks(targetTicks: Double) =
-      LambdaCommand("setTurretAngle")
-          .setStart {
-            val limited = applyTickLimits(targetTicks)
-            PID.goal = KineticState(limited, 0.0)
-            usingPID = true
-          }
-          .setIsDone { abs(encoder.currentPosition.toDouble() - targetTicks) < 50 }
-          .requires(this)
+  fun setTicks(targetTicks: Double): LambdaCommand {
+    var limitedTicks = 0.0
+    return LambdaCommand("setTurretAngle")
+        .setStart {
+          limitedTicks = applyTickLimits(targetTicks)
+          PID.goal = KineticState(limitedTicks, 0.0)
+          goal = KineticState(limitedTicks, 0.0)
+          usingPID = true
+        }
+        .setIsDone { abs(encoder.currentPosition.toDouble() - limitedTicks) < 50 }
+        .requires(this)
+  }
 
   fun setAngle(angle: Angle, useIMU: Boolean = false) =
       LambdaCommand("setTurretAngle")
@@ -98,9 +101,10 @@ object Turret : Subsystem {
       LambdaCommand("setTurretPower")
           .setStart {
             usingPID = false
-            if (angle >= 19_000) {
+            val currentTicks = encoder.currentPosition.toDouble()
+            if (currentTicks >= 19_000) {
               this.power = 0.2
-            } else if (angle <= -19_000) {
+            } else if (currentTicks <= -19_000) {
               this.power = -0.2
             } else {
               this.power = power
@@ -121,9 +125,10 @@ object Turret : Subsystem {
             val dt = (currentTime - lastTime) / 1000.0
             val errorRate = if (dt > 0) (error - previousError) / dt else 0.0
 
-            if (angle >= 19_000) {
+            val currentTicks = encoder.currentPosition.toDouble()
+            if (currentTicks >= 19_000) {
               this.power = 0.2
-            } else if (angle <= -19_000) {
+            } else if (currentTicks <= -19_000) {
               this.power = -0.2
             } else {
               this.power = ((error * kP) + (errorRate * kD)).coerceIn(-1.0, 1.0)
