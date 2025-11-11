@@ -54,7 +54,6 @@ class teleop : NextFTCOpMode() {
   }
 
   companion object {
-    // HSV color detection thresholds
     const val PURPLE_HUE_MIN = 200f
     const val PURPLE_HUE_MAX = 245f
     const val GREEN_HUE_MIN = 150f
