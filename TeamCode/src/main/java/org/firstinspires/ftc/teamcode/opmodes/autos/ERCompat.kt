@@ -10,9 +10,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
-import dev.nextftc.core.commands.groups.ParallelDeadlineGroup
 import dev.nextftc.core.commands.groups.ParallelGroup
-import dev.nextftc.core.commands.groups.ParallelRaceGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -143,7 +141,7 @@ class ERCompat : NextFTCOpMode() {
             FollowPath(redSpikeReturn, false, 1.0),
             shootAll,
             Indexer.setIntakePower(0.0),
-            InstantCommand { Lights.state = LightsState.DEBUG_GREEN },
+            InstantCommand { Lights.state = LightsState.ARTIFACT_GREEN },
             Delay(30.seconds),
         )
 
