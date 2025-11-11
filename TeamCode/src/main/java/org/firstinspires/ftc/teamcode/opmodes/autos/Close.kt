@@ -16,6 +16,7 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
@@ -23,7 +24,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Lights
 import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous
 class Close : NextFTCOpMode() {
@@ -99,6 +99,10 @@ class Close : NextFTCOpMode() {
             .addPath(Path(BezierLine(redStart, redShoot)))
             .setConstantHeadingInterpolation(0.0)
             .build()
+
+    Indexer.feed().schedule()
+    Indexer.unFeed().schedule()
+    Indexer.indexerToSlot(0).schedule()
   }
 
   override fun onWaitForStart() {
