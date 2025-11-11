@@ -53,6 +53,15 @@ class teleop : NextFTCOpMode() {
     UNKNOWN,
   }
 
+  companion object {
+    // HSV color detection thresholds
+    const val PURPLE_HUE_MIN = 200f
+    const val PURPLE_HUE_MAX = 245f
+    const val GREEN_HUE_MIN = 150f
+    const val GREEN_HUE_MAX = 170f
+    const val SATURATION_THRESHOLD = 140f
+  }
+
   private lateinit var intakeBreakBeam: DigitalChannel
   private lateinit var leftBreakBeam: DigitalChannel
   private lateinit var rightBreakBeam: DigitalChannel
@@ -214,9 +223,9 @@ class teleop : NextFTCOpMode() {
     val b = normalized.blue // 215 +- 15 for purp, 160 +- 10 for green
 
     val hsv = rgbToHsv(r, g, b)
-    if (hsv[0] > 200 && hsv[0] < 245 && hsv[1] > 140) {
+    if (hsv[0] > PURPLE_HUE_MIN && hsv[0] < PURPLE_HUE_MAX && hsv[1] > SATURATION_THRESHOLD) {
       Lights.state = LightsState.ARTIFACT_PURPLE
-    } else if (hsv[0] > 150 && hsv[0] < 170 && hsv[1] > 140) {
+    } else if (hsv[0] > GREEN_HUE_MIN && hsv[0] < GREEN_HUE_MAX && hsv[1] > SATURATION_THRESHOLD) {
       Lights.state = LightsState.ARTIFACT_GREEN
     } else {
       Lights.state = LightsState.OFF
@@ -290,6 +299,17 @@ class teleop : NextFTCOpMode() {
   }
 }
 
+/**
+ * Converts RGB color values to HSV.
+ *
+ * @param rIn Red component, in the range [0.0, 1.0].
+ * @param gIn Green component, in the range [0.0, 1.0].
+ * @param bIn Blue component, in the range [0.0, 1.0].
+ * @return A FloatArray of size 3: [hue (0..360), saturation (0..255), value (0..255)].
+ *
+ * The conversion uses the standard RGB to HSV algorithm. Hue is in degrees [0, 360),
+ * saturation and value are scaled to [0, 255].
+ */
 private fun rgbToHsv(rIn: Float, gIn: Float, bIn: Float): FloatArray {
   val r = rIn.coerceIn(0f, 1f)
   val g = gIn.coerceIn(0f, 1f)
