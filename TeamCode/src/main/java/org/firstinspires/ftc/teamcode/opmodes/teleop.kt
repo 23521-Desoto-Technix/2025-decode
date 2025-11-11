@@ -20,8 +20,6 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -35,6 +33,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.math.atan2
+import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -59,6 +59,7 @@ class teleop : NextFTCOpMode() {
     const val GREEN_HUE_MIN = 150f
     const val GREEN_HUE_MAX = 170f
     const val SATURATION_THRESHOLD = 140f
+    const val LOCK_BUFFER_MS = 250
   }
 
   private lateinit var intakeBreakBeam: DigitalChannel
@@ -78,6 +79,8 @@ class teleop : NextFTCOpMode() {
   var speedMultiplier = 1.0
 
   var alliance = Alliance.UNKNOWN
+
+  var lastLockTime: Long = 0
 
   override fun onInit() {
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
@@ -279,13 +282,16 @@ class teleop : NextFTCOpMode() {
             .rad
     telemetry.addData("Has Lock", hasLock)
     if (hasLock) {
+      lastLockTime = System.currentTimeMillis()
       Turret.cameraTrackPower(pixelOffset).schedule()
-    } else {
+    } else if (System.currentTimeMillis() - lastLockTime > LOCK_BUFFER_MS) {
       Turret.setAngle(
               goalAngle,
               true,
           )
           .schedule()
+    } else {
+      Turret.cameraTrackPower((RESOLUTION_WIDTH / 2.0)).schedule()
     }
     telemetry.addData("Relative X", offsetX)
     telemetry.addData("Relative Y", offsetY)
@@ -306,8 +312,8 @@ class teleop : NextFTCOpMode() {
  * @param bIn Blue component, in the range [0.0, 1.0].
  * @return A FloatArray of size 3: [hue (0..360), saturation (0..255), value (0..255)].
  *
- * The conversion uses the standard RGB to HSV algorithm. Hue is in degrees [0, 360),
- * saturation and value are scaled to [0, 255].
+ * The conversion uses the standard RGB to HSV algorithm. Hue is in degrees
+ * [0, 360), saturation and value are scaled to [0, 255].
  */
 private fun rgbToHsv(rIn: Float, gIn: Float, bIn: Float): FloatArray {
   val r = rIn.coerceIn(0f, 1f)
