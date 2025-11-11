@@ -291,7 +291,7 @@ class teleop : NextFTCOpMode() {
           )
           .schedule()
     } else {
-      Turret.cameraTrackPower((RESOLUTION_WIDTH / 2.0)).schedule()
+      Turret.cameraTrackPower(0.0).schedule()
     }
     telemetry.addData("Relative X", offsetX)
     telemetry.addData("Relative Y", offsetY)
