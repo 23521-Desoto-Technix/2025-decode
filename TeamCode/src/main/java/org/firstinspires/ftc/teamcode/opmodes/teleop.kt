@@ -59,7 +59,7 @@ class teleop : NextFTCOpMode() {
     const val GREEN_HUE_MIN = 150f
     const val GREEN_HUE_MAX = 170f
     const val SATURATION_THRESHOLD = 140f
-    const val LOCK_BUFFER_MS = 50
+    const val LOCK_BUFFER_MS = 150
   }
 
   private lateinit var intakeBreakBeam: DigitalChannel
