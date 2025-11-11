@@ -80,7 +80,8 @@ class Close : NextFTCOpMode() {
   val routine: Command
     get() =
         SequentialGroup(
-            Turret.setAngle(45.deg),
+            Shooter.setSpeed(2_100.0),
+            Turret.setAngle((-45).deg),
             FollowPath(redStartToShoot),
             shootAll,
         )
