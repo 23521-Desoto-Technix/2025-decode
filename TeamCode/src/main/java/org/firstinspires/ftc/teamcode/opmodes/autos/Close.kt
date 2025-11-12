@@ -53,8 +53,8 @@ class Close : NextFTCOpMode() {
   val blueStart = Pose(0.0, 0.0, 0.0)
   val redShoot = Pose(87.0, 82.0, 0.0)
   val redSpikeOneEnd = Pose(120.0, 82.0, 0.0)
-  val redSpikeTwoStart = Pose(100.0, 106.0, 0.0)
-  val redSpikeTwoEnd = Pose(120.0, 82.0, 0.0)
+  val redSpikeTwoStart = Pose(100.0, 58.0, 0.0)
+  val redSpikeTwoEnd = Pose(120.0, 58.0, 0.0)
 
   lateinit var redStartToShoot: PathChain
   lateinit var redShootToSpikeOne: PathChain
