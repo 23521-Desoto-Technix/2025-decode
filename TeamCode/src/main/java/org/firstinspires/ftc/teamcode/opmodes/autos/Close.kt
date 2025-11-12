@@ -113,6 +113,7 @@ class Close : NextFTCOpMode() {
                 ),
                 FollowPath(redShootToSpikeOne, false, 0.3),
             ),
+            Indexer.indexerToSlot(0),
             FollowPath(redSpikeOneToShoot, false, 1.0),
             shootAll,
         )
