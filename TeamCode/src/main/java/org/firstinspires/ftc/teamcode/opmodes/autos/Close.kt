@@ -53,10 +53,15 @@ class Close : NextFTCOpMode() {
   val blueStart = Pose(0.0, 0.0, 0.0)
   val redShoot = Pose(87.0, 82.0, 0.0)
   val redSpikeOneEnd = Pose(120.0, 82.0, 0.0)
+  val redSpikeTwoStart = Pose(100.0, 106.0, 0.0)
+  val redSpikeTwoEnd = Pose(120.0, 82.0, 0.0)
 
   lateinit var redStartToShoot: PathChain
   lateinit var redShootToSpikeOne: PathChain
   lateinit var redSpikeOneToShoot: PathChain
+  lateinit var redShootToSpikeTwo: PathChain
+  lateinit var redSpikeTwoIntake: PathChain
+  lateinit var redSpikeTwoToShoot: PathChain
 
   val waitForFeeder = 200.milliseconds
   val waitForIndexer = 750.milliseconds
@@ -82,6 +87,28 @@ class Close : NextFTCOpMode() {
             shoot,
         )
 
+  val intakeAll: Command
+    get() =
+        SequentialGroup(
+            Indexer.latchDown(),
+            Indexer.waitForSlotBreakbeam(),
+            Indexer.latchUp(),
+            Delay(100.milliseconds),
+            Indexer.indexerToSlot(1),
+            Delay(100.milliseconds),
+            Indexer.latchDown(),
+            Delay(500.milliseconds),
+            Indexer.waitForSlotBreakbeam(),
+            Indexer.latchUp(),
+            Delay(100.milliseconds),
+            Indexer.indexerToSlot(2),
+            Delay(100.milliseconds),
+            Indexer.latchDown(),
+            Delay(500.milliseconds),
+            Indexer.waitForSlotBreakbeam(),
+            Indexer.latchUp(),
+        )
+
   val routine: Command
     get() =
         SequentialGroup(
@@ -92,29 +119,20 @@ class Close : NextFTCOpMode() {
             Indexer.indexerToSlot(0),
             Indexer.setIntakePower(1.0),
             ParallelGroup(
-                SequentialGroup(
-                    Indexer.latchDown(),
-                    Indexer.waitForSlotBreakbeam(),
-                    Indexer.latchUp(),
-                    Delay(100.milliseconds),
-                    Indexer.indexerToSlot(1),
-                    Delay(100.milliseconds),
-                    Indexer.latchDown(),
-                    Delay(500.milliseconds),
-                    Indexer.waitForSlotBreakbeam(),
-                    Indexer.latchUp(),
-                    Delay(100.milliseconds),
-                    Indexer.indexerToSlot(2),
-                    Delay(100.milliseconds),
-                    Indexer.latchDown(),
-                    Delay(500.milliseconds),
-                    Indexer.waitForSlotBreakbeam(),
-                    Indexer.latchUp(),
-                ),
+                intakeAll,
                 FollowPath(redShootToSpikeOne, false, 0.3),
             ),
             Indexer.indexerToSlot(0),
             FollowPath(redSpikeOneToShoot, false, 1.0),
+            shootAll,
+            Indexer.indexerToSlot(0),
+            FollowPath(redShootToSpikeTwo, false, 1.0),
+            ParallelGroup(
+                intakeAll,
+                FollowPath(redSpikeTwoIntake, false, 0.3),
+            ),
+            Indexer.indexerToSlot(0),
+            FollowPath(redSpikeTwoToShoot, false, 1.0),
             shootAll,
         )
 
@@ -148,6 +166,27 @@ class Close : NextFTCOpMode() {
         PedroComponent.follower
             .pathBuilder()
             .addPath(Path(BezierLine(redSpikeOneEnd, redShoot)))
+            .setConstantHeadingInterpolation(0.0)
+            .build()
+
+    redShootToSpikeTwo =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(Path(BezierLine(redShoot, redSpikeTwoStart)))
+            .setConstantHeadingInterpolation(0.0)
+            .build()
+
+    redSpikeTwoIntake =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(Path(BezierLine(redSpikeTwoStart, redSpikeTwoEnd)))
+            .setConstantHeadingInterpolation(0.0)
+            .build()
+
+    redSpikeTwoToShoot =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(Path(BezierLine(redSpikeTwoEnd, redShoot)))
             .setConstantHeadingInterpolation(0.0)
             .build()
 
