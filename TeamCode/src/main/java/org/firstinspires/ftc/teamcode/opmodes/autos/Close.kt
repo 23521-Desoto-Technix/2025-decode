@@ -17,6 +17,7 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
@@ -24,7 +25,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Lights
 import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous
 class Close : NextFTCOpMode() {
@@ -55,6 +55,7 @@ class Close : NextFTCOpMode() {
   val redSpikeOneEnd = Pose(120.0, 82.0, 0.0)
   val redSpikeTwoStart = Pose(100.0, 58.0, 0.0)
   val redSpikeTwoEnd = Pose(120.0, 58.0, 0.0)
+  val redGateHover = Pose(115.0, 70.0, 0.0)
 
   lateinit var redStartToShoot: PathChain
   lateinit var redShootToSpikeOne: PathChain
@@ -62,6 +63,7 @@ class Close : NextFTCOpMode() {
   lateinit var redShootToSpikeTwo: PathChain
   lateinit var redSpikeTwoIntake: PathChain
   lateinit var redSpikeTwoToShoot: PathChain
+  lateinit var redSpikeToGateHover: PathChain
 
   val waitForFeeder = 200.milliseconds
   val waitForIndexer = 750.milliseconds
@@ -135,6 +137,8 @@ class Close : NextFTCOpMode() {
             Indexer.indexerToSlot(0),
             FollowPath(redSpikeTwoToShoot, false, 1.0),
             shootAll,
+            Indexer.setIntakePower(0.0),
+            FollowPath(redSpikeToGateHover, true, 1.0),
         )
 
   override fun onInit() {
@@ -188,6 +192,13 @@ class Close : NextFTCOpMode() {
         PedroComponent.follower
             .pathBuilder()
             .addPath(Path(BezierLine(redSpikeTwoEnd, redShoot)))
+            .setConstantHeadingInterpolation(0.0)
+            .build()
+
+      redSpikeToGateHover =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(Path(BezierLine(redSpikeTwoEnd, redGateHover)))
             .setConstantHeadingInterpolation(0.0)
             .build()
 
