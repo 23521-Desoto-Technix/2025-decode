@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.autos
 
+import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.Path
@@ -132,7 +133,7 @@ class Close : NextFTCOpMode() {
             FollowPath(redShootToSpikeTwo, false, 1.0),
             ParallelGroup(
                 intakeAll,
-                FollowPath(redSpikeTwoIntake, false, 0.225),
+                FollowPath(redSpikeTwoIntake, false, 0.25),
             ),
             Indexer.indexerToSlot(0),
             FollowPath(redSpikeTwoToShoot, false, 1.0),
@@ -191,7 +192,9 @@ class Close : NextFTCOpMode() {
     redSpikeTwoToShoot =
         PedroComponent.follower
             .pathBuilder()
-            .addPath(Path(BezierLine(redSpikeTwoEnd, redShoot)))
+            .addPath(
+                Path(BezierCurve(redSpikeTwoEnd, Pose(redShoot.x, redSpikeTwoEnd.y, 0.0), redShoot))
+            )
             .setConstantHeadingInterpolation(0.0)
             .build()
 
