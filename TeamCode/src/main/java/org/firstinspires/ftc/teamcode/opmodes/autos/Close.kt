@@ -52,9 +52,9 @@ class Close : NextFTCOpMode() {
   val redStart = Pose(111.1, 133.3, 0.0)
   val blueStart = Pose(0.0, 0.0, 0.0)
   val redShoot = Pose(87.0, 82.0, 0.0)
-  val redSpikeOneEnd = Pose(125.0, 82.0, 0.0)
-  val redSpikeTwoStart = Pose(100.0, 58.0, 0.0)
-  val redSpikeTwoEnd = Pose(130.0, 58.0, 0.0)
+  val redSpikeOneEnd = Pose(125.0, 85.0, 0.0)
+  val redSpikeTwoStart = Pose(100.0, 61.0, 0.0)
+  val redSpikeTwoEnd = Pose(130.0, 61.0, 0.0)
   val redGateHover = Pose(115.0, 70.0, 0.0)
 
   lateinit var redStartToShoot: PathChain
@@ -123,7 +123,7 @@ class Close : NextFTCOpMode() {
             Indexer.setIntakePower(1.0),
             ParallelGroup(
                 intakeAll,
-                FollowPath(redShootToSpikeOne, false, 0.3),
+                FollowPath(redShootToSpikeOne, false, 0.25),
             ),
             Indexer.indexerToSlot(0),
             FollowPath(redSpikeOneToShoot, false, 1.0),
@@ -132,7 +132,7 @@ class Close : NextFTCOpMode() {
             FollowPath(redShootToSpikeTwo, false, 1.0),
             ParallelGroup(
                 intakeAll,
-                FollowPath(redSpikeTwoIntake, false, 0.3),
+                FollowPath(redSpikeTwoIntake, false, 0.225),
             ),
             Indexer.indexerToSlot(0),
             FollowPath(redSpikeTwoToShoot, false, 1.0),
@@ -195,7 +195,7 @@ class Close : NextFTCOpMode() {
             .setConstantHeadingInterpolation(0.0)
             .build()
 
-      redSpikeToGateHover =
+    redSpikeToGateHover =
         PedroComponent.follower
             .pathBuilder()
             .addPath(Path(BezierLine(redSpikeTwoEnd, redGateHover)))
