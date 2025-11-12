@@ -8,6 +8,7 @@ import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.CRServoEx
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.ServoEx
+import org.firstinspires.ftc.teamcode.Constants
 
 object Indexer : Subsystem {
   val indexerServo = CRServoEx("indexer")
@@ -19,7 +20,7 @@ object Indexer : Subsystem {
   val leftFeederServo = ServoEx("leftFeeder")
   val rightFeederServo = ServoEx("rightFeeder")
 
-  val indexerPID = controlSystem { posPid(0.00015, 0.0, 0.000001) }
+  val indexerPID = controlSystem { posPid(Constants.INDEXER_PID_P, Constants.INDEXER_PID_I, Constants.INDEXER_PID_D) }
   lateinit var leftBreakBeam: DigitalChannel
   lateinit var rightBreakBeam: DigitalChannel
   lateinit var intakeBreakBeam: DigitalChannel
@@ -66,7 +67,7 @@ object Indexer : Subsystem {
   fun waitForPid() =
       LambdaCommand("waitForPid")
           .setIsDone {
-            indexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
+            indexerPID.isWithinTolerance(KineticState(Constants.INDEXER_PID_TOLERANCE_POSITION, Constants.INDEXER_PID_TOLERANCE_VELOCITY, Double.POSITIVE_INFINITY))
           }
           .requires(this)
 
@@ -78,8 +79,8 @@ object Indexer : Subsystem {
   fun indexerToSlot(slot: Int) =
       LambdaCommand("indexerToSlot")
           .setStart {
-            val cycleLength = 2730.0 * 3
-            val slotPosition = slot * 2730.0
+            val cycleLength = Constants.INDEXER_SLOT_TICKS * Constants.INDEXER_CYCLE_SLOTS
+            val slotPosition = slot * Constants.INDEXER_SLOT_TICKS
 
             val numCycles =
                 kotlin.math.ceil(kotlin.math.abs(goalPosition) / cycleLength).toInt() + 2
@@ -98,7 +99,7 @@ object Indexer : Subsystem {
           .setIsDone { true }
           .requires(this)
 
-  fun toNextSlot() = indexerToPosition(goalPosition + 2730.0)
+  fun toNextSlot() = indexerToPosition(goalPosition + Constants.INDEXER_SLOT_TICKS)
 
   fun setIntakePower(power: Double) =
       LambdaCommand("setIntakePower")
@@ -106,12 +107,12 @@ object Indexer : Subsystem {
           .setIsDone { true }
           .requires(this)
 
-  fun toPreviousSlot() = indexerToPosition(goalPosition - 2730.0)
+  fun toPreviousSlot() = indexerToPosition(goalPosition - Constants.INDEXER_SLOT_TICKS)
 
   fun latchDown() =
       LambdaCommand("latchDown")
           .setStart {
-            latchServo.position = 0.90
+            latchServo.position = Constants.LATCH_SERVO_DOWN
             latched = false
           }
           .setIsDone { true }
@@ -119,7 +120,7 @@ object Indexer : Subsystem {
   fun latchUp() =
       LambdaCommand("latchUp")
           .setStart {
-            latchServo.position = 0.45
+            latchServo.position = Constants.LATCH_SERVO_UP
             latched = true
           }
           .setIsDone { true }
@@ -127,8 +128,8 @@ object Indexer : Subsystem {
   fun feed() =
       LambdaCommand("feed")
           .setStart {
-            leftFeederServo.position = 0.61
-            rightFeederServo.position = 0.71
+            leftFeederServo.position = Constants.LEFT_FEEDER_FEED
+            rightFeederServo.position = Constants.RIGHT_FEEDER_FEED
           }
           .setIsDone { true }
           .requires(this)
@@ -136,8 +137,8 @@ object Indexer : Subsystem {
   fun unFeed() =
       LambdaCommand("resetFeeder")
           .setStart {
-            leftFeederServo.position = 0.9
-            rightFeederServo.position = 1.0
+            leftFeederServo.position = Constants.LEFT_FEEDER_UNFEED
+            rightFeederServo.position = Constants.RIGHT_FEEDER_UNFEED
           }
           .setIsDone { true }
           .requires(this)

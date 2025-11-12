@@ -19,6 +19,7 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import kotlin.time.Duration.Companion.milliseconds
+import org.firstinspires.ftc.teamcode.Constants as AppConstants
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
@@ -27,7 +28,7 @@ import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 
-@Autonomous
+@Autonomous(name = "Close (6 near)")
 class Close : NextFTCOpMode() {
   init {
     addComponents(
@@ -50,13 +51,13 @@ class Close : NextFTCOpMode() {
   private lateinit var leftBreakBeam: DigitalChannel
   private lateinit var rightBreakBeam: DigitalChannel
 
-  val redStart = Pose(111.1, 133.3, 0.0)
-  val blueStart = Pose(0.0, 0.0, 0.0)
-  val redShoot = Pose(87.0, 82.0, 0.0)
-  val redSpikeOneEnd = Pose(125.0, 85.0, 0.0)
-  val redSpikeTwoStart = Pose(100.0, 60.0, 0.0)
-  val redSpikeTwoEnd = Pose(130.0, 60.0, 0.0)
-  val redGateHover = Pose(115.0, 70.0, 0.0)
+  val redStart = Pose(AppConstants.CLOSE_RED_START_X, AppConstants.CLOSE_RED_START_Y, AppConstants.FIELD_MIN)
+  val blueStart = Pose(AppConstants.FIELD_MIN, AppConstants.FIELD_MIN, AppConstants.FIELD_MIN)
+  val redShoot = Pose(AppConstants.CLOSE_RED_SHOOT_X, AppConstants.CLOSE_RED_SHOOT_Y, AppConstants.FIELD_MIN)
+  val redSpikeOneEnd = Pose(AppConstants.CLOSE_RED_SPIKE_ONE_END_X, AppConstants.CLOSE_RED_SPIKE_ONE_END_Y, AppConstants.FIELD_MIN)
+  val redSpikeTwoStart = Pose(AppConstants.CLOSE_RED_SPIKE_TWO_START_X, AppConstants.CLOSE_RED_SPIKE_TWO_START_Y, AppConstants.FIELD_MIN)
+  val redSpikeTwoEnd = Pose(AppConstants.CLOSE_RED_SPIKE_TWO_END_X, AppConstants.CLOSE_RED_SPIKE_TWO_END_Y, AppConstants.FIELD_MIN)
+  val redGateHover = Pose(AppConstants.CLOSE_RED_GATE_HOVER_X, AppConstants.CLOSE_RED_GATE_HOVER_Y, AppConstants.FIELD_MIN)
 
   lateinit var redStartToShoot: PathChain
   lateinit var redShootToSpikeOne: PathChain
@@ -66,8 +67,8 @@ class Close : NextFTCOpMode() {
   lateinit var redSpikeTwoToShoot: PathChain
   lateinit var redSpikeToGateHover: PathChain
 
-  val waitForFeeder = 200.milliseconds
-  val waitForIndexer = 750.milliseconds
+  val waitForFeeder = AppConstants.WAIT_FOR_FEEDER_MS.milliseconds
+  val waitForIndexer = AppConstants.WAIT_FOR_INDEXER_MS.milliseconds
 
   val shoot: Command
     get() =
@@ -82,10 +83,10 @@ class Close : NextFTCOpMode() {
     get() =
         SequentialGroup(
             shoot,
-            Indexer.indexerToSlot(1),
+            Indexer.indexerToSlot(AppConstants.INDEXER_SLOT_1),
             Delay(waitForIndexer),
             shoot,
-            Indexer.indexerToSlot(2),
+            Indexer.indexerToSlot(AppConstants.INDEXER_SLOT_2),
             Delay(waitForIndexer),
             shoot,
         )
@@ -96,18 +97,18 @@ class Close : NextFTCOpMode() {
             Indexer.latchDown(),
             Indexer.waitForSlotBreakbeam(),
             Indexer.latchUp(),
-            Delay(100.milliseconds),
-            Indexer.indexerToSlot(1),
-            Delay(100.milliseconds),
+            Delay(AppConstants.LATCH_WAIT_SHORT_MS.milliseconds),
+            Indexer.indexerToSlot(AppConstants.INDEXER_SLOT_1),
+            Delay(AppConstants.LATCH_WAIT_SHORT_MS.milliseconds),
             Indexer.latchDown(),
-            Delay(500.milliseconds),
+            Delay(AppConstants.LATCH_WAIT_LONG_MS.milliseconds),
             Indexer.waitForSlotBreakbeam(),
             Indexer.latchUp(),
-            Delay(100.milliseconds),
-            Indexer.indexerToSlot(2),
-            Delay(100.milliseconds),
+            Delay(AppConstants.LATCH_WAIT_SHORT_MS.milliseconds),
+            Indexer.indexerToSlot(AppConstants.INDEXER_SLOT_2),
+            Delay(AppConstants.LATCH_WAIT_SHORT_MS.milliseconds),
             Indexer.latchDown(),
-            Delay(500.milliseconds),
+            Delay(AppConstants.LATCH_WAIT_LONG_MS.milliseconds),
             Indexer.waitForSlotBreakbeam(),
             Indexer.latchUp(),
         )
@@ -116,30 +117,30 @@ class Close : NextFTCOpMode() {
     get() =
         SequentialGroup(
             Indexer.latchUp(),
-            Shooter.setSpeed(2_100.0),
-            Turret.setAngle((-45).deg),
-            FollowPath(redStartToShoot, false, 1.0),
+            Shooter.setSpeed(AppConstants.SHOOTER_SPEED_CLOSE),
+            Turret.setAngle(AppConstants.TURRET_ANGLE_CLOSE_START.deg),
+            FollowPath(redStartToShoot, false, AppConstants.PATH_SPEED_FAST),
             shootAll,
-            Indexer.indexerToSlot(0),
-            Indexer.setIntakePower(1.0),
+            Indexer.indexerToSlot(AppConstants.INDEXER_SLOT_0),
+            Indexer.setIntakePower(AppConstants.INTAKE_POWER_FORWARD),
             ParallelGroup(
                 intakeAll,
-                FollowPath(redShootToSpikeOne, false, 0.25),
+                FollowPath(redShootToSpikeOne, false, AppConstants.PATH_SPEED_SLOW),
             ),
-            Indexer.indexerToSlot(0),
-            FollowPath(redSpikeOneToShoot, false, 1.0),
+            Indexer.indexerToSlot(AppConstants.INDEXER_SLOT_0),
+            FollowPath(redSpikeOneToShoot, false, AppConstants.PATH_SPEED_FAST),
             shootAll,
-            Indexer.indexerToSlot(0),
-            FollowPath(redShootToSpikeTwo, false, 1.0),
+            Indexer.indexerToSlot(AppConstants.INDEXER_SLOT_0),
+            FollowPath(redShootToSpikeTwo, false, AppConstants.PATH_SPEED_FAST),
             ParallelGroup(
                 intakeAll,
-                FollowPath(redSpikeTwoIntake, false, 0.25),
+                FollowPath(redSpikeTwoIntake, false, AppConstants.PATH_SPEED_SLOW),
             ),
-            Indexer.indexerToSlot(0),
-            FollowPath(redSpikeTwoToShoot, false, 1.0),
+            Indexer.indexerToSlot(AppConstants.INDEXER_SLOT_0),
+            FollowPath(redSpikeTwoToShoot, false, AppConstants.PATH_SPEED_FAST),
             shootAll,
-            Indexer.setIntakePower(0.0),
-            FollowPath(redSpikeToGateHover, true, 1.0),
+            Indexer.setIntakePower(AppConstants.INTAKE_POWER_OFF),
+            FollowPath(redSpikeToGateHover, true, AppConstants.PATH_SPEED_FAST),
         )
 
   override fun onInit() {
@@ -193,9 +194,9 @@ class Close : NextFTCOpMode() {
         PedroComponent.follower
             .pathBuilder()
             .addPath(
-                Path(BezierCurve(redSpikeTwoEnd, Pose(redShoot.x, redSpikeTwoEnd.y, 0.0), redShoot))
+                Path(BezierCurve(redSpikeTwoEnd, Pose(redShoot.x, redSpikeTwoEnd.y, AppConstants.FIELD_MIN), redShoot))
             )
-            .setConstantHeadingInterpolation(0.0)
+            .setConstantHeadingInterpolation(AppConstants.FIELD_MIN)
             .build()
 
     redSpikeToGateHover =
@@ -207,7 +208,7 @@ class Close : NextFTCOpMode() {
 
     Indexer.feed().schedule()
     Indexer.unFeed().schedule()
-    Indexer.indexerToSlot(0).schedule()
+    Indexer.indexerToSlot(AppConstants.INDEXER_SLOT_0).schedule()
   }
 
   override fun onWaitForStart() {
