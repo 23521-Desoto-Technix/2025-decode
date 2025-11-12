@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
+import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
@@ -51,7 +52,11 @@ class Close : NextFTCOpMode() {
   val redStart = Pose(111.1, 133.3, 0.0)
   val blueStart = Pose(0.0, 0.0, 0.0)
   val redShoot = Pose(87.0, 82.0, 0.0)
+  val redSpikeOneEnd = Pose(120.0, 82.0, 0.0)
+
   lateinit var redStartToShoot: PathChain
+  lateinit var redShootToSpikeOne: PathChain
+  lateinit var redSpikeOneToShoot: PathChain
 
   val waitForFeeder = 200.milliseconds
   val waitForIndexer = 750.milliseconds
@@ -82,7 +87,33 @@ class Close : NextFTCOpMode() {
         SequentialGroup(
             Shooter.setSpeed(2_100.0),
             Turret.setAngle((-45).deg),
-            FollowPath(redStartToShoot),
+            FollowPath(redStartToShoot, false, 1.0),
+            shootAll,
+            Indexer.indexerToSlot(0),
+            Indexer.setIntakePower(1.0),
+            ParallelGroup(
+                SequentialGroup(
+                    Indexer.latchDown(),
+                    Indexer.waitForSlotBreakbeam(),
+                    Indexer.latchUp(),
+                    Delay(100.milliseconds),
+                    Indexer.indexerToSlot(1),
+                    Delay(100.milliseconds),
+                    Indexer.latchDown(),
+                    Delay(500.milliseconds),
+                    Indexer.waitForSlotBreakbeam(),
+                    Indexer.latchUp(),
+                    Delay(100.milliseconds),
+                    Indexer.indexerToSlot(2),
+                    Delay(100.milliseconds),
+                    Indexer.latchDown(),
+                    Delay(500.milliseconds),
+                    Indexer.waitForSlotBreakbeam(),
+                    Indexer.latchUp(),
+                ),
+                FollowPath(redShootToSpikeOne, false, 0.3),
+            ),
+            FollowPath(redSpikeOneToShoot, false, 1.0),
             shootAll,
         )
 
@@ -93,10 +124,25 @@ class Close : NextFTCOpMode() {
     intakeBreakBeam.mode = DigitalChannel.Mode.INPUT
     leftBreakBeam.mode = DigitalChannel.Mode.INPUT
     rightBreakBeam.mode = DigitalChannel.Mode.INPUT
+
     redStartToShoot =
         PedroComponent.follower
             .pathBuilder()
             .addPath(Path(BezierLine(redStart, redShoot)))
+            .setConstantHeadingInterpolation(0.0)
+            .build()
+
+    redShootToSpikeOne =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(Path(BezierLine(redShoot, redSpikeOneEnd)))
+            .setConstantHeadingInterpolation(0.0)
+            .build()
+
+    redSpikeOneToShoot =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(Path(BezierLine(redSpikeOneEnd, redShoot)))
             .setConstantHeadingInterpolation(0.0)
             .build()
 
