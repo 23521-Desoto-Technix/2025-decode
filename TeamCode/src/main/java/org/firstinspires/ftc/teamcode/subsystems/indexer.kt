@@ -8,7 +8,7 @@ import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.CRServoEx
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.ServoEx
-import org.firstinspires.ftc.teamcode.Constants
+import org.firstinspires.ftc.teamcode.BotConstants
 
 object Indexer : Subsystem {
   val indexerServo = CRServoEx("indexer")
@@ -20,7 +20,7 @@ object Indexer : Subsystem {
   val leftFeederServo = ServoEx("leftFeeder")
   val rightFeederServo = ServoEx("rightFeeder")
 
-  val indexerPID = controlSystem { posPid(Constants.INDEXER_PID_P, Constants.INDEXER_PID_I, Constants.INDEXER_PID_D) }
+  val indexerPID = controlSystem { posPid(BotConstants.INDEXER_PID_P, BotConstants.INDEXER_PID_I, BotConstants.INDEXER_PID_D) }
   lateinit var leftBreakBeam: DigitalChannel
   lateinit var rightBreakBeam: DigitalChannel
   lateinit var intakeBreakBeam: DigitalChannel
@@ -67,7 +67,7 @@ object Indexer : Subsystem {
   fun waitForPid() =
       LambdaCommand("waitForPid")
           .setIsDone {
-            indexerPID.isWithinTolerance(KineticState(Constants.INDEXER_PID_TOLERANCE_POSITION, Constants.INDEXER_PID_TOLERANCE_VELOCITY, Double.POSITIVE_INFINITY))
+            indexerPID.isWithinTolerance(KineticState(BotConstants.INDEXER_PID_TOLERANCE_POSITION, BotConstants.INDEXER_PID_TOLERANCE_VELOCITY, Double.POSITIVE_INFINITY))
           }
           .requires(this)
 
@@ -79,8 +79,8 @@ object Indexer : Subsystem {
   fun indexerToSlot(slot: Int) =
       LambdaCommand("indexerToSlot")
           .setStart {
-            val cycleLength = Constants.INDEXER_SLOT_TICKS * Constants.INDEXER_CYCLE_SLOTS
-            val slotPosition = slot * Constants.INDEXER_SLOT_TICKS
+            val cycleLength = BotConstants.INDEXER_SLOT_TICKS * BotConstants.INDEXER_CYCLE_SLOTS
+            val slotPosition = slot * BotConstants.INDEXER_SLOT_TICKS
 
             val numCycles =
                 kotlin.math.ceil(kotlin.math.abs(goalPosition) / cycleLength).toInt() + 2
@@ -99,7 +99,7 @@ object Indexer : Subsystem {
           .setIsDone { true }
           .requires(this)
 
-  fun toNextSlot() = indexerToPosition(goalPosition + Constants.INDEXER_SLOT_TICKS)
+  fun toNextSlot() = indexerToPosition(goalPosition + BotConstants.INDEXER_SLOT_TICKS)
 
   fun setIntakePower(power: Double) =
       LambdaCommand("setIntakePower")
@@ -107,12 +107,12 @@ object Indexer : Subsystem {
           .setIsDone { true }
           .requires(this)
 
-  fun toPreviousSlot() = indexerToPosition(goalPosition - Constants.INDEXER_SLOT_TICKS)
+  fun toPreviousSlot() = indexerToPosition(goalPosition - BotConstants.INDEXER_SLOT_TICKS)
 
   fun latchDown() =
       LambdaCommand("latchDown")
           .setStart {
-            latchServo.position = Constants.LATCH_SERVO_DOWN
+            latchServo.position = BotConstants.LATCH_SERVO_DOWN
             latched = false
           }
           .setIsDone { true }
@@ -120,7 +120,7 @@ object Indexer : Subsystem {
   fun latchUp() =
       LambdaCommand("latchUp")
           .setStart {
-            latchServo.position = Constants.LATCH_SERVO_UP
+            latchServo.position = BotConstants.LATCH_SERVO_UP
             latched = true
           }
           .setIsDone { true }
@@ -128,8 +128,8 @@ object Indexer : Subsystem {
   fun feed() =
       LambdaCommand("feed")
           .setStart {
-            leftFeederServo.position = Constants.LEFT_FEEDER_FEED
-            rightFeederServo.position = Constants.RIGHT_FEEDER_FEED
+            leftFeederServo.position = BotConstants.LEFT_FEEDER_FEED
+            rightFeederServo.position = BotConstants.RIGHT_FEEDER_FEED
           }
           .setIsDone { true }
           .requires(this)
@@ -137,8 +137,8 @@ object Indexer : Subsystem {
   fun unFeed() =
       LambdaCommand("resetFeeder")
           .setStart {
-            leftFeederServo.position = Constants.LEFT_FEEDER_UNFEED
-            rightFeederServo.position = Constants.RIGHT_FEEDER_UNFEED
+            leftFeederServo.position = BotConstants.LEFT_FEEDER_UNFEED
+            rightFeederServo.position = BotConstants.RIGHT_FEEDER_UNFEED
           }
           .setIsDone { true }
           .requires(this)

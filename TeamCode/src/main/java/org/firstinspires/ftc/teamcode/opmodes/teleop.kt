@@ -23,7 +23,7 @@ import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
-import org.firstinspires.ftc.teamcode.Constants as AppConstants
+import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
@@ -55,7 +55,43 @@ class teleop : NextFTCOpMode() {
   }
 
   companion object {
-    // These constants remain here as they're specific to teleop logic
+    // Color detection HSV thresholds
+    const val PURPLE_HUE_MIN = 200f
+    const val PURPLE_HUE_MAX = 245f
+    const val GREEN_HUE_MIN = 150f
+    const val GREEN_HUE_MAX = 170f
+    const val SATURATION_THRESHOLD = 140f
+    
+    // Turret lock buffer
+    const val LOCK_BUFFER_MS = 150
+    
+    // Gamepad thresholds
+    const val TRIGGER_THRESHOLD = 0.5
+    const val SPEED_MULTIPLIER_SLOW = 0.5
+    const val SPEED_MULTIPLIER_NORMAL = 1.0
+    
+    // Hood adjustment
+    const val HOOD_ADJUSTMENT_STEP = 0.1
+    
+    // Rumble duration
+    const val RUMBLE_DURATION_MS = 250
+    
+    // Rotation compensation multiplier
+    const val ROTATION_COMP_MULTIPLIER = 150.0
+    
+    // HSV conversion constants
+    const val HSV_DELTA_THRESHOLD = 1e-6f
+    const val HSV_HUE_SEGMENTS = 6f
+    const val HSV_HUE_GREEN_OFFSET = 2f
+    const val HSV_HUE_BLUE_OFFSET = 4f
+    const val HSV_HUE_MULTIPLIER = 60f
+    const val HSV_HUE_MAX = 360f
+    const val HSV_SCALE_MAX = 255f
+    const val HSV_CLAMP_MIN = 0f
+    const val HSV_CLAMP_MAX = 1f
+    
+    // Feeder delay for sequential group (seconds)
+    const val FEEDER_DELAY_SECONDS = 0.2
   }
 
   private lateinit var intakeBreakBeam: DigitalChannel
@@ -66,7 +102,7 @@ class teleop : NextFTCOpMode() {
   lateinit var aprilTag: AprilTagProcessor
   lateinit var portal: VisionPortal
 
-  var targetPose = Pose(AppConstants.FIELD_CENTER_X, AppConstants.FIELD_MAX_Y, AppConstants.FIELD_MIN)
+  var targetPose = Pose(72.0, 144.0, 0.0)
   var targetAprilTag = 0
 
   var speedMultiplier = 1.0
@@ -86,8 +122,8 @@ class teleop : NextFTCOpMode() {
     Indexer.intakeBreakBeam = intakeBreakBeam
     Indexer.leftBreakBeam = leftBreakBeam
     Indexer.rightBreakBeam = rightBreakBeam
-    Indexer.indexerToSlot(AppConstants.INDEXER_SLOT_0).schedule()
-    PedroComponent.follower.pose = Pose(AppConstants.FIELD_CENTER_X, AppConstants.FIELD_CENTER_Y, AppConstants.FIELD_MIN)
+    Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_0).schedule()
+    PedroComponent.follower.pose = BotConstants.FIELD_CENTER
     PedroComponent.follower.breakFollowing()
 
     aprilTag =
@@ -96,7 +132,7 @@ class teleop : NextFTCOpMode() {
             .setDrawCubeProjection(true)
             .setDrawTagOutline(true)
             .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-            .setLensIntrinsics(AppConstants.CAMERA_LENS_FX, AppConstants.CAMERA_LENS_FY, AppConstants.CAMERA_LENS_CX, AppConstants.CAMERA_LENS_CY)
+            .setLensIntrinsics(BotConstants.CAMERA_LENS_FX, BotConstants.CAMERA_LENS_FY, BotConstants.CAMERA_LENS_CX, BotConstants.CAMERA_LENS_CY)
             .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
             // ... these parameters are fx, fy, cx, cy.
             .build()
@@ -104,7 +140,7 @@ class teleop : NextFTCOpMode() {
     portal =
         VisionPortal.Builder()
             .setCamera(hardwareMap.get<WebcamName?>(WebcamName::class.java, "turretCamera"))
-            .setCameraResolution(Size(AppConstants.CAMERA_RESOLUTION_WIDTH, AppConstants.CAMERA_RESOLUTION_HEIGHT))
+            .setCameraResolution(Size(BotConstants.CAMERA_RESOLUTION_WIDTH, BotConstants.CAMERA_RESOLUTION_HEIGHT))
             .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
             .addProcessor(aprilTag)
             .build()
@@ -125,27 +161,27 @@ class teleop : NextFTCOpMode() {
 
   override fun onStartButtonPressed() {
     val shooterFar =
-        button { gamepad2.right_bumper }.whenBecomesTrue { Shooter.setSpeed(AppConstants.SHOOTER_SPEED_FAR).schedule() }
+        button { gamepad2.right_bumper }.whenBecomesTrue { Shooter.setSpeed(BotConstants.SHOOTER_SPEED_FAR).schedule() }
     val shooterClose =
-        button { gamepad2.left_bumper }.whenBecomesTrue { Shooter.setSpeed(AppConstants.SHOOTER_SPEED_CLOSE).schedule() }
+        button { gamepad2.left_bumper }.whenBecomesTrue { Shooter.setSpeed(BotConstants.SHOOTER_SPEED_CLOSE).schedule() }
     val shooterOff =
-        button { gamepad2.left_trigger > AppConstants.TRIGGER_THRESHOLD }.whenBecomesTrue { Shooter.setSpeed(AppConstants.SHOOTER_SPEED_OFF).schedule() }
+        button { gamepad2.left_trigger > TRIGGER_THRESHOLD }.whenBecomesTrue { Shooter.setSpeed(BotConstants.SHOOTER_SPEED_OFF).schedule() }
     val intakeForward =
         button { gamepad2.circle }
             .whenBecomesTrue {
-              Indexer.setIntakePower(if (Indexer.intakePower == AppConstants.INTAKE_POWER_FORWARD) AppConstants.INTAKE_POWER_OFF else AppConstants.INTAKE_POWER_FORWARD).schedule()
+              Indexer.setIntakePower(if (Indexer.intakePower == BotConstants.INTAKE_POWER_FORWARD) BotConstants.INTAKE_POWER_OFF else BotConstants.INTAKE_POWER_FORWARD).schedule()
             }
     val intakeReverse =
         button { gamepad2.cross }
             .whenBecomesTrue {
-              Indexer.setIntakePower(if (Indexer.intakePower == AppConstants.INTAKE_POWER_REVERSE) AppConstants.INTAKE_POWER_OFF else AppConstants.INTAKE_POWER_REVERSE).schedule()
+              Indexer.setIntakePower(if (Indexer.intakePower == BotConstants.INTAKE_POWER_REVERSE) BotConstants.INTAKE_POWER_OFF else BotConstants.INTAKE_POWER_REVERSE).schedule()
             }
     val spindexerBumpNext =
         button { gamepad2.dpad_left } whenBecomesTrue { Indexer.toNextSlot().schedule() }
     val spindexerBumpPrevious =
         button { gamepad2.dpad_right } whenBecomesTrue { Indexer.toPreviousSlot().schedule() }
     val spindexerReset =
-        button { gamepad2.dpad_down } whenBecomesTrue { Indexer.indexerToSlot(AppConstants.INDEXER_SLOT_0).schedule() }
+        button { gamepad2.dpad_down } whenBecomesTrue { Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_0).schedule() }
 
     val feed =
         button { gamepad2.triangle } whenTrue
@@ -155,7 +191,7 @@ class teleop : NextFTCOpMode() {
             {
               SequentialGroup(
                       Indexer.unFeed(),
-                      Delay((AppConstants.WAIT_FOR_FEEDER_MS.toDouble() / 1000.0).seconds),
+                      Delay(FEEDER_DELAY_SECONDS.seconds),
                       Indexer.toNextSlot(),
                   )
                   .schedule()
@@ -168,12 +204,12 @@ class teleop : NextFTCOpMode() {
     val hoodUp =
         button { gamepad1.dpad_up }
             .whenBecomesTrue {
-              Hood.setPosition((Hood.position + AppConstants.HOOD_ADJUSTMENT_STEP).coerceAtMost(AppConstants.SPEED_MULTIPLIER_NORMAL)).schedule()
+              Hood.setPosition((Hood.position + HOOD_ADJUSTMENT_STEP).coerceAtMost(SPEED_MULTIPLIER_NORMAL)).schedule()
             }
     val hoodDown =
         button { gamepad1.dpad_down }
             .whenBecomesTrue {
-              Hood.setPosition((Hood.position - AppConstants.HOOD_ADJUSTMENT_STEP).coerceAtLeast(AppConstants.INTAKE_POWER_OFF)).schedule()
+              Hood.setPosition((Hood.position - HOOD_ADJUSTMENT_STEP).coerceAtLeast(0.0)).schedule()
             }
     /*
     val turretRight =
@@ -188,19 +224,19 @@ class teleop : NextFTCOpMode() {
     val rumble =
         button { !leftBreakBeam.state || !rightBreakBeam.state }
             .whenBecomesTrue {
-              gamepad1.rumble(AppConstants.RUMBLE_DURATION_MS)
-              gamepad2.rumble(AppConstants.RUMBLE_DURATION_MS)
+              gamepad1.rumble(RUMBLE_DURATION_MS)
+              gamepad2.rumble(RUMBLE_DURATION_MS)
             }
 
     val gateDisplay =
         button { Indexer.latched }
-            .whenTrue { gamepad2.setLedColor(AppConstants.INTAKE_POWER_OFF, AppConstants.SPEED_MULTIPLIER_NORMAL, AppConstants.INTAKE_POWER_OFF, Gamepad.LED_DURATION_CONTINUOUS) }
-            .whenFalse { gamepad2.setLedColor(AppConstants.SPEED_MULTIPLIER_NORMAL, AppConstants.INTAKE_POWER_OFF, AppConstants.INTAKE_POWER_OFF, Gamepad.LED_DURATION_CONTINUOUS) }
+            .whenTrue { gamepad2.setLedColor(0.0, 1.0, 0.0, Gamepad.LED_DURATION_CONTINUOUS) }
+            .whenFalse { gamepad2.setLedColor(1.0, 0.0, 0.0, Gamepad.LED_DURATION_CONTINUOUS) }
     val speedToggle =
         Gamepads.gamepad1.rightTrigger
-            .atLeast(AppConstants.TRIGGER_THRESHOLD)
-            .whenBecomesTrue { InstantCommand { speedMultiplier = AppConstants.SPEED_MULTIPLIER_SLOW }.schedule() }
-            .whenBecomesFalse { InstantCommand { speedMultiplier = AppConstants.SPEED_MULTIPLIER_NORMAL }.schedule() }
+            .atLeast(TRIGGER_THRESHOLD)
+            .whenBecomesTrue { InstantCommand { speedMultiplier = SPEED_MULTIPLIER_SLOW }.schedule() }
+            .whenBecomesFalse { InstantCommand { speedMultiplier = SPEED_MULTIPLIER_NORMAL }.schedule() }
     val driverControlled =
         PedroDriverControlled(
             range { -gamepad1.left_stick_y.toDouble() * speedMultiplier },
@@ -218,9 +254,9 @@ class teleop : NextFTCOpMode() {
     val b = normalized.blue // 215 +- 15 for purp, 160 +- 10 for green
 
     val hsv = rgbToHsv(r, g, b)
-    if (hsv[0] > AppConstants.PURPLE_HUE_MIN && hsv[0] < AppConstants.PURPLE_HUE_MAX && hsv[1] > AppConstants.SATURATION_THRESHOLD) {
+    if (hsv[0] > PURPLE_HUE_MIN && hsv[0] < PURPLE_HUE_MAX && hsv[1] > SATURATION_THRESHOLD) {
       Lights.state = LightsState.ARTIFACT_PURPLE
-    } else if (hsv[0] > AppConstants.GREEN_HUE_MIN && hsv[0] < AppConstants.GREEN_HUE_MAX && hsv[1] > AppConstants.SATURATION_THRESHOLD) {
+    } else if (hsv[0] > GREEN_HUE_MIN && hsv[0] < GREEN_HUE_MAX && hsv[1] > SATURATION_THRESHOLD) {
       Lights.state = LightsState.ARTIFACT_GREEN
     } else {
       Lights.state = LightsState.OFF
@@ -237,20 +273,20 @@ class teleop : NextFTCOpMode() {
     Turret.IMUDegrees = PedroComponent.follower.pose.heading.rad.inDeg
 
     var pixelOffset = 0.0
-    var rotationComp = gamepad1.right_stick_x * 150.0
+    var rotationComp = gamepad1.right_stick_x * ROTATION_COMP_MULTIPLIER
     var hasLock = false
 
     if (alliance == Alliance.RED) {
-      targetAprilTag = AppConstants.RED_ALLIANCE_APRILTAG_ID
+      targetAprilTag = BotConstants.RED_ALLIANCE_APRILTAG_ID
     }
     if (alliance == Alliance.BLUE) {
-      targetAprilTag = AppConstants.BLUE_ALLIANCE_APRILTAG_ID
+      targetAprilTag = BotConstants.BLUE_ALLIANCE_APRILTAG_ID
     }
     if (aprilTag.detections.isNotEmpty()) {
       for (detection in aprilTag.detections) {
         if (detection.id == targetAprilTag) {
           hasLock = true
-          pixelOffset = detection.center.x - (AppConstants.CAMERA_RESOLUTION_WIDTH / 2.0)
+          pixelOffset = detection.center.x - (BotConstants.CAMERA_RESOLUTION_WIDTH / 2.0)
           if (detection.ftcPose != null) {
             telemetry.addData("pose", detection.ftcPose.range)
           } else {
@@ -261,12 +297,12 @@ class teleop : NextFTCOpMode() {
     }
 
     if (alliance == Alliance.RED) {
-      targetPose = Pose(AppConstants.FIELD_MAX_X, AppConstants.FIELD_MAX_Y, AppConstants.FIELD_MIN)
+      targetPose = BotConstants.RED_TARGET_POSE
     } else if (alliance == Alliance.BLUE) {
-      targetPose = Pose(AppConstants.FIELD_MAX_X, AppConstants.FIELD_MIN, AppConstants.FIELD_MIN)
+      targetPose = BotConstants.BLUE_TARGET_POSE
     }
-    val offsetX = targetPose.x - (AppConstants.FIELD_MAX_X - PedroComponent.follower.pose.x)
-    val offsetY = targetPose.y - (AppConstants.FIELD_MAX_Y - PedroComponent.follower.pose.y)
+    val offsetX = targetPose.x - (144.0 - PedroComponent.follower.pose.x)
+    val offsetY = targetPose.y - (144.0 - PedroComponent.follower.pose.y)
     val goalAngle =
         atan2(
                 offsetY,
@@ -277,14 +313,14 @@ class teleop : NextFTCOpMode() {
     if (hasLock) {
       lastLockTime = System.currentTimeMillis()
       Turret.cameraTrackPower(pixelOffset).schedule()
-    } else if (System.currentTimeMillis() - lastLockTime > AppConstants.LOCK_BUFFER_MS) {
+    } else if (System.currentTimeMillis() - lastLockTime > LOCK_BUFFER_MS) {
       Turret.setAngle(
               goalAngle,
               true,
           )
           .schedule()
     } else {
-      Turret.cameraTrackPower(AppConstants.INTAKE_POWER_OFF).schedule()
+      Turret.cameraTrackPower(0.0).schedule()
     }
     telemetry.addData("Relative X", offsetX)
     telemetry.addData("Relative Y", offsetY)
@@ -309,31 +345,31 @@ class teleop : NextFTCOpMode() {
  * [0, 360), saturation and value are scaled to [0, 255].
  */
 private fun rgbToHsv(rIn: Float, gIn: Float, bIn: Float): FloatArray {
-  val r = rIn.coerceIn(AppConstants.HSV_CLAMP_MIN, AppConstants.HSV_CLAMP_MAX)
-  val g = gIn.coerceIn(AppConstants.HSV_CLAMP_MIN, AppConstants.HSV_CLAMP_MAX)
-  val b = bIn.coerceIn(AppConstants.HSV_CLAMP_MIN, AppConstants.HSV_CLAMP_MAX)
+  val r = rIn.coerceIn(teleop.HSV_CLAMP_MIN, teleop.HSV_CLAMP_MAX)
+  val g = gIn.coerceIn(teleop.HSV_CLAMP_MIN, teleop.HSV_CLAMP_MAX)
+  val b = bIn.coerceIn(teleop.HSV_CLAMP_MIN, teleop.HSV_CLAMP_MAX)
 
   val max = maxOf(r, g, b)
   val min = minOf(r, g, b)
   val delta = max - min
 
   val v = max
-  val s = if (max <= AppConstants.HSV_CLAMP_MIN) AppConstants.HSV_CLAMP_MIN else delta / max
+  val s = if (max <= teleop.HSV_CLAMP_MIN) teleop.HSV_CLAMP_MIN else delta / max
 
-  var h = AppConstants.HSV_CLAMP_MIN
-  if (delta > AppConstants.HSV_DELTA_THRESHOLD) {
+  var h = teleop.HSV_CLAMP_MIN
+  if (delta > teleop.HSV_DELTA_THRESHOLD) {
     h =
         when (max) {
-          r -> ((g - b) / delta) % AppConstants.HSV_HUE_SEGMENTS
-          g -> ((b - r) / delta) + AppConstants.HSV_HUE_GREEN_OFFSET
-          else -> ((r - g) / delta) + AppConstants.HSV_HUE_BLUE_OFFSET
+          r -> ((g - b) / delta) % teleop.HSV_HUE_SEGMENTS
+          g -> ((b - r) / delta) + teleop.HSV_HUE_GREEN_OFFSET
+          else -> ((r - g) / delta) + teleop.HSV_HUE_BLUE_OFFSET
         }
-    h *= AppConstants.HSV_HUE_MULTIPLIER
-    if (h < AppConstants.HSV_CLAMP_MIN) h += AppConstants.HSV_HUE_MAX
+    h *= teleop.HSV_HUE_MULTIPLIER
+    if (h < teleop.HSV_CLAMP_MIN) h += teleop.HSV_HUE_MAX
   }
 
-  val sScaled = (s * AppConstants.HSV_SCALE_MAX).coerceIn(AppConstants.HSV_CLAMP_MIN, AppConstants.HSV_SCALE_MAX)
-  val vScaled = (v * AppConstants.HSV_SCALE_MAX).coerceIn(AppConstants.HSV_CLAMP_MIN, AppConstants.HSV_SCALE_MAX)
+  val sScaled = (s * teleop.HSV_SCALE_MAX).coerceIn(teleop.HSV_CLAMP_MIN, teleop.HSV_SCALE_MAX)
+  val vScaled = (v * teleop.HSV_SCALE_MAX).coerceIn(teleop.HSV_CLAMP_MIN, teleop.HSV_SCALE_MAX)
 
   return floatArrayOf(h, sScaled, vScaled)
 }
