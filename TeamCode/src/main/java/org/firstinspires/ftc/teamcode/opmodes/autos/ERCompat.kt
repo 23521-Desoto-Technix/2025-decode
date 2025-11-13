@@ -51,7 +51,7 @@ class ERCompat : NextFTCOpMode() {
 
   companion object {
     // Path following speeds
-    const val PATH_SPEED_MEDIUM = 0.3
+    const val PATH_SPEED_SLOW = 0.25
     const val PATH_SPEED_FAST = 1.0
 
     // Autonomous end wait time (seconds)
@@ -165,9 +165,8 @@ class ERCompat : NextFTCOpMode() {
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.latchUp(),
                 ),
-                FollowPath(redSpikeIntake, false, PATH_SPEED_MEDIUM),
+                FollowPath(redSpikeIntake, false, PATH_SPEED_SLOW),
             ),
-            Indexer.setIntakePower(BotConstants.INTAKE_POWER_REVERSE),
             Indexer.indexerToSlot(0),
             FollowPath(redSpikeReturn, false, PATH_SPEED_FAST),
             shootAll,
