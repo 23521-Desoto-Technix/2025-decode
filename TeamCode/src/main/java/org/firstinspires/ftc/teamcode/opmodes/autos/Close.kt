@@ -243,7 +243,7 @@ class Close : NextFTCOpMode() {
     turretAngle =
         when (alliance) {
           Alliance.RED -> -45.0
-          Alliance.BLUE -> 45.0
+          Alliance.BLUE -> 55.0
           Alliance.UNKNOWN -> 0.0
         }
   }
