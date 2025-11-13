@@ -19,6 +19,7 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import kotlin.time.Duration.Companion.milliseconds
+import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
@@ -27,7 +28,7 @@ import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 
-@Autonomous
+@Autonomous(name = "Close (6 near)")
 class Close : NextFTCOpMode() {
   init {
     addComponents(
@@ -42,6 +43,15 @@ class Close : NextFTCOpMode() {
     RED,
     BLUE,
     UNKNOWN,
+  }
+
+  companion object {
+    // Path following speeds
+    const val PATH_SPEED_SLOW = 0.25
+    const val PATH_SPEED_FAST = 1.0
+    
+    // Turret angle
+    const val TURRET_ANGLE_START = -45.0
   }
 
   var alliance = Alliance.UNKNOWN
@@ -66,8 +76,8 @@ class Close : NextFTCOpMode() {
   lateinit var redSpikeTwoToShoot: PathChain
   lateinit var redSpikeToGateHover: PathChain
 
-  val waitForFeeder = 200.milliseconds
-  val waitForIndexer = 750.milliseconds
+  val waitForFeeder = BotConstants.WAIT_FOR_FEEDER_MS.milliseconds
+  val waitForIndexer = BotConstants.WAIT_FOR_INDEXER_MS.milliseconds
 
   val shoot: Command
     get() =
@@ -96,18 +106,18 @@ class Close : NextFTCOpMode() {
             Indexer.latchDown(),
             Indexer.waitForSlotBreakbeam(),
             Indexer.latchUp(),
-            Delay(100.milliseconds),
+            Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
             Indexer.indexerToSlot(1),
-            Delay(100.milliseconds),
+            Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
             Indexer.latchDown(),
-            Delay(500.milliseconds),
+            Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
             Indexer.waitForSlotBreakbeam(),
             Indexer.latchUp(),
-            Delay(100.milliseconds),
+            Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
             Indexer.indexerToSlot(2),
-            Delay(100.milliseconds),
+            Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
             Indexer.latchDown(),
-            Delay(500.milliseconds),
+            Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
             Indexer.waitForSlotBreakbeam(),
             Indexer.latchUp(),
         )
@@ -116,30 +126,30 @@ class Close : NextFTCOpMode() {
     get() =
         SequentialGroup(
             Indexer.latchUp(),
-            Shooter.setSpeed(2_100.0),
-            Turret.setAngle((-45).deg),
-            FollowPath(redStartToShoot, false, 1.0),
+            Shooter.setSpeed(BotConstants.SHOOTER_SPEED_CLOSE),
+            Turret.setAngle(TURRET_ANGLE_START.deg),
+            FollowPath(redStartToShoot, false, PATH_SPEED_FAST),
             shootAll,
             Indexer.indexerToSlot(0),
-            Indexer.setIntakePower(1.0),
+            Indexer.setIntakePower(BotConstants.INTAKE_POWER_FORWARD),
             ParallelGroup(
                 intakeAll,
-                FollowPath(redShootToSpikeOne, false, 0.25),
+                FollowPath(redShootToSpikeOne, false, PATH_SPEED_SLOW),
             ),
             Indexer.indexerToSlot(0),
-            FollowPath(redSpikeOneToShoot, false, 1.0),
+            FollowPath(redSpikeOneToShoot, false, PATH_SPEED_FAST),
             shootAll,
             Indexer.indexerToSlot(0),
-            FollowPath(redShootToSpikeTwo, false, 1.0),
+            FollowPath(redShootToSpikeTwo, false, PATH_SPEED_FAST),
             ParallelGroup(
                 intakeAll,
-                FollowPath(redSpikeTwoIntake, false, 0.25),
+                FollowPath(redSpikeTwoIntake, false, PATH_SPEED_SLOW),
             ),
             Indexer.indexerToSlot(0),
-            FollowPath(redSpikeTwoToShoot, false, 1.0),
+            FollowPath(redSpikeTwoToShoot, false, PATH_SPEED_FAST),
             shootAll,
-            Indexer.setIntakePower(0.0),
-            FollowPath(redSpikeToGateHover, true, 1.0),
+            Indexer.setIntakePower(BotConstants.INTAKE_POWER_OFF),
+            FollowPath(redSpikeToGateHover, true, PATH_SPEED_FAST),
         )
 
   override fun onInit() {

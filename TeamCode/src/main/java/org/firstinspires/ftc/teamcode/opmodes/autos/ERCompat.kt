@@ -37,6 +37,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
 import kotlin.math.atan2
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import org.firstinspires.ftc.teamcode.BotConstants
 
 @Autonomous(name = "East Rankin (6 far)")
 class ERCompat : NextFTCOpMode() {
@@ -47,6 +48,18 @@ class ERCompat : NextFTCOpMode() {
         BindingsComponent,
         PedroComponent(Constants::createFollower),
     )
+  }
+
+  companion object {
+    // Path following speeds
+    const val PATH_SPEED_MEDIUM = 0.3
+    const val PATH_SPEED_FAST = 1.0
+    
+    // Turret angle
+    const val TURRET_ANGLE_START = 25.0
+    
+    // Autonomous end wait time (seconds)
+    const val AUTO_END_WAIT_SECONDS = 30
   }
 
   enum class Alliance {
@@ -62,9 +75,6 @@ class ERCompat : NextFTCOpMode() {
   lateinit var aprilTag: AprilTagProcessor
   lateinit var portal: VisionPortal
 
-  val RESOLUTION_WIDTH: Int = 800
-  val RESOLUTION_HEIGHT: Int = 600
-
   var targetPose = Pose(72.0, 144.0, 0.0)
   var targetAprilTag = 0
 
@@ -79,8 +89,8 @@ class ERCompat : NextFTCOpMode() {
   lateinit var redSpikeIntake: PathChain
   lateinit var redSpikeReturn: PathChain
 
-  val waitForFeeder = 200.milliseconds
-  val waitForIndexer = 750.milliseconds
+  val waitForFeeder = BotConstants.WAIT_FOR_FEEDER_MS.milliseconds
+  val waitForIndexer = BotConstants.WAIT_FOR_INDEXER_MS.milliseconds
 
   val shoot: Command
     get() =
@@ -107,42 +117,42 @@ class ERCompat : NextFTCOpMode() {
     get() =
         SequentialGroup(
             Indexer.latchUp(),
-            Turret.setAngle(25.0.deg, true),
-            Shooter.setSpeed(2_300.0),
+            Turret.setAngle(TURRET_ANGLE_START.deg, true),
+            Shooter.setSpeed(BotConstants.SHOOTER_SPEED_FAR),
             Shooter.waitForSpeed(),
             shootAll,
-            Indexer.setIntakePower(1.0),
+            Indexer.setIntakePower(BotConstants.INTAKE_POWER_FORWARD),
             Indexer.indexerToSlot(0),
-            FollowPath(startToRedSpikeOne, false, 1.0),
+            FollowPath(startToRedSpikeOne, false, PATH_SPEED_FAST),
             ParallelGroup(
                 SequentialGroup(
                     Indexer.latchDown(),
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.latchUp(),
-                    Delay(100.milliseconds),
+                    Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
                     Indexer.indexerToSlot(1),
-                    Delay(100.milliseconds),
+                    Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
                     Indexer.latchDown(),
-                    Delay(500.milliseconds),
+                    Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.latchUp(),
-                    Delay(100.milliseconds),
+                    Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
                     Indexer.indexerToSlot(2),
-                    Delay(100.milliseconds),
+                    Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
                     Indexer.latchDown(),
-                    Delay(500.milliseconds),
+                    Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.latchUp(),
                 ),
-                FollowPath(redSpikeIntake, false, 0.3),
+                FollowPath(redSpikeIntake, false, PATH_SPEED_MEDIUM),
             ),
-            Indexer.setIntakePower(-1.0),
+            Indexer.setIntakePower(BotConstants.INTAKE_POWER_REVERSE),
             Indexer.indexerToSlot(0),
-            FollowPath(redSpikeReturn, false, 1.0),
+            FollowPath(redSpikeReturn, false, PATH_SPEED_FAST),
             shootAll,
-            Indexer.setIntakePower(0.0),
+            Indexer.setIntakePower(BotConstants.INTAKE_POWER_OFF),
             InstantCommand { Lights.state = LightsState.ARTIFACT_GREEN },
-            Delay(30.seconds),
+            Delay(AUTO_END_WAIT_SECONDS.seconds),
         )
 
   override fun onInit() {
@@ -173,7 +183,7 @@ class ERCompat : NextFTCOpMode() {
     Indexer.intakeBreakBeam = intakeBreakBeam
     Indexer.leftBreakBeam = leftBreakBeam
     Indexer.rightBreakBeam = rightBreakBeam
-    PedroComponent.follower.pose = Pose(72.0, 72.0, 0.0)
+    PedroComponent.follower.pose = BotConstants.FIELD_CENTER
     PedroComponent.follower.breakFollowing()
 
     Indexer.feed().schedule()
@@ -186,7 +196,7 @@ class ERCompat : NextFTCOpMode() {
             .setDrawCubeProjection(true)
             .setDrawTagOutline(true)
             .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-            .setLensIntrinsics(667.154, 667.154, 438.702, 286.414)
+            .setLensIntrinsics(BotConstants.CAMERA_LENS_FX, BotConstants.CAMERA_LENS_FY, BotConstants.CAMERA_LENS_CX, BotConstants.CAMERA_LENS_CY)
             .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
             // ... these parameters are fx, fy, cx, cy.
             .build()
@@ -194,7 +204,7 @@ class ERCompat : NextFTCOpMode() {
     portal =
         VisionPortal.Builder()
             .setCamera(hardwareMap.get<WebcamName?>(WebcamName::class.java, "turretCamera"))
-            .setCameraResolution(Size(RESOLUTION_WIDTH, RESOLUTION_HEIGHT))
+            .setCameraResolution(Size(BotConstants.CAMERA_RESOLUTION_WIDTH, BotConstants.CAMERA_RESOLUTION_HEIGHT))
             .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
             .addProcessor(aprilTag)
             .build()
@@ -224,16 +234,16 @@ class ERCompat : NextFTCOpMode() {
     var hasLock = false
 
     if (alliance == Alliance.RED) {
-      targetAprilTag = 24
+      targetAprilTag = BotConstants.RED_ALLIANCE_APRILTAG_ID
     }
     if (alliance == Alliance.BLUE) {
-      targetAprilTag = 20
+      targetAprilTag = BotConstants.BLUE_ALLIANCE_APRILTAG_ID
     }
     if (aprilTag.detections.isNotEmpty()) {
       for (detection in aprilTag.detections) {
         if (detection.id == targetAprilTag) {
           hasLock = true
-          pixelOffset = detection.center.x - (RESOLUTION_WIDTH / 2.0)
+          pixelOffset = detection.center.x - (BotConstants.CAMERA_RESOLUTION_WIDTH / 2.0)
           if (detection.ftcPose != null) {
             telemetry.addData("pose", detection.ftcPose.range)
           } else {
@@ -244,12 +254,12 @@ class ERCompat : NextFTCOpMode() {
     }
 
     if (alliance == Alliance.RED) {
-      targetPose = Pose(144.0, 144.0, 0.0)
+      targetPose = BotConstants.RED_TARGET_POSE
     } else if (alliance == Alliance.BLUE) {
-      targetPose = Pose(144.0, 0.0, 0.0)
+      targetPose = BotConstants.BLUE_TARGET_POSE
     }
-    val offsetX = targetPose.x - (144 - PedroComponent.follower.pose.x)
-    val offsetY = targetPose.y - (144 - PedroComponent.follower.pose.y)
+    val offsetX = targetPose.x - (144.0 - PedroComponent.follower.pose.x)
+    val offsetY = targetPose.y - (144.0 - PedroComponent.follower.pose.y)
     val goalAngle =
         atan2(
                 offsetY,
