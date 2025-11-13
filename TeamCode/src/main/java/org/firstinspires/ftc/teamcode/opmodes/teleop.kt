@@ -122,7 +122,7 @@ class teleop : NextFTCOpMode() {
     Indexer.intakeBreakBeam = intakeBreakBeam
     Indexer.leftBreakBeam = leftBreakBeam
     Indexer.rightBreakBeam = rightBreakBeam
-    Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_0).schedule()
+    Indexer.indexerToSlot(0).schedule()
     PedroComponent.follower.pose = BotConstants.FIELD_CENTER
     PedroComponent.follower.breakFollowing()
 
@@ -181,7 +181,7 @@ class teleop : NextFTCOpMode() {
     val spindexerBumpPrevious =
         button { gamepad2.dpad_right } whenBecomesTrue { Indexer.toPreviousSlot().schedule() }
     val spindexerReset =
-        button { gamepad2.dpad_down } whenBecomesTrue { Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_0).schedule() }
+        button { gamepad2.dpad_down } whenBecomesTrue { Indexer.indexerToSlot(0).schedule() }
 
     val feed =
         button { gamepad2.triangle } whenTrue

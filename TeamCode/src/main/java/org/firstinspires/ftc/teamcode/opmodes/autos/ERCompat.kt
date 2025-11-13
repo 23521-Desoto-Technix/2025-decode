@@ -105,10 +105,10 @@ class ERCompat : NextFTCOpMode() {
     get() =
         SequentialGroup(
             shoot,
-            Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_1),
+            Indexer.indexerToSlot(1),
             Delay(waitForIndexer),
             shoot,
-            Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_2),
+            Indexer.indexerToSlot(2),
             Delay(waitForIndexer),
             shoot,
         )
@@ -122,7 +122,7 @@ class ERCompat : NextFTCOpMode() {
             Shooter.waitForSpeed(),
             shootAll,
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_FORWARD),
-            Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_0),
+            Indexer.indexerToSlot(0),
             FollowPath(startToRedSpikeOne, false, PATH_SPEED_FAST),
             ParallelGroup(
                 SequentialGroup(
@@ -130,14 +130,14 @@ class ERCompat : NextFTCOpMode() {
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.latchUp(),
                     Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
-                    Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_1),
+                    Indexer.indexerToSlot(1),
                     Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
                     Indexer.latchDown(),
                     Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
                     Indexer.waitForSlotBreakbeam(),
                     Indexer.latchUp(),
                     Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
-                    Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_2),
+                    Indexer.indexerToSlot(2),
                     Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
                     Indexer.latchDown(),
                     Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
@@ -147,7 +147,7 @@ class ERCompat : NextFTCOpMode() {
                 FollowPath(redSpikeIntake, false, PATH_SPEED_MEDIUM),
             ),
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_REVERSE),
-            Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_0),
+            Indexer.indexerToSlot(0),
             FollowPath(redSpikeReturn, false, PATH_SPEED_FAST),
             shootAll,
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_OFF),
@@ -188,7 +188,7 @@ class ERCompat : NextFTCOpMode() {
 
     Indexer.feed().schedule()
     Indexer.unFeed().schedule()
-    Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_0).schedule()
+    Indexer.indexerToSlot(0).schedule()
 
     aprilTag =
         AprilTagProcessor.Builder()

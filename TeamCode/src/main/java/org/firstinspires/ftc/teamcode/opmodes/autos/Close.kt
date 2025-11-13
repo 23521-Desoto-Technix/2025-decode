@@ -92,10 +92,10 @@ class Close : NextFTCOpMode() {
     get() =
         SequentialGroup(
             shoot,
-            Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_1),
+            Indexer.indexerToSlot(1),
             Delay(waitForIndexer),
             shoot,
-            Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_2),
+            Indexer.indexerToSlot(2),
             Delay(waitForIndexer),
             shoot,
         )
@@ -107,14 +107,14 @@ class Close : NextFTCOpMode() {
             Indexer.waitForSlotBreakbeam(),
             Indexer.latchUp(),
             Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
-            Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_1),
+            Indexer.indexerToSlot(1),
             Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
             Indexer.latchDown(),
             Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
             Indexer.waitForSlotBreakbeam(),
             Indexer.latchUp(),
             Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
-            Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_2),
+            Indexer.indexerToSlot(2),
             Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
             Indexer.latchDown(),
             Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
@@ -130,22 +130,22 @@ class Close : NextFTCOpMode() {
             Turret.setAngle(TURRET_ANGLE_START.deg),
             FollowPath(redStartToShoot, false, PATH_SPEED_FAST),
             shootAll,
-            Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_0),
+            Indexer.indexerToSlot(0),
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_FORWARD),
             ParallelGroup(
                 intakeAll,
                 FollowPath(redShootToSpikeOne, false, PATH_SPEED_SLOW),
             ),
-            Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_0),
+            Indexer.indexerToSlot(0),
             FollowPath(redSpikeOneToShoot, false, PATH_SPEED_FAST),
             shootAll,
-            Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_0),
+            Indexer.indexerToSlot(0),
             FollowPath(redShootToSpikeTwo, false, PATH_SPEED_FAST),
             ParallelGroup(
                 intakeAll,
                 FollowPath(redSpikeTwoIntake, false, PATH_SPEED_SLOW),
             ),
-            Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_0),
+            Indexer.indexerToSlot(0),
             FollowPath(redSpikeTwoToShoot, false, PATH_SPEED_FAST),
             shootAll,
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_OFF),
@@ -217,7 +217,7 @@ class Close : NextFTCOpMode() {
 
     Indexer.feed().schedule()
     Indexer.unFeed().schedule()
-    Indexer.indexerToSlot(BotConstants.INDEXER_SLOT_0).schedule()
+    Indexer.indexerToSlot(0).schedule()
   }
 
   override fun onWaitForStart() {
