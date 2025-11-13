@@ -47,14 +47,14 @@ class Close : NextFTCOpMode() {
     const val PATH_SPEED_SLOW = 0.25
     const val PATH_SPEED_FAST = 1.0
   }
-
+    
   var alliance = Alliance.UNKNOWN
 
   private lateinit var intakeBreakBeam: DigitalChannel
   private lateinit var leftBreakBeam: DigitalChannel
   private lateinit var rightBreakBeam: DigitalChannel
 
-  val redStart = Pose(111.1, 133.3, 0.0)
+  val redStart = Pose(113.0, 131.0, 0.0)
   val redShoot = Pose(87.0, 82.0, 0.0)
   val redSpikeOneEnd = Pose(125.0, 85.0, 0.0)
   val redSpikeTwoStart = Pose(100.0, 60.0, 0.0)
