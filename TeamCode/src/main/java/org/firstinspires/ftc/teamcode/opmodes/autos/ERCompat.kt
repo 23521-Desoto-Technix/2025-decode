@@ -254,7 +254,7 @@ class ERCompat : NextFTCOpMode() {
     turretAngle =
         when (alliance) {
           Alliance.RED -> 25.0
-          Alliance.BLUE -> -25.0
+          Alliance.BLUE -> 155.0
           Alliance.UNKNOWN -> 0.0
         }
   }
