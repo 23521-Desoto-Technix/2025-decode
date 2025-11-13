@@ -81,7 +81,7 @@ class ERCompat : NextFTCOpMode() {
   val redShoot = Pose(82.0, 10.0, 0.0)
   val redSpikeOneStart = Pose(97.0, 35.0, 0.0)
   val redSpikeOneEnd = Pose(130.0, 35.0, 0.0)
-  val redPark = Pose(100.0, 15.0, 0.0)
+  val redPark = Pose(110.0, 20.0, 0.0)
 
   val blueStart: Pose
     get() = PoseUtils.mirrorPose(redStart)
@@ -110,8 +110,8 @@ class ERCompat : NextFTCOpMode() {
   val currentSpikeOneEnd: Pose
     get() = if (alliance == Alliance.RED) redSpikeOneEnd else blueSpikeOneEnd
 
-    val currentPark: Pose
-        get() = if (alliance == Alliance.RED) redPark else bluePark
+  val currentPark: Pose
+    get() = if (alliance == Alliance.RED) redPark else bluePark
 
   lateinit var startToRedSpikeOne: PathChain
   lateinit var redSpikeIntake: PathChain
