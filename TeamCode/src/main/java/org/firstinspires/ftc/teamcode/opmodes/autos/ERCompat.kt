@@ -81,6 +81,7 @@ class ERCompat : NextFTCOpMode() {
   val redShoot = Pose(82.0, 10.0, 0.0)
   val redSpikeOneStart = Pose(97.0, 35.0, 0.0)
   val redSpikeOneEnd = Pose(130.0, 35.0, 0.0)
+  val redPark = Pose(100.0, 15.0, 0.0)
 
   val blueStart: Pose
     get() = PoseUtils.mirrorPose(redStart)
@@ -94,6 +95,9 @@ class ERCompat : NextFTCOpMode() {
   val blueSpikeOneEnd: Pose
     get() = PoseUtils.mirrorPose(redSpikeOneEnd)
 
+  val bluePark: Pose
+    get() = PoseUtils.mirrorPose(redPark)
+
   val currentStart: Pose
     get() = if (alliance == Alliance.RED) redStart else blueStart
 
@@ -106,9 +110,13 @@ class ERCompat : NextFTCOpMode() {
   val currentSpikeOneEnd: Pose
     get() = if (alliance == Alliance.RED) redSpikeOneEnd else blueSpikeOneEnd
 
+    val currentPark: Pose
+        get() = if (alliance == Alliance.RED) redPark else bluePark
+
   lateinit var startToRedSpikeOne: PathChain
   lateinit var redSpikeIntake: PathChain
   lateinit var redSpikeReturn: PathChain
+  lateinit var redShootToPark: PathChain
 
   val waitForFeeder = BotConstants.WAIT_FOR_FEEDER_MS.milliseconds
   val waitForIndexer = BotConstants.WAIT_FOR_INDEXER_MS.milliseconds
@@ -134,27 +142,27 @@ class ERCompat : NextFTCOpMode() {
             shoot,
         )
 
-    val intakeAll: Command
-        get() =
-            SequentialGroup(
-                Indexer.latchDown(),
-                Indexer.waitForSlotBreakbeam(),
-                Indexer.latchUp(),
-                Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
-                Indexer.indexerToSlot(1),
-                Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
-                Indexer.latchDown(),
-                Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
-                Indexer.waitForSlotBreakbeam(),
-                Indexer.latchUp(),
-                Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
-                Indexer.indexerToSlot(2),
-                Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
-                Indexer.latchDown(),
-                Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
-                Indexer.waitForSlotBreakbeam(),
-                Indexer.latchUp(),
-            )
+  val intakeAll: Command
+    get() =
+        SequentialGroup(
+            Indexer.latchDown(),
+            Indexer.waitForSlotBreakbeam(),
+            Indexer.latchUp(),
+            Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
+            Indexer.indexerToSlot(1),
+            Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
+            Indexer.latchDown(),
+            Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
+            Indexer.waitForSlotBreakbeam(),
+            Indexer.latchUp(),
+            Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
+            Indexer.indexerToSlot(2),
+            Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
+            Indexer.latchDown(),
+            Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
+            Indexer.waitForSlotBreakbeam(),
+            Indexer.latchUp(),
+        )
 
   val routine: Command
     get() =
@@ -176,6 +184,7 @@ class ERCompat : NextFTCOpMode() {
             shootAll,
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_OFF),
             InstantCommand { Lights.state = LightsState.ARTIFACT_GREEN },
+            FollowPath(redShootToPark, false, PATH_SPEED_FAST),
             Delay(AUTO_END_WAIT_SECONDS.seconds),
         )
 
@@ -183,6 +192,7 @@ class ERCompat : NextFTCOpMode() {
     startToRedSpikeOne = PoseUtils.createBasicPath(currentStart, currentSpikeOneStart)
     redSpikeIntake = PoseUtils.createBasicPath(currentSpikeOneStart, currentSpikeOneEnd)
     redSpikeReturn = PoseUtils.createBasicPath(currentSpikeOneEnd, currentShoot)
+    redShootToPark = PoseUtils.createBasicPath(currentShoot, currentPark)
   }
 
   override fun onInit() {
