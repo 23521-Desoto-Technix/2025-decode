@@ -134,6 +134,28 @@ class ERCompat : NextFTCOpMode() {
             shoot,
         )
 
+    val intakeAll: Command
+        get() =
+            SequentialGroup(
+                Indexer.latchDown(),
+                Indexer.waitForSlotBreakbeam(),
+                Indexer.latchUp(),
+                Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
+                Indexer.indexerToSlot(1),
+                Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
+                Indexer.latchDown(),
+                Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
+                Indexer.waitForSlotBreakbeam(),
+                Indexer.latchUp(),
+                Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
+                Indexer.indexerToSlot(2),
+                Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
+                Indexer.latchDown(),
+                Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
+                Indexer.waitForSlotBreakbeam(),
+                Indexer.latchUp(),
+            )
+
   val routine: Command
     get() =
         SequentialGroup(
@@ -146,25 +168,7 @@ class ERCompat : NextFTCOpMode() {
             Indexer.indexerToSlot(0),
             FollowPath(startToRedSpikeOne, false, PATH_SPEED_FAST),
             ParallelGroup(
-                SequentialGroup(
-                    Indexer.latchDown(),
-                    Indexer.waitForSlotBreakbeam(),
-                    Indexer.latchUp(),
-                    Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
-                    Indexer.indexerToSlot(1),
-                    Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
-                    Indexer.latchDown(),
-                    Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
-                    Indexer.waitForSlotBreakbeam(),
-                    Indexer.latchUp(),
-                    Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
-                    Indexer.indexerToSlot(2),
-                    Delay(BotConstants.LATCH_WAIT_SHORT_MS.milliseconds),
-                    Indexer.latchDown(),
-                    Delay(BotConstants.LATCH_WAIT_LONG_MS.milliseconds),
-                    Indexer.waitForSlotBreakbeam(),
-                    Indexer.latchUp(),
-                ),
+                intakeAll,
                 FollowPath(redSpikeIntake, false, PATH_SPEED_SLOW),
             ),
             Indexer.indexerToSlot(0),
