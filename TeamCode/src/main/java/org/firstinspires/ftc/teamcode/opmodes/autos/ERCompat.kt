@@ -81,7 +81,7 @@ class ERCompat : NextFTCOpMode() {
   val redShoot = Pose(82.0, 10.0, 0.0)
   val redSpikeOneStart = Pose(97.0, 35.0, 0.0)
   val redSpikeOneEnd = Pose(130.0, 35.0, 0.0)
-  val redPark = Pose(110.0, 20.0, 0.0)
+  val redPark = Pose(105.0, 30.0, 0.0)
 
   val blueStart: Pose
     get() = PoseUtils.mirrorPose(redStart)
