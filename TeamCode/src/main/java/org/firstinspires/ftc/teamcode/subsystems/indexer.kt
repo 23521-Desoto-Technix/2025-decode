@@ -8,8 +8,31 @@ import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.CRServoEx
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.ServoEx
+import org.firstinspires.ftc.teamcode.BotConstants
 
 object Indexer : Subsystem {
+  // Indexer constants
+  const val INDEXER_SLOT_TICKS = 2730.0
+  const val INDEXER_CYCLE_SLOTS = 3
+  
+  // Indexer servo positions
+  const val LATCH_SERVO_DOWN = 0.90
+  const val LATCH_SERVO_UP = 0.45
+  const val LATCH_SERVO_STANDBY = 0.95
+  const val LEFT_FEEDER_FEED = 0.61
+  const val RIGHT_FEEDER_FEED = 0.71
+  const val LEFT_FEEDER_UNFEED = 0.9
+  const val RIGHT_FEEDER_UNFEED = 1.0
+  
+  // Indexer PID constants
+  const val INDEXER_PID_P = 0.00015
+  const val INDEXER_PID_I = 0.0
+  const val INDEXER_PID_D = 0.000001
+  
+  // Indexer PID tolerance
+  const val INDEXER_PID_TOLERANCE_POSITION = 100.0
+  const val INDEXER_PID_TOLERANCE_VELOCITY = 100.0
+
   val indexerServo = CRServoEx("indexer")
   val indexerEncoder = MotorEx("backRight").zeroed()
   val latchServo = ServoEx("latch")
@@ -19,7 +42,7 @@ object Indexer : Subsystem {
   val leftFeederServo = ServoEx("leftFeeder")
   val rightFeederServo = ServoEx("rightFeeder")
 
-  val indexerPID = controlSystem { posPid(0.0003, 0.0, 0.00001) }
+  val indexerPID = controlSystem { posPid(INDEXER_PID_P, INDEXER_PID_I, INDEXER_PID_D) }
   lateinit var leftBreakBeam: DigitalChannel
   lateinit var rightBreakBeam: DigitalChannel
   lateinit var intakeBreakBeam: DigitalChannel
@@ -66,7 +89,7 @@ object Indexer : Subsystem {
   fun waitForPid() =
       LambdaCommand("waitForPid")
           .setIsDone {
-            indexerPID.isWithinTolerance(KineticState(100.0, 100.0, Double.POSITIVE_INFINITY))
+            indexerPID.isWithinTolerance(KineticState(INDEXER_PID_TOLERANCE_POSITION, INDEXER_PID_TOLERANCE_VELOCITY, Double.POSITIVE_INFINITY))
           }
           .requires(this)
 
@@ -78,8 +101,8 @@ object Indexer : Subsystem {
   fun indexerToSlot(slot: Int) =
       LambdaCommand("indexerToSlot")
           .setStart {
-            val cycleLength = 2730.0 * 3
-            val slotPosition = slot * 2730.0
+            val cycleLength = INDEXER_SLOT_TICKS * INDEXER_CYCLE_SLOTS
+            val slotPosition = slot * INDEXER_SLOT_TICKS
 
             val numCycles =
                 kotlin.math.ceil(kotlin.math.abs(goalPosition) / cycleLength).toInt() + 2
@@ -98,7 +121,7 @@ object Indexer : Subsystem {
           .setIsDone { true }
           .requires(this)
 
-  fun toNextSlot() = indexerToPosition(goalPosition + 2730.0)
+  fun toNextSlot() = indexerToPosition(goalPosition + INDEXER_SLOT_TICKS)
 
   fun setIntakePower(power: Double) =
       LambdaCommand("setIntakePower")
@@ -106,12 +129,12 @@ object Indexer : Subsystem {
           .setIsDone { true }
           .requires(this)
 
-  fun toPreviousSlot() = indexerToPosition(goalPosition - 2730.0)
+  fun toPreviousSlot() = indexerToPosition(goalPosition - INDEXER_SLOT_TICKS)
 
   fun latchDown() =
       LambdaCommand("latchDown")
           .setStart {
-            latchServo.position = 0.90
+            latchServo.position = LATCH_SERVO_DOWN
             latched = false
           }
           .setIsDone { true }
@@ -119,7 +142,7 @@ object Indexer : Subsystem {
   fun latchUp() =
       LambdaCommand("latchUp")
           .setStart {
-            latchServo.position = 0.45
+            latchServo.position = LATCH_SERVO_UP
             latched = true
           }
           .setIsDone { true }
@@ -127,8 +150,8 @@ object Indexer : Subsystem {
   fun feed() =
       LambdaCommand("feed")
           .setStart {
-            leftFeederServo.position = 0.61
-            rightFeederServo.position = 0.71
+            leftFeederServo.position = LEFT_FEEDER_FEED
+            rightFeederServo.position = RIGHT_FEEDER_FEED
           }
           .setIsDone { true }
           .requires(this)
@@ -136,8 +159,8 @@ object Indexer : Subsystem {
   fun unFeed() =
       LambdaCommand("resetFeeder")
           .setStart {
-            leftFeederServo.position = 0.9
-            rightFeederServo.position = 1.0
+            leftFeederServo.position = LEFT_FEEDER_UNFEED
+            rightFeederServo.position = RIGHT_FEEDER_UNFEED
           }
           .setIsDone { true }
           .requires(this)
