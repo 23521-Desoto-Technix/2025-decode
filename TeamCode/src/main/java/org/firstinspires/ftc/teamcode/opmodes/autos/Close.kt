@@ -46,8 +46,6 @@ class Close : NextFTCOpMode() {
   companion object {
     const val PATH_SPEED_SLOW = 0.25
     const val PATH_SPEED_FAST = 1.0
-
-    const val TURRET_ANGLE_START = -45.0
   }
 
   var alliance = Alliance.UNKNOWN
@@ -62,6 +60,8 @@ class Close : NextFTCOpMode() {
   val redSpikeTwoStart = Pose(100.0, 60.0, 0.0)
   val redSpikeTwoEnd = Pose(130.0, 60.0, 0.0)
   val redGateHover = Pose(115.0, 70.0, 0.0)
+
+  var turretAngle = 0.0
 
   val blueStart: Pose
     get() = PoseUtils.mirrorPose(redStart)
@@ -158,7 +158,7 @@ class Close : NextFTCOpMode() {
         SequentialGroup(
             Indexer.latchUp(),
             Shooter.setSpeed(BotConstants.SHOOTER_SPEED_CLOSE),
-            Turret.setAngle(TURRET_ANGLE_START.deg),
+            Turret.setAngle(turretAngle.deg),
             FollowPath(startToShoot, false, PATH_SPEED_FAST),
             shootAll,
             Indexer.indexerToSlot(0),
@@ -239,6 +239,13 @@ class Close : NextFTCOpMode() {
       Alliance.BLUE -> PedroComponent.follower.pose = blueStart
       Alliance.UNKNOWN -> PedroComponent.follower.pose = redStart
     }
+
+    turretAngle =
+        when (alliance) {
+          Alliance.RED -> -45.0
+          Alliance.BLUE -> 45.0
+          Alliance.UNKNOWN -> 0.0
+        }
   }
 
   override fun onStartButtonPressed() {
