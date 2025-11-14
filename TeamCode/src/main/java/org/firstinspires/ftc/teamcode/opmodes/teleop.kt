@@ -123,9 +123,12 @@ class teleop : NextFTCOpMode() {
     } else {
       PedroComponent.follower.pose = BotConstants.FIELD_CENTER
     }
-    if (blackboard["alliance"] != null && blackboard["alliance"] is Alliance) {
-      alliance = blackboard["alliance"] as Alliance
+    if (blackboard["alliance"] == "RED") {
+      alliance = Alliance.RED
     }
+      if (blackboard["alliance"] == "BLUE") {
+          alliance = Alliance.BLUE
+      }
     PedroComponent.follower.breakFollowing()
 
     aprilTag =

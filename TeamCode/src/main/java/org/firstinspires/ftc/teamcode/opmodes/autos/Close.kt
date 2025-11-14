@@ -178,6 +178,7 @@ class Close : NextFTCOpMode() {
             FollowPath(spikeTwoToShoot, false, PATH_SPEED_FAST),
             shootAll,
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_OFF),
+            Shooter.setSpeed(0.0),
             FollowPath(spikeToGateHover, true, PATH_SPEED_FAST),
         )
 
@@ -240,7 +241,7 @@ class Close : NextFTCOpMode() {
 
   override fun onUpdate() {
     blackboard["pose"] = PedroComponent.follower.pose
-    blackboard["alliance"] = alliance
+    blackboard["alliance"] = alliance.toString()
   }
 
   override fun onStartButtonPressed() {

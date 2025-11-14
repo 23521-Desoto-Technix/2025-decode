@@ -30,6 +30,13 @@ enum class Alliance {
         UNKNOWN -> LightsState.ALLIANCE_UNKNOWN
       }
 
+  override fun toString(): String =
+      when (this) {
+        RED -> "RED"
+        BLUE -> "BLUE"
+        UNKNOWN -> "UNKNOWN"
+      }
+
   val isKnown: Boolean
     get() = this != UNKNOWN
 }

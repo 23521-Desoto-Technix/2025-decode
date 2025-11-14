@@ -186,6 +186,7 @@ class ERCompat : NextFTCOpMode() {
             shootAll,
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_OFF),
             InstantCommand { Lights.state = LightsState.ARTIFACT_GREEN },
+            Shooter.setSpeed(0.0),
             FollowPath(redShootToPark, false, PATH_SPEED_FAST),
             Delay(AUTO_END_WAIT_SECONDS.seconds),
         )
@@ -277,7 +278,7 @@ class ERCompat : NextFTCOpMode() {
   override fun onUpdate() {
 
     blackboard["pose"] = PedroComponent.follower.pose
-    blackboard["alliance"] = alliance
+    blackboard["alliance"] = alliance.toString()
 
     var pixelOffset = 0.0
     var hasLock = false
