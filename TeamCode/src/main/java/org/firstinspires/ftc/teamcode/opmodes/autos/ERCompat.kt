@@ -18,6 +18,8 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -27,8 +29,6 @@ import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.PoseUtils
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @Autonomous(name = "East Rankin (6 far)")
 class ERCompat : NextFTCOpMode() {
@@ -232,6 +232,11 @@ class ERCompat : NextFTCOpMode() {
   }
 
   override fun onWaitForStart() {
+    telemetry.addLine("Increase: Up, Decrease: Down")
+    telemetry.addData("Start Delay", startDelay.inWholeMilliseconds)
+    telemetry.addLine("Increase: Triangle, Decrease: Cross")
+    telemetry.addData("Secondary Delay", secondaryDelay.inWholeMilliseconds)
+    telemetry.update()
     if (gamepad1.circle) {
       alliance = Alliance.RED
     } else if (gamepad1.cross) {
