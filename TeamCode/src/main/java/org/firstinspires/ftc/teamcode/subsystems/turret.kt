@@ -24,6 +24,7 @@ object Turret : Subsystem {
   var previousError = 0.0
   var lastTime = System.currentTimeMillis()
   var imuOffset = -(90.0).deg
+  var enabled = true
 
   private fun normalizeAngle(angleDeg: Double): Double {
     var normalized = angleDeg
@@ -61,6 +62,11 @@ object Turret : Subsystem {
   }
 
   override fun periodic() {
+    if (!enabled) {
+      motor.power = 0.0
+      return
+    }
+
     if (usingIMU) {
       val adjustedAngle = baseAngle + IMUDegrees + imuOffset.inDeg
       setGoalSafe(adjustedAngle, false)
@@ -139,6 +145,18 @@ object Turret : Subsystem {
             previousError = error
             lastTime = currentTime
           }
+          .setIsDone { true }
+          .requires(this)
+
+  fun enable() =
+      LambdaCommand("enableTurret")
+          .setStart { enabled = true }
+          .setIsDone { true }
+          .requires(this)
+
+  fun disable() =
+      LambdaCommand("disableTurret")
+          .setStart { enabled = false }
           .setIsDone { true }
           .requires(this)
 }

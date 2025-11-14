@@ -186,7 +186,9 @@ class ERCompat : NextFTCOpMode() {
             shootAll,
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_OFF),
             InstantCommand { Lights.state = LightsState.ARTIFACT_GREEN },
-            Shooter.setSpeed(0.0),
+            Shooter.disable(),
+            Turret.disable(),
+            Indexer.disable(),
             FollowPath(redShootToPark, false, PATH_SPEED_FAST),
             Delay(AUTO_END_WAIT_SECONDS.seconds),
         )

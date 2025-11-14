@@ -25,10 +25,18 @@ object Shooter : Subsystem {
   var targetSpeed = 0.0
 
   var usingPID = false
+  var enabled = true
 
   private const val SPEED_TOLERANCE = 100
 
   override fun periodic() {
+    if (!enabled) {
+      upperShooterMotor.power = 0.0
+      lowerShooterMotor.power = 0.0
+      return
+    }
+
+
     this.speed = -shooterEncoder.velocity
     if (this.usingPID) {
       PID.goal = KineticState(Double.POSITIVE_INFINITY, this.targetSpeed, 0.0)
@@ -69,5 +77,17 @@ object Shooter : Subsystem {
   fun waitForSpeed() =
       LambdaCommand("waitForSpeed")
           .setIsDone { abs(targetSpeed - speed) <= SPEED_TOLERANCE }
+          .requires(this)
+
+  fun enable() =
+      LambdaCommand("enableShooter")
+          .setStart { enabled = true }
+          .setIsDone { true }
+          .requires(this)
+
+  fun disable() =
+      LambdaCommand("disableShooter")
+          .setStart { enabled = false }
+          .setIsDone { true }
           .requires(this)
 }

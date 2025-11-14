@@ -51,8 +51,16 @@ object Indexer : Subsystem {
   var intakePower = 0.0
   var goalPosition = 0.0
   var latched = false
+  var enabled = true
 
   override fun periodic() {
+    if (!enabled) {
+      indexerServo.power = 0.0
+      intakeMotor.power = 0.0
+      return
+    }
+
+
     /*if (
         intakePower > 0 &&
             (!leftBreakBeam.state || !rightBreakBeam.state) &&
@@ -162,6 +170,18 @@ object Indexer : Subsystem {
             leftFeederServo.position = LEFT_FEEDER_UNFEED
             rightFeederServo.position = RIGHT_FEEDER_UNFEED
           }
+          .setIsDone { true }
+          .requires(this)
+
+  fun enable() =
+      LambdaCommand("enableIndexer")
+          .setStart { enabled = true }
+          .setIsDone { true }
+          .requires(this)
+
+  fun disable() =
+      LambdaCommand("disableIndexer")
+          .setStart { enabled = false }
           .setIsDone { true }
           .requires(this)
 }

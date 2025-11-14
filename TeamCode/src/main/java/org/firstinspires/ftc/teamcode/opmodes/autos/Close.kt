@@ -15,7 +15,6 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -25,6 +24,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.PoseUtils
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Close (9 non sorted)")
 class Close : NextFTCOpMode() {
@@ -178,7 +178,9 @@ class Close : NextFTCOpMode() {
             FollowPath(spikeTwoToShoot, false, PATH_SPEED_FAST),
             shootAll,
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_OFF),
-            Shooter.setSpeed(0.0),
+            Shooter.disable(),
+            Turret.disable(),
+            Indexer.disable(),
             FollowPath(spikeToGateHover, true, PATH_SPEED_FAST),
         )
 
