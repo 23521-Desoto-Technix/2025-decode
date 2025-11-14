@@ -169,9 +169,9 @@ class teleop : NextFTCOpMode() {
   }
 
   override fun onStartButtonPressed() {
-    Indexer.enable()
-    Turret.enable()
-    Shooter.enable()
+    Indexer.enable().schedule()
+    Turret.enable().schedule()
+    Shooter.enable().schedule()
     val shooterFar =
         button { gamepad2.right_bumper }
             .whenBecomesTrue { Shooter.setSpeed(BotConstants.SHOOTER_SPEED_FAR).schedule() }
