@@ -17,8 +17,7 @@ object Indexer : Subsystem {
   
   // Indexer servo positions
   const val LATCH_SERVO_DOWN = 0.90
-  const val LATCH_SERVO_UP = 0.45
-  const val LATCH_SERVO_STANDBY = 0.95
+  const val LATCH_SERVO_UP = 0.4
   const val LEFT_FEEDER_FEED = 0.61
   const val RIGHT_FEEDER_FEED = 0.71
   const val LEFT_FEEDER_UNFEED = 0.9
