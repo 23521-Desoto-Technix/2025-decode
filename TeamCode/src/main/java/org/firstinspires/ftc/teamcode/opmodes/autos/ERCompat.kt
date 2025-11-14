@@ -193,24 +193,32 @@ class ERCompat : NextFTCOpMode() {
 
   override fun onInit() {
     val startDelayUp =
-        button { gamepad1.dpad_up }
+        button { gamepad2.dpad_up }
             .inLayer("init") {
-              startDelay = (startDelay + 500.milliseconds).coerceAtMost(15.seconds)
+              whenBecomesTrue {
+                startDelay = (startDelay + 500.milliseconds).coerceAtMost(15.seconds)
+              }
             }
     val startDelayDown =
-        button { gamepad1.dpad_down }
+        button { gamepad2.dpad_down }
             .inLayer("init") {
-              startDelay = (startDelay - 500.milliseconds).coerceAtLeast(0.seconds)
+              whenBecomesTrue {
+                startDelay = (startDelay - 500.milliseconds).coerceAtLeast(0.seconds)
+              }
             }
     val secondaryDelayUp =
-        button { gamepad1.triangle }
+        button { gamepad2.triangle }
             .inLayer("init") {
-              secondaryDelay = (secondaryDelay + 500.milliseconds).coerceAtMost(15.seconds)
+              whenBecomesTrue {
+                secondaryDelay = (secondaryDelay + 500.milliseconds).coerceAtMost(15.seconds)
+              }
             }
     val secondaryDelayDown =
-        button { gamepad1.cross }
+        button { gamepad2.cross }
             .inLayer("init") {
-              secondaryDelay = (secondaryDelay - 500.milliseconds).coerceAtLeast(0.seconds)
+              whenBecomesTrue {
+                secondaryDelay = (secondaryDelay - 500.milliseconds).coerceAtLeast(0.seconds)
+              }
             }
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
     intakeBreakBeam.mode = DigitalChannel.Mode.INPUT
