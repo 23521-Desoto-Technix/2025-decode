@@ -5,7 +5,6 @@ import com.pedropathing.paths.PathChain
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
-import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
@@ -192,42 +191,6 @@ class ERCompat : NextFTCOpMode() {
   }
 
   override fun onInit() {
-    val startDelayUp =
-        button { gamepad2.dpad_up }
-            .whenBecomesTrue {
-              InstantCommand {
-                startDelay = (startDelay.inWholeMilliseconds + 500).coerceAtMost(15000).milliseconds
-              }
-            }
-
-    val startDelayDown =
-        button { gamepad2.dpad_down }
-            .whenBecomesTrue {
-              InstantCommand {
-                startDelay = (startDelay.inWholeMilliseconds - 500).coerceAtLeast(0).milliseconds
-              }
-            }
-
-    val secondaryDelayUp =
-        button { gamepad2.triangle }
-            .whenBecomesTrue {
-              InstantCommand {
-                secondaryDelay =
-                    (secondaryDelay.inWholeMilliseconds + 500).coerceAtMost(15000).milliseconds
-              }
-            }
-    val secondaryDelayDown =
-        button { gamepad2.cross }
-            .whenBecomesTrue {
-              InstantCommand {
-                secondaryDelay =
-                    (secondaryDelay.inWholeMilliseconds - 500).coerceAtLeast(0).milliseconds
-              }
-            }
-    BindingManager.add(startDelayUp)
-    BindingManager.add(startDelayDown)
-    BindingManager.add(secondaryDelayUp)
-    BindingManager.add(secondaryDelayDown)
 
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
     intakeBreakBeam.mode = DigitalChannel.Mode.INPUT
@@ -259,6 +222,22 @@ class ERCompat : NextFTCOpMode() {
       alliance = Alliance.RED
     } else if (gamepad1.cross) {
       alliance = Alliance.BLUE
+    }
+
+    if (gamepad2.dpadUpWasPressed()) {
+      startDelay = (startDelay.inWholeMilliseconds + 500).coerceAtMost(15000).milliseconds
+    }
+
+    if (gamepad2.dpadDownWasPressed()) {
+      startDelay = (startDelay.inWholeMilliseconds - 500).coerceAtLeast(0).milliseconds
+    }
+
+    if (gamepad2.triangleWasPressed()) {
+      secondaryDelay = (secondaryDelay.inWholeMilliseconds + 500).coerceAtMost(15000).milliseconds
+    }
+
+    if (gamepad2.crossWasPressed()) {
+      secondaryDelay = (secondaryDelay.inWholeMilliseconds - 500).coerceAtLeast(0).milliseconds
     }
 
     when (alliance) {
