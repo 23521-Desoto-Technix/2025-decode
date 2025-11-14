@@ -14,15 +14,12 @@ import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
-import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -38,6 +35,8 @@ import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.math.atan2
+import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -274,11 +273,6 @@ class teleop : NextFTCOpMode() {
             false,
         )
     driverControlled()
-    if (alliance == Alliance.BLUE) {
-      Turret.setImuOffset(90.0.deg)
-    } else {
-      Turret.setImuOffset((-90.0).deg)
-    }
   }
 
   override fun onUpdate() {
@@ -348,6 +342,7 @@ class teleop : NextFTCOpMode() {
     } else {
       Turret.cameraTrackPower(0.0).schedule()
     }
+    telemetry.addData("Goal Angle", goalAngle.inDeg)
     telemetry.addData("Relative X", offsetX)
     telemetry.addData("Relative Y", offsetY)
     BindingManager.update()
