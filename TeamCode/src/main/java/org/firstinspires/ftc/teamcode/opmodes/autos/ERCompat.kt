@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.opmodes.autos
 
-import android.util.Size
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.PathChain
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.bindings.BindingManager
+import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
@@ -14,14 +14,10 @@ import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
-import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -31,10 +27,6 @@ import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.PoseUtils
-import org.firstinspires.ftc.vision.VisionPortal
-import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.math.atan2
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -68,12 +60,6 @@ class ERCompat : NextFTCOpMode() {
   private lateinit var leftBreakBeam: DigitalChannel
   private lateinit var rightBreakBeam: DigitalChannel
 
-  lateinit var aprilTag: AprilTagProcessor
-  lateinit var portal: VisionPortal
-
-  var targetPose = Pose(72.0, 144.0, 0.0)
-  var targetAprilTag = 0
-
   var alliance = Alliance.UNKNOWN
   var turretAngle = 0.0
 
@@ -82,6 +68,9 @@ class ERCompat : NextFTCOpMode() {
   val redSpikeOneStart = Pose(97.0, 35.0, 0.0)
   val redSpikeOneEnd = Pose(130.0, 35.0, 0.0)
   val redPark = Pose(105.0, 30.0, 0.0)
+
+  var startDelay = 0.seconds
+  var secondaryDelay = 0.seconds
 
   val blueStart: Pose
     get() = PoseUtils.mirrorPose(redStart)
@@ -171,6 +160,7 @@ class ERCompat : NextFTCOpMode() {
             Turret.setAngle(turretAngle.deg, true),
             Shooter.setSpeed(BotConstants.SHOOTER_SPEED_FAR),
             Shooter.waitForSpeed(),
+            Delay(startDelay),
             shootAll,
             Shooter.setSpeed(BotConstants.SHOOTER_SPEED_OFF),
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_FORWARD),
@@ -183,6 +173,7 @@ class ERCompat : NextFTCOpMode() {
             Shooter.setSpeed(BotConstants.SHOOTER_SPEED_FAR),
             Indexer.indexerToSlot(0),
             FollowPath(redSpikeReturn, false, PATH_SPEED_FAST),
+            Delay(secondaryDelay),
             shootAll,
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_OFF),
             InstantCommand { Lights.state = LightsState.ARTIFACT_GREEN },
@@ -201,6 +192,26 @@ class ERCompat : NextFTCOpMode() {
   }
 
   override fun onInit() {
+    val startDelayUp =
+        button { gamepad1.dpad_up }
+            .inLayer("init") {
+              startDelay = (startDelay + 500.milliseconds).coerceAtMost(15.seconds)
+            }
+    val startDelayDown =
+        button { gamepad1.dpad_down }
+            .inLayer("init") {
+              startDelay = (startDelay - 500.milliseconds).coerceAtLeast(0.seconds)
+            }
+    val secondaryDelayUp =
+        button { gamepad1.triangle }
+            .inLayer("init") {
+              secondaryDelay = (secondaryDelay + 500.milliseconds).coerceAtMost(15.seconds)
+            }
+    val secondaryDelayDown =
+        button { gamepad1.cross }
+            .inLayer("init") {
+              secondaryDelay = (secondaryDelay - 500.milliseconds).coerceAtLeast(0.seconds)
+            }
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
     intakeBreakBeam.mode = DigitalChannel.Mode.INPUT
     leftBreakBeam = hardwareMap.get(DigitalChannel::class.java, "leftBreakBeam")
@@ -218,32 +229,6 @@ class ERCompat : NextFTCOpMode() {
     Indexer.indexerToSlot(0).schedule()
 
     initializePaths()
-
-    aprilTag =
-        AprilTagProcessor.Builder()
-            .setDrawAxes(true)
-            .setDrawCubeProjection(true)
-            .setDrawTagOutline(true)
-            .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-            .setLensIntrinsics(
-                BotConstants.CAMERA_LENS_FX,
-                BotConstants.CAMERA_LENS_FY,
-                BotConstants.CAMERA_LENS_CX,
-                BotConstants.CAMERA_LENS_CY,
-            )
-            .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
-            // ... these parameters are fx, fy, cx, cy.
-            .build()
-
-    portal =
-        VisionPortal.Builder()
-            .setCamera(hardwareMap.get<WebcamName?>(WebcamName::class.java, "turretCamera"))
-            .setCameraResolution(
-                Size(BotConstants.CAMERA_RESOLUTION_WIDTH, BotConstants.CAMERA_RESOLUTION_HEIGHT)
-            )
-            .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-            .addProcessor(aprilTag)
-            .build()
   }
 
   override fun onWaitForStart() {
@@ -281,53 +266,11 @@ class ERCompat : NextFTCOpMode() {
 
     blackboard["pose"] = PedroComponent.follower.pose
     blackboard["alliance"] = alliance.toString()
-
-    var pixelOffset = 0.0
-    var hasLock = false
-
-    if (alliance == Alliance.RED) {
-      targetAprilTag = BotConstants.RED_ALLIANCE_APRILTAG_ID
-    }
-    if (alliance == Alliance.BLUE) {
-      targetAprilTag = BotConstants.BLUE_ALLIANCE_APRILTAG_ID
-    }
-    if (aprilTag.detections.isNotEmpty()) {
-      for (detection in aprilTag.detections) {
-        if (detection.id == targetAprilTag) {
-          hasLock = true
-          pixelOffset = detection.center.x - (BotConstants.CAMERA_RESOLUTION_WIDTH / 2.0)
-          if (detection.ftcPose != null) {
-            telemetry.addData("pose", detection.ftcPose.range)
-          } else {
-            telemetry.addData("pose", "null")
-          }
-        }
-      }
-    }
-
-    if (alliance == Alliance.RED) {
-      targetPose = BotConstants.RED_TARGET_POSE
-    } else if (alliance == Alliance.BLUE) {
-      targetPose = BotConstants.BLUE_TARGET_POSE
-    }
-    val offsetX = targetPose.x - (144.0 - PedroComponent.follower.pose.x)
-    val offsetY = targetPose.y - (144.0 - PedroComponent.follower.pose.y)
-    val goalAngle =
-        atan2(
-                offsetY,
-                offsetX,
-            )
-            .rad
-    telemetry.addData("Has Lock", hasLock)
-    if (hasLock) {
-      /*Turret.cameraTrackPower(pixelOffset).schedule()*/
-    } else {
-      /*Turret.setAngle(
-          goalAngle,
-          true,
-      )
-      .schedule()*/
-    }
+    telemetry.addLine("Increase: Up, Decrease: Down")
+    telemetry.addData("Start Delay", startDelay.inWholeMilliseconds)
+    telemetry.addLine("Increase: Triangle, Decrease: Cross")
+    telemetry.addData("Secondary Delay", secondaryDelay.inWholeMilliseconds)
+    telemetry.update()
     BindingManager.update()
   }
 
