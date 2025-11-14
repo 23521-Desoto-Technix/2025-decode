@@ -276,6 +276,9 @@ class ERCompat : NextFTCOpMode() {
 
   override fun onUpdate() {
 
+    blackboard["pose"] = PedroComponent.follower.pose
+    blackboard["alliance"] = alliance
+
     var pixelOffset = 0.0
     var hasLock = false
 

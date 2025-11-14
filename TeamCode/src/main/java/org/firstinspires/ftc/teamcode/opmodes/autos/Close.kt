@@ -15,16 +15,16 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.Lights
-import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
+import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.PoseUtils
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Close (9 non sorted)")
 class Close : NextFTCOpMode() {
@@ -35,12 +35,6 @@ class Close : NextFTCOpMode() {
         BindingsComponent,
         PedroComponent(Constants::createFollower),
     )
-  }
-
-  enum class Alliance {
-    RED,
-    BLUE,
-    UNKNOWN,
   }
 
   companion object {
@@ -228,21 +222,13 @@ class Close : NextFTCOpMode() {
       alliance = Alliance.BLUE
     }
 
-    when (alliance) {
-      Alliance.RED -> Lights.state = LightsState.ALLIANCE_RED
-      Alliance.BLUE -> Lights.state = LightsState.ALLIANCE_BLUE
-      Alliance.UNKNOWN -> Lights.state = LightsState.ALLIANCE_UNKNOWN
-    }
+    Lights.state = alliance.lightsState()
 
-    if (alliance != Alliance.UNKNOWN) {
+    if (alliance.isKnown) {
       initializePaths()
     }
 
-    when (alliance) {
-      Alliance.RED -> PedroComponent.follower.pose = redStart
-      Alliance.BLUE -> PedroComponent.follower.pose = blueStart
-      Alliance.UNKNOWN -> PedroComponent.follower.pose = redStart
-    }
+    PedroComponent.follower.pose = if (alliance == Alliance.BLUE) blueStart else redStart
 
     turretAngle =
         when (alliance) {
@@ -250,6 +236,11 @@ class Close : NextFTCOpMode() {
           Alliance.BLUE -> 55.0
           Alliance.UNKNOWN -> 0.0
         }
+  }
+
+  override fun onUpdate() {
+    blackboard["pose"] = PedroComponent.follower.pose
+    blackboard["alliance"] = alliance
   }
 
   override fun onStartButtonPressed() {

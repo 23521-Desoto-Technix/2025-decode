@@ -31,6 +31,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Lights
 import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
+import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
@@ -48,12 +49,6 @@ class teleop : NextFTCOpMode() {
     )
   }
 
-  enum class Alliance {
-    RED,
-    BLUE,
-    UNKNOWN,
-  }
-
   companion object {
     // Color detection HSV thresholds
     const val PURPLE_HUE_MIN = 200f
@@ -61,24 +56,24 @@ class teleop : NextFTCOpMode() {
     const val GREEN_HUE_MIN = 150f
     const val GREEN_HUE_MAX = 170f
     const val SATURATION_THRESHOLD = 140f
-    
+
     // Turret lock buffer
     const val LOCK_BUFFER_MS = 150
-    
+
     // Gamepad thresholds
     const val TRIGGER_THRESHOLD = 0.5
     const val SPEED_MULTIPLIER_SLOW = 0.5
     const val SPEED_MULTIPLIER_NORMAL = 1.0
-    
+
     // Hood adjustment
     const val HOOD_ADJUSTMENT_STEP = 0.1
-    
+
     // Rumble duration
     const val RUMBLE_DURATION_MS = 250
-    
+
     // Rotation compensation multiplier
     const val ROTATION_COMP_MULTIPLIER = 150.0
-    
+
     // HSV conversion constants
     const val HSV_DELTA_THRESHOLD = 1e-6f
     const val HSV_HUE_SEGMENTS = 6f
@@ -89,7 +84,7 @@ class teleop : NextFTCOpMode() {
     const val HSV_SCALE_MAX = 255f
     const val HSV_CLAMP_MIN = 0f
     const val HSV_CLAMP_MAX = 1f
-    
+
     // Feeder delay for sequential group (seconds)
     const val FEEDER_DELAY_SECONDS = 0.2
   }
@@ -123,7 +118,14 @@ class teleop : NextFTCOpMode() {
     Indexer.leftBreakBeam = leftBreakBeam
     Indexer.rightBreakBeam = rightBreakBeam
     Indexer.indexerToSlot(0).schedule()
-    PedroComponent.follower.pose = BotConstants.FIELD_CENTER
+    if (blackboard["pose"] != null && blackboard["pose"] is Pose) {
+      PedroComponent.follower.pose = blackboard["pose"] as Pose?
+    } else {
+      PedroComponent.follower.pose = BotConstants.FIELD_CENTER
+    }
+    if (blackboard["alliance"] != null && blackboard["alliance"] is Alliance) {
+      alliance = blackboard["alliance"] as Alliance
+    }
     PedroComponent.follower.breakFollowing()
 
     aprilTag =
@@ -132,7 +134,12 @@ class teleop : NextFTCOpMode() {
             .setDrawCubeProjection(true)
             .setDrawTagOutline(true)
             .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-            .setLensIntrinsics(BotConstants.CAMERA_LENS_FX, BotConstants.CAMERA_LENS_FY, BotConstants.CAMERA_LENS_CX, BotConstants.CAMERA_LENS_CY)
+            .setLensIntrinsics(
+                BotConstants.CAMERA_LENS_FX,
+                BotConstants.CAMERA_LENS_FY,
+                BotConstants.CAMERA_LENS_CX,
+                BotConstants.CAMERA_LENS_CY,
+            )
             .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
             // ... these parameters are fx, fy, cx, cy.
             .build()
@@ -140,41 +147,52 @@ class teleop : NextFTCOpMode() {
     portal =
         VisionPortal.Builder()
             .setCamera(hardwareMap.get<WebcamName?>(WebcamName::class.java, "turretCamera"))
-            .setCameraResolution(Size(BotConstants.CAMERA_RESOLUTION_WIDTH, BotConstants.CAMERA_RESOLUTION_HEIGHT))
+            .setCameraResolution(
+                Size(BotConstants.CAMERA_RESOLUTION_WIDTH, BotConstants.CAMERA_RESOLUTION_HEIGHT)
+            )
             .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
             .addProcessor(aprilTag)
             .build()
   }
 
   override fun onWaitForStart() {
-    when (alliance) {
-      Alliance.RED -> Lights.state = LightsState.ALLIANCE_RED
-      Alliance.BLUE -> Lights.state = LightsState.ALLIANCE_BLUE
-      Alliance.UNKNOWN -> Lights.state = LightsState.ALLIANCE_UNKNOWN
-    }
     if (gamepad1.circle) {
       alliance = Alliance.RED
     } else if (gamepad1.cross) {
       alliance = Alliance.BLUE
     }
+    Lights.state = alliance.lightsState()
   }
 
   override fun onStartButtonPressed() {
     val shooterFar =
-        button { gamepad2.right_bumper }.whenBecomesTrue { Shooter.setSpeed(BotConstants.SHOOTER_SPEED_FAR).schedule() }
+        button { gamepad2.right_bumper }
+            .whenBecomesTrue { Shooter.setSpeed(BotConstants.SHOOTER_SPEED_FAR).schedule() }
     val shooterClose =
-        button { gamepad2.left_bumper }.whenBecomesTrue { Shooter.setSpeed(BotConstants.SHOOTER_SPEED_CLOSE).schedule() }
+        button { gamepad2.left_bumper }
+            .whenBecomesTrue { Shooter.setSpeed(BotConstants.SHOOTER_SPEED_CLOSE).schedule() }
     val shooterOff =
-        button { gamepad2.left_trigger > TRIGGER_THRESHOLD }.whenBecomesTrue { Shooter.setSpeed(BotConstants.SHOOTER_SPEED_OFF).schedule() }
+        button { gamepad2.left_trigger > TRIGGER_THRESHOLD }
+            .whenBecomesTrue { Shooter.setSpeed(BotConstants.SHOOTER_SPEED_OFF).schedule() }
     val intakeForward =
         button { gamepad2.circle }
             .whenBecomesTrue {
-              Indexer.setIntakePower(if (Indexer.intakePower == BotConstants.INTAKE_POWER_FORWARD) BotConstants.INTAKE_POWER_OFF else BotConstants.INTAKE_POWER_FORWARD).schedule()
+              Indexer.setIntakePower(
+                      if (Indexer.intakePower == BotConstants.INTAKE_POWER_FORWARD)
+                          BotConstants.INTAKE_POWER_OFF
+                      else BotConstants.INTAKE_POWER_FORWARD
+                  )
+                  .schedule()
             }
     val intakeReverse =
         button { gamepad2.cross }
             .whenBecomesTrue {
-              Indexer.setIntakePower(if (Indexer.intakePower == BotConstants.INTAKE_POWER_REVERSE) BotConstants.INTAKE_POWER_OFF else BotConstants.INTAKE_POWER_REVERSE).schedule()
+              Indexer.setIntakePower(
+                      if (Indexer.intakePower == BotConstants.INTAKE_POWER_REVERSE)
+                          BotConstants.INTAKE_POWER_OFF
+                      else BotConstants.INTAKE_POWER_REVERSE
+                  )
+                  .schedule()
             }
     val spindexerBumpNext =
         button { gamepad2.dpad_left } whenBecomesTrue { Indexer.toNextSlot().schedule() }
@@ -204,7 +222,10 @@ class teleop : NextFTCOpMode() {
     val hoodUp =
         button { gamepad1.dpad_up }
             .whenBecomesTrue {
-              Hood.setPosition((Hood.position + HOOD_ADJUSTMENT_STEP).coerceAtMost(SPEED_MULTIPLIER_NORMAL)).schedule()
+              Hood.setPosition(
+                      (Hood.position + HOOD_ADJUSTMENT_STEP).coerceAtMost(SPEED_MULTIPLIER_NORMAL)
+                  )
+                  .schedule()
             }
     val hoodDown =
         button { gamepad1.dpad_down }
@@ -235,8 +256,12 @@ class teleop : NextFTCOpMode() {
     val speedToggle =
         Gamepads.gamepad1.rightTrigger
             .atLeast(TRIGGER_THRESHOLD)
-            .whenBecomesTrue { InstantCommand { speedMultiplier = SPEED_MULTIPLIER_SLOW }.schedule() }
-            .whenBecomesFalse { InstantCommand { speedMultiplier = SPEED_MULTIPLIER_NORMAL }.schedule() }
+            .whenBecomesTrue {
+              InstantCommand { speedMultiplier = SPEED_MULTIPLIER_SLOW }.schedule()
+            }
+            .whenBecomesFalse {
+              InstantCommand { speedMultiplier = SPEED_MULTIPLIER_NORMAL }.schedule()
+            }
     val driverControlled =
         PedroDriverControlled(
             range { -gamepad1.left_stick_y.toDouble() * speedMultiplier },
@@ -273,7 +298,6 @@ class teleop : NextFTCOpMode() {
     Turret.IMUDegrees = PedroComponent.follower.pose.heading.rad.inDeg
 
     var pixelOffset = 0.0
-    var rotationComp = gamepad1.right_stick_x * ROTATION_COMP_MULTIPLIER
     var hasLock = false
 
     if (alliance == Alliance.RED) {
@@ -283,24 +307,17 @@ class teleop : NextFTCOpMode() {
       targetAprilTag = BotConstants.BLUE_ALLIANCE_APRILTAG_ID
     }
     if (aprilTag.detections.isNotEmpty()) {
+      val desiredId = alliance.aprilTagId()
       for (detection in aprilTag.detections) {
-        if (detection.id == targetAprilTag) {
+        if (detection.id == desiredId) {
           hasLock = true
           pixelOffset = detection.center.x - (BotConstants.CAMERA_RESOLUTION_WIDTH / 2.0)
-          if (detection.ftcPose != null) {
-            telemetry.addData("pose", detection.ftcPose.range)
-          } else {
-            telemetry.addData("pose", "null")
-          }
+          telemetry.addData("pose", detection.ftcPose?.range ?: "null")
         }
       }
     }
 
-    if (alliance == Alliance.RED) {
-      targetPose = BotConstants.RED_TARGET_POSE
-    } else if (alliance == Alliance.BLUE) {
-      targetPose = BotConstants.BLUE_TARGET_POSE
-    }
+    targetPose = alliance.targetPose()
     val offsetX = targetPose.x - (144.0 - PedroComponent.follower.pose.x)
     val offsetY = targetPose.y - (144.0 - PedroComponent.follower.pose.y)
     val goalAngle =
