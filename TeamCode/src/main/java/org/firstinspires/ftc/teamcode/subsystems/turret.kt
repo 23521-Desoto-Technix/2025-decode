@@ -23,7 +23,7 @@ object Turret : Subsystem {
   var baseAngle = 0.0
   var previousError = 0.0
   var lastTime = System.currentTimeMillis()
-  val IMU_OFFSET = -(90.0).deg
+  var imuOffset = -(90.0).deg
 
   private fun normalizeAngle(angleDeg: Double): Double {
     var normalized = angleDeg
@@ -62,7 +62,7 @@ object Turret : Subsystem {
 
   override fun periodic() {
     if (usingIMU) {
-      val adjustedAngle = baseAngle + IMUDegrees + IMU_OFFSET.inDeg
+      val adjustedAngle = baseAngle + IMUDegrees + imuOffset.inDeg
       setGoalSafe(adjustedAngle, false)
     }
     if (usingPID) {
@@ -73,6 +73,8 @@ object Turret : Subsystem {
     }
     angle = ticksToDegrees(encoder.currentPosition.toDouble())
   }
+
+  fun setImuOffset(angle: Angle) = LambdaCommand().setStart { imuOffset = angle }
 
   fun setTicks(targetTicks: Double): LambdaCommand {
     var limitedTicks = 0.0

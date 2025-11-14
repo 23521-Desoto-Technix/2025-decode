@@ -3,8 +3,7 @@ package org.firstinspires.ftc.teamcode
 import com.pedropathing.geometry.Pose
 
 /**
- * Shared constants used across multiple opmodes.
- * All constants use SNAKE_CASE naming convention.
+ * Shared constants used across multiple opmodes. All constants use SNAKE_CASE naming convention.
  */
 object BotConstants {
   // Vision constants - shared across teleop and autonomous opmodes
@@ -38,5 +37,5 @@ object BotConstants {
   // Shared field poses - used in multiple opmodes
   val FIELD_CENTER = Pose(72.0, 72.0, 0.0)
   val RED_TARGET_POSE = Pose(144.0, 144.0, 0.0)
-  val BLUE_TARGET_POSE = Pose(0.0, 144.0, 0.0)
+  val BLUE_TARGET_POSE = Pose(144.0, 144.0, 0.0)
 }
