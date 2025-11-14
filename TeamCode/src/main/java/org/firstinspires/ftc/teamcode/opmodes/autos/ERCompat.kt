@@ -18,8 +18,6 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -29,6 +27,8 @@ import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.PoseUtils
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Autonomous(name = "East Rankin (6 far)")
 class ERCompat : NextFTCOpMode() {
@@ -196,28 +196,36 @@ class ERCompat : NextFTCOpMode() {
         button { gamepad2.dpad_up }
             .inLayer("init") {
               whenBecomesTrue {
-                startDelay = (startDelay + 500.milliseconds).coerceAtMost(15.seconds)
+                InstantCommand {
+                  startDelay = (startDelay + 500.milliseconds).coerceAtMost(15.seconds)
+                }
               }
             }
     val startDelayDown =
         button { gamepad2.dpad_down }
             .inLayer("init") {
               whenBecomesTrue {
-                startDelay = (startDelay - 500.milliseconds).coerceAtLeast(0.seconds)
+                InstantCommand {
+                  startDelay = (startDelay - 500.milliseconds).coerceAtLeast(0.seconds)
+                }
               }
             }
     val secondaryDelayUp =
         button { gamepad2.triangle }
             .inLayer("init") {
               whenBecomesTrue {
-                secondaryDelay = (secondaryDelay + 500.milliseconds).coerceAtMost(15.seconds)
+                InstantCommand {
+                  secondaryDelay = (secondaryDelay + 500.milliseconds).coerceAtMost(15.seconds)
+                }
               }
             }
     val secondaryDelayDown =
         button { gamepad2.cross }
             .inLayer("init") {
               whenBecomesTrue {
-                secondaryDelay = (secondaryDelay - 500.milliseconds).coerceAtLeast(0.seconds)
+                InstantCommand {
+                  secondaryDelay = (secondaryDelay - 500.milliseconds).coerceAtLeast(0.seconds)
+                }
               }
             }
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
