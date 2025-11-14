@@ -14,12 +14,15 @@ import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.atan2
+import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -35,8 +38,6 @@ import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.math.atan2
-import kotlin.time.Duration.Companion.seconds
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -323,12 +324,15 @@ class teleop : NextFTCOpMode() {
     targetPose = alliance.targetPose()
     val offsetX = targetPose.x - (144.0 - PedroComponent.follower.pose.x)
     val offsetY = targetPose.y - (144.0 - PedroComponent.follower.pose.y)
-    val goalAngle =
+    var goalAngle =
         atan2(
                 offsetY,
                 offsetX,
             )
             .rad
+    if (alliance == Alliance.BLUE) {
+      goalAngle = (135.0 - (goalAngle.inDeg - 135.0)).deg
+    }
     telemetry.addData("Has Lock", hasLock)
     if (hasLock) {
       lastLockTime = System.currentTimeMillis()
