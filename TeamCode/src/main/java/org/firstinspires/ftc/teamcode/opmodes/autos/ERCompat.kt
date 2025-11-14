@@ -18,8 +18,6 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -29,6 +27,8 @@ import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.PoseUtils
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Autonomous(name = "East Rankin (6 far)")
 class ERCompat : NextFTCOpMode() {
@@ -196,7 +196,7 @@ class ERCompat : NextFTCOpMode() {
         button { gamepad2.dpad_up }
             .whenBecomesTrue {
               InstantCommand {
-                startDelay = (startDelay + 500.milliseconds).coerceAtMost(15.seconds)
+                startDelay = (startDelay.inWholeMilliseconds + 500).coerceAtMost(15000).milliseconds
               }
             }
 
@@ -204,7 +204,7 @@ class ERCompat : NextFTCOpMode() {
         button { gamepad2.dpad_down }
             .whenBecomesTrue {
               InstantCommand {
-                startDelay = (startDelay - 500.milliseconds).coerceAtLeast(0.seconds)
+                startDelay = (startDelay.inWholeMilliseconds - 500).coerceAtLeast(0).milliseconds
               }
             }
 
@@ -212,16 +212,22 @@ class ERCompat : NextFTCOpMode() {
         button { gamepad2.triangle }
             .whenBecomesTrue {
               InstantCommand {
-                secondaryDelay = (secondaryDelay + 500.milliseconds).coerceAtMost(15.seconds)
+                secondaryDelay =
+                    (secondaryDelay.inWholeMilliseconds + 500).coerceAtMost(15000).milliseconds
               }
             }
     val secondaryDelayDown =
         button { gamepad2.cross }
             .whenBecomesTrue {
               InstantCommand {
-                secondaryDelay = (secondaryDelay - 500.milliseconds).coerceAtLeast(0.seconds)
+                secondaryDelay =
+                    (secondaryDelay.inWholeMilliseconds - 500).coerceAtLeast(0).milliseconds
               }
             }
+    BindingManager.add(startDelayUp)
+    BindingManager.add(startDelayDown)
+    BindingManager.add(secondaryDelayUp)
+    BindingManager.add(secondaryDelayDown)
 
     intakeBreakBeam = hardwareMap.get(DigitalChannel::class.java, "intakeBreakBeam")
     intakeBreakBeam.mode = DigitalChannel.Mode.INPUT
@@ -248,6 +254,7 @@ class ERCompat : NextFTCOpMode() {
     telemetry.addLine("Increase: Triangle, Decrease: Cross")
     telemetry.addData("Secondary Delay", secondaryDelay.inWholeMilliseconds)
     telemetry.update()
+    BindingManager.update()
     if (gamepad1.circle) {
       alliance = Alliance.RED
     } else if (gamepad1.cross) {
