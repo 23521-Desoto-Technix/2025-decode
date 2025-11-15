@@ -16,7 +16,6 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -33,6 +32,7 @@ import org.firstinspires.ftc.teamcode.utils.PoseUtils
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Close (9 non sorted)")
 class Close : NextFTCOpMode() {
@@ -370,7 +370,7 @@ class Close : NextFTCOpMode() {
             Alliance.UNKNOWN -> 0.0
           }
         }
-    Turret.setAngle(turretAngle.deg)
+    Turret.setAngle(turretAngle.deg).schedule()
   }
 
   override fun onStartButtonPressed() {
