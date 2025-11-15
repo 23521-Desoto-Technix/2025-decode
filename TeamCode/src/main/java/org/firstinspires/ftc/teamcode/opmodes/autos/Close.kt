@@ -213,7 +213,7 @@ class Close : NextFTCOpMode() {
 
     override fun start() {
       actualCommand = getShootSequenceForSeries(seriesIndex)
-      actualCommand.start()
+      actualCommand.schedule()
     }
 
     override fun stop(interrupted: Boolean) {
