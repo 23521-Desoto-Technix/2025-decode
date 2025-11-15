@@ -49,11 +49,11 @@ class Close : NextFTCOpMode() {
     const val PATH_SPEED_SLOW = 0.25
     const val PATH_SPEED_FAST = 1.0
 
-    const val TURRET_ANGLE_RED_UNKNOWN = 0.0
+    const val TURRET_ANGLE_RED_UNKNOWN = -100.0
     const val TURRET_ANGLE_BLUE_UNKNOWN = 0.0
 
     const val TURRET_ANGLE_RED_KNOWN = -45.0
-    const val TURRET_ANGLE_BLUE_KNOWN = 55.0
+    const val TURRET_ANGLE_BLUE_KNOWN = 45.0
   }
 
   var alliance = Alliance.UNKNOWN
