@@ -5,12 +5,6 @@ import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.PathChain
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.hardware.DigitalChannel
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
-import org.firstinspires.ftc.vision.VisionPortal
-import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
@@ -22,6 +16,10 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.milliseconds
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -32,7 +30,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.Motif
 import org.firstinspires.ftc.teamcode.utils.PoseUtils
-import kotlin.time.Duration.Companion.milliseconds
+import org.firstinspires.ftc.vision.VisionPortal
+import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
 
 @Autonomous(name = "Close (9 non sorted)")
 class Close : NextFTCOpMode() {
@@ -218,7 +218,6 @@ class Close : NextFTCOpMode() {
         SequentialGroup(
             Indexer.latchUp(),
             Shooter.setSpeed(BotConstants.SHOOTER_SPEED_CLOSE),
-            Turret.setAngle(turretAngle.deg),
             FollowPath(startToShoot, false, PATH_SPEED_FAST),
             shootSequenceForSeries(0),
             Shooter.setSpeed(BotConstants.SHOOTER_SPEED_OFF),
@@ -342,15 +341,18 @@ class Close : NextFTCOpMode() {
       if (aprilTag.detections.isNotEmpty()) {
         for (detection in aprilTag.detections) {
           motif = Motif.fromAprilTagId(detection.id)
-           telemetry.addData("AprilTag ID", detection.id)
-           telemetry.addData("AprilTag Center", "x=%.1f y=%.1f".format(detection.center.x, detection.center.y))
-           telemetry.addData("AprilTag Pose", detection.ftcPose?.range ?: "null")
-         }
-         telemetry.addData("Motif", motif.toString())
+          telemetry.addData("AprilTag ID", detection.id)
+          telemetry.addData(
+              "AprilTag Center",
+              "x=%.1f y=%.1f".format(detection.center.x, detection.center.y),
+          )
+          telemetry.addData("AprilTag Pose", detection.ftcPose?.range ?: "null")
+        }
+        telemetry.addData("Motif", motif.toString())
       } else {
         telemetry.addData("AprilTag", "no detections")
       }
-        telemetry.addData("Motif", motif.toString())
+      telemetry.addData("Motif", motif.toString())
       telemetry.update()
     }
 
@@ -368,6 +370,7 @@ class Close : NextFTCOpMode() {
             Alliance.UNKNOWN -> 0.0
           }
         }
+    Turret.setAngle(turretAngle.deg)
   }
 
   override fun onStartButtonPressed() {
