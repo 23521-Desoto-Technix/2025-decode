@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.autos
 
-import com.pedropathing.geometry.BezierCurve
-import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
-import com.pedropathing.paths.Path
 import com.pedropathing.paths.PathChain
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.hardware.DigitalChannel
@@ -18,17 +15,19 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.Lights
-import org.firstinspires.ftc.teamcode.subsystems.LightsState
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Turret
+import org.firstinspires.ftc.teamcode.utils.Alliance
+import org.firstinspires.ftc.teamcode.utils.Motif
+import org.firstinspires.ftc.teamcode.utils.PoseUtils
+import kotlin.time.Duration.Companion.milliseconds
 
-@Autonomous(name = "Close (6 near)")
+@Autonomous(name = "Close (9 non sorted)")
 class Close : NextFTCOpMode() {
   init {
     addComponents(
@@ -39,42 +38,73 @@ class Close : NextFTCOpMode() {
     )
   }
 
-  enum class Alliance {
-    RED,
-    BLUE,
-    UNKNOWN,
-  }
-
   companion object {
-    // Path following speeds
     const val PATH_SPEED_SLOW = 0.25
     const val PATH_SPEED_FAST = 1.0
-    
-    // Turret angle
-    const val TURRET_ANGLE_START = -45.0
+
+    const val TURRET_ANGLE_RED_KNOWN = -45.0
+    const val TURRET_ANGLE_BLUE_KNOWN = 45.0
   }
 
   var alliance = Alliance.UNKNOWN
+  var motif = Motif.UNKNOWN
 
   private lateinit var intakeBreakBeam: DigitalChannel
   private lateinit var leftBreakBeam: DigitalChannel
   private lateinit var rightBreakBeam: DigitalChannel
 
-  val redStart = Pose(111.1, 133.3, 0.0)
-  val blueStart = Pose(0.0, 0.0, 0.0)
+  val redStart = Pose(113.0, 131.0, 0.0)
   val redShoot = Pose(87.0, 82.0, 0.0)
-  val redSpikeOneEnd = Pose(125.0, 85.0, 0.0)
-  val redSpikeTwoStart = Pose(100.0, 60.0, 0.0)
-  val redSpikeTwoEnd = Pose(130.0, 60.0, 0.0)
+  val redSpikeOneEnd = Pose(125.0, 82.0, 0.0)
+  val redSpikeTwoStart = Pose(100.0, 58.0, 0.0)
+  val redSpikeTwoEnd = Pose(130.0, 58.0, 0.0)
   val redGateHover = Pose(115.0, 70.0, 0.0)
 
-  lateinit var redStartToShoot: PathChain
-  lateinit var redShootToSpikeOne: PathChain
-  lateinit var redSpikeOneToShoot: PathChain
-  lateinit var redShootToSpikeTwo: PathChain
-  lateinit var redSpikeTwoIntake: PathChain
-  lateinit var redSpikeTwoToShoot: PathChain
-  lateinit var redSpikeToGateHover: PathChain
+  var turretAngle = 0.0
+
+  val blueStart: Pose
+    get() = PoseUtils.mirrorPose(redStart)
+
+  val blueShoot: Pose
+    get() = PoseUtils.mirrorPose(redShoot)
+
+  val blueSpikeOneEnd: Pose
+    get() = PoseUtils.mirrorPose(redSpikeOneEnd)
+
+  val blueSpikeTwoStart: Pose
+    get() = PoseUtils.mirrorPose(redSpikeTwoStart)
+
+  val blueSpikeTwoEnd: Pose
+    get() = PoseUtils.mirrorPose(redSpikeTwoEnd)
+
+  val blueGateHover: Pose
+    get() = PoseUtils.mirrorPose(redGateHover)
+
+  val currentStart: Pose
+    get() = if (alliance == Alliance.RED) redStart else blueStart
+
+  val currentShoot: Pose
+    get() = if (alliance == Alliance.RED) redShoot else blueShoot
+
+  val currentSpikeOneEnd: Pose
+    get() = if (alliance == Alliance.RED) redSpikeOneEnd else blueSpikeOneEnd
+
+  val currentSpikeTwoStart: Pose
+    get() = if (alliance == Alliance.RED) redSpikeTwoStart else blueSpikeTwoStart
+
+  val currentSpikeTwoEnd: Pose
+    get() = if (alliance == Alliance.RED) redSpikeTwoEnd else blueSpikeTwoEnd
+
+  val currentGateHover: Pose
+    get() = if (alliance == Alliance.RED) redGateHover else blueGateHover
+
+  lateinit var startToShoot: PathChain
+  lateinit var shootToSpikeOne: PathChain
+  lateinit var spikeOneToShoot: PathChain
+  lateinit var shootToSpikeTwo: PathChain
+  lateinit var spikeTwoIntake: PathChain
+  lateinit var spikeTwoToShoot: PathChain
+  lateinit var spikeToGateHover: PathChain
 
   val waitForFeeder = BotConstants.WAIT_FOR_FEEDER_MS.milliseconds
   val waitForIndexer = BotConstants.WAIT_FOR_INDEXER_MS.milliseconds
@@ -127,29 +157,35 @@ class Close : NextFTCOpMode() {
         SequentialGroup(
             Indexer.latchUp(),
             Shooter.setSpeed(BotConstants.SHOOTER_SPEED_CLOSE),
-            Turret.setAngle(TURRET_ANGLE_START.deg),
-            FollowPath(redStartToShoot, false, PATH_SPEED_FAST),
+            FollowPath(startToShoot, false, PATH_SPEED_FAST),
             shootAll,
+            Shooter.setSpeed(BotConstants.SHOOTER_SPEED_OFF),
             Indexer.indexerToSlot(0),
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_FORWARD),
             ParallelGroup(
                 intakeAll,
-                FollowPath(redShootToSpikeOne, false, PATH_SPEED_SLOW),
+                FollowPath(shootToSpikeOne, false, PATH_SPEED_SLOW),
             ),
+            Shooter.setSpeed(BotConstants.SHOOTER_SPEED_CLOSE),
             Indexer.indexerToSlot(0),
-            FollowPath(redSpikeOneToShoot, false, PATH_SPEED_FAST),
+            FollowPath(spikeOneToShoot, false, PATH_SPEED_FAST),
             shootAll,
+            Shooter.setSpeed(BotConstants.SHOOTER_SPEED_OFF),
             Indexer.indexerToSlot(0),
-            FollowPath(redShootToSpikeTwo, false, PATH_SPEED_FAST),
+            FollowPath(shootToSpikeTwo, false, PATH_SPEED_FAST),
             ParallelGroup(
                 intakeAll,
-                FollowPath(redSpikeTwoIntake, false, PATH_SPEED_SLOW),
+                FollowPath(spikeTwoIntake, false, PATH_SPEED_SLOW),
             ),
+            Shooter.setSpeed(BotConstants.SHOOTER_SPEED_CLOSE),
             Indexer.indexerToSlot(0),
-            FollowPath(redSpikeTwoToShoot, false, PATH_SPEED_FAST),
+            FollowPath(spikeTwoToShoot, false, PATH_SPEED_FAST),
             shootAll,
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_OFF),
-            FollowPath(redSpikeToGateHover, true, PATH_SPEED_FAST),
+            Shooter.disable(),
+            Turret.disable(),
+            Indexer.disable(),
+            FollowPath(spikeToGateHover, true, PATH_SPEED_FAST),
         )
 
   override fun onInit() {
@@ -164,78 +200,64 @@ class Close : NextFTCOpMode() {
     Indexer.leftBreakBeam = leftBreakBeam
     Indexer.rightBreakBeam = rightBreakBeam
 
-    redStartToShoot =
-        PedroComponent.follower
-            .pathBuilder()
-            .addPath(Path(BezierLine(redStart, redShoot)))
-            .setConstantHeadingInterpolation(0.0)
-            .build()
-
-    redShootToSpikeOne =
-        PedroComponent.follower
-            .pathBuilder()
-            .addPath(Path(BezierLine(redShoot, redSpikeOneEnd)))
-            .setConstantHeadingInterpolation(0.0)
-            .build()
-
-    redSpikeOneToShoot =
-        PedroComponent.follower
-            .pathBuilder()
-            .addPath(Path(BezierLine(redSpikeOneEnd, redShoot)))
-            .setConstantHeadingInterpolation(0.0)
-            .build()
-
-    redShootToSpikeTwo =
-        PedroComponent.follower
-            .pathBuilder()
-            .addPath(Path(BezierLine(redShoot, redSpikeTwoStart)))
-            .setConstantHeadingInterpolation(0.0)
-            .build()
-
-    redSpikeTwoIntake =
-        PedroComponent.follower
-            .pathBuilder()
-            .addPath(Path(BezierLine(redSpikeTwoStart, redSpikeTwoEnd)))
-            .setConstantHeadingInterpolation(0.0)
-            .build()
-
-    redSpikeTwoToShoot =
-        PedroComponent.follower
-            .pathBuilder()
-            .addPath(
-                Path(BezierCurve(redSpikeTwoEnd, Pose(redShoot.x, redSpikeTwoEnd.y, 0.0), redShoot))
-            )
-            .setConstantHeadingInterpolation(0.0)
-            .build()
-
-    redSpikeToGateHover =
-        PedroComponent.follower
-            .pathBuilder()
-            .addPath(Path(BezierLine(redSpikeTwoEnd, redGateHover)))
-            .setConstantHeadingInterpolation(0.0)
-            .build()
+    initializePaths()
 
     Indexer.feed().schedule()
     Indexer.unFeed().schedule()
     Indexer.indexerToSlot(0).schedule()
   }
 
+  private fun initializePaths() {
+    startToShoot = PoseUtils.createBasicPath(currentStart, currentShoot)
+    shootToSpikeOne = PoseUtils.createBasicPath(currentShoot, currentSpikeOneEnd)
+    spikeOneToShoot = PoseUtils.createBasicPath(currentSpikeOneEnd, currentShoot)
+    shootToSpikeTwo = PoseUtils.createBasicPath(currentShoot, currentSpikeTwoStart)
+    spikeTwoIntake = PoseUtils.createBasicPath(currentSpikeTwoStart, currentSpikeTwoEnd)
+    spikeTwoToShoot =
+        PoseUtils.createCurvedPath(
+            currentSpikeTwoEnd,
+            Pose(currentShoot.x, currentSpikeTwoEnd.y, 0.0),
+            currentShoot,
+        )
+    spikeToGateHover = PoseUtils.createBasicPath(currentSpikeTwoEnd, currentGateHover)
+  }
+
   override fun onWaitForStart() {
-    when (alliance) {
-      Alliance.RED -> Lights.state = LightsState.ALLIANCE_RED
-      Alliance.BLUE -> Lights.state = LightsState.ALLIANCE_BLUE
-      Alliance.UNKNOWN -> Lights.state = LightsState.ALLIANCE_UNKNOWN
-    }
-    when (alliance) {
-      Alliance.RED -> PedroComponent.follower.pose = redStart
-      Alliance.BLUE -> PedroComponent.follower.pose = blueStart
-      Alliance.UNKNOWN -> PedroComponent.follower.pose = redStart
-    }
     if (gamepad1.circle) {
       alliance = Alliance.RED
     } else if (gamepad1.cross) {
       alliance = Alliance.BLUE
     }
+
+    Lights.state = alliance.lightsState()
+
+    if (alliance.isKnown) {
+      initializePaths()
+    }
+
+    PedroComponent.follower.pose = if (alliance == Alliance.BLUE) blueStart else redStart
+
+    turretAngle =
+        when (alliance) {
+          Alliance.RED -> TURRET_ANGLE_RED_KNOWN
+          Alliance.BLUE -> TURRET_ANGLE_BLUE_KNOWN
+          Alliance.UNKNOWN -> 0.0
+        }
+  }
+
+  override fun onUpdate() {
+    blackboard["pose"] = PedroComponent.follower.pose
+    blackboard["alliance"] = alliance.toString()
+    blackboard["motif"] = motif.toString()
+
+    turretAngle =
+        when (alliance) {
+          Alliance.RED -> TURRET_ANGLE_RED_KNOWN
+          Alliance.BLUE -> TURRET_ANGLE_BLUE_KNOWN
+          Alliance.UNKNOWN -> 0.0
+        }
+
+    Turret.setAngle(turretAngle.deg).schedule()
   }
 
   override fun onStartButtonPressed() {
