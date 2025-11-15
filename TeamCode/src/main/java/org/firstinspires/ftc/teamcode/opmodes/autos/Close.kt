@@ -150,7 +150,7 @@ class Close : NextFTCOpMode() {
   val shootAll2: Command
     get() = buildThreeShotSequence(0, -1, -2)
 
-  private fun shootSequenceForSeries(seriesIndex: Int): Command {
+  private fun getShootSequenceForSeries(seriesIndex: Int): Command {
     return when (motif) {
       Motif.PPG ->
           when (seriesIndex) {
@@ -176,6 +176,28 @@ class Close : NextFTCOpMode() {
             1 -> shootAll0
             else -> shootAll0
           }
+    }
+  }
+
+  private fun shootSequenceForSeries(seriesIndex: Int): Command {
+    return DeferredShootCommand(seriesIndex)
+  }
+
+  inner class DeferredShootCommand(private val seriesIndex: Int) : Command() {
+    private lateinit var actualCommand: Command
+
+    override val isDone: Boolean
+      get() = ::actualCommand.isInitialized && actualCommand.isDone
+
+    override fun start() {
+      actualCommand = getShootSequenceForSeries(seriesIndex)
+      actualCommand.start()
+    }
+
+    override fun stop(interrupted: Boolean) {
+      if (::actualCommand.isInitialized) {
+        actualCommand.stop(interrupted)
+      }
     }
   }
 
