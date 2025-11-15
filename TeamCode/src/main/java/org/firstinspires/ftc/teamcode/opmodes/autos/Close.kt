@@ -350,6 +350,7 @@ class Close : NextFTCOpMode() {
       } else {
         telemetry.addData("AprilTag", "no detections")
       }
+        telemetry.addData("Motif", motif.toString())
       telemetry.update()
     }
 
