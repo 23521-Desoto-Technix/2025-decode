@@ -130,25 +130,47 @@ class Close : NextFTCOpMode() {
             Delay(waitForFeeder),
         )
 
-  private fun buildThreeShotSequence(vararg slots: Int): Command {
-    require(slots.size == 3) { "Expected exactly 3 slots" }
-    val commands = mutableListOf<Command>()
-    for (i in slots.indices) {
-      commands.add(Indexer.indexerToSlot(slots[i]))
-      commands.add(Delay(waitForIndexer))
-      commands.add(shoot)
-    }
-    return SequentialGroup(*commands.toTypedArray())
-  }
-
   val shootAll0: Command
-    get() = buildThreeShotSequence(0, 1, 2)
+    get() =
+        SequentialGroup(
+            Indexer.indexerToSlot(0),
+            Delay(waitForIndexer),
+            shoot,
+            Indexer.indexerToSlot(1),
+            Delay(waitForIndexer),
+            shoot,
+            Indexer.indexerToSlot(2),
+            Delay(waitForIndexer),
+            shoot,
+        )
 
   val shootAll1: Command
-    get() = buildThreeShotSequence(2, 1, 0)
+    get() =
+        SequentialGroup(
+            Indexer.indexerToSlot(1),
+            Delay(waitForIndexer),
+            shoot,
+            Indexer.indexerToSlot(0),
+            Delay(waitForIndexer),
+            shoot,
+            Indexer.indexerToSlot(-1),
+            Delay(waitForIndexer),
+            shoot,
+        )
 
   val shootAll2: Command
-    get() = buildThreeShotSequence(3, 0, 1)
+    get() =
+        SequentialGroup(
+            Indexer.indexerToSlot(0),
+            Delay(waitForIndexer),
+            shoot,
+            Indexer.indexerToSlot(-1),
+            Delay(waitForIndexer),
+            shoot,
+            Indexer.indexerToSlot(-2),
+            Delay(waitForIndexer),
+            shoot,
+        )
 
   private fun getShootSequenceForSeries(seriesIndex: Int): Command {
     return when (motif) {
