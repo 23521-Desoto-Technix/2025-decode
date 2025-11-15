@@ -154,9 +154,9 @@ class Close : NextFTCOpMode() {
     return when (motif) {
       Motif.PPG ->
           when (seriesIndex) {
-            0 -> shootAll0
+            0 -> shootAll1
             1 -> shootAll1
-            else -> shootAll0
+            else -> shootAll2
           }
       Motif.PGP ->
           when (seriesIndex) {
@@ -166,7 +166,7 @@ class Close : NextFTCOpMode() {
           }
       Motif.GPP ->
           when (seriesIndex) {
-            0 -> shootAll2
+            0 -> shootAll0
             1 -> shootAll0
             else -> shootAll1
           }
