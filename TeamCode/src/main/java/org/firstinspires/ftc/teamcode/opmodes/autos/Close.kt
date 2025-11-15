@@ -16,6 +16,7 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -32,7 +33,6 @@ import org.firstinspires.ftc.teamcode.utils.PoseUtils
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Close (9 non sorted)")
 class Close : NextFTCOpMode() {
@@ -130,99 +130,6 @@ class Close : NextFTCOpMode() {
             Delay(waitForFeeder),
         )
 
-  val shootAll0: Command
-    get() =
-        SequentialGroup(
-            Indexer.indexerToSlot(0),
-            Delay(waitForIndexer),
-            shoot,
-            Indexer.indexerToSlot(1),
-            Delay(waitForIndexer),
-            shoot,
-            Indexer.indexerToSlot(2),
-            Delay(waitForIndexer),
-            shoot,
-        )
-
-  val shootAll1: Command
-    get() =
-        SequentialGroup(
-            Indexer.indexerToSlot(1),
-            Delay(waitForIndexer),
-            shoot,
-            Indexer.indexerToSlot(0),
-            Delay(waitForIndexer),
-            shoot,
-            Indexer.indexerToSlot(-1),
-            Delay(waitForIndexer),
-            shoot,
-        )
-
-  val shootAll2: Command
-    get() =
-        SequentialGroup(
-            Indexer.indexerToSlot(0),
-            Delay(waitForIndexer),
-            shoot,
-            Indexer.indexerToSlot(-1),
-            Delay(waitForIndexer),
-            shoot,
-            Indexer.indexerToSlot(-2),
-            Delay(waitForIndexer),
-            shoot,
-        )
-
-  private fun getShootSequenceForSeries(seriesIndex: Int): Command {
-    return when (motif) {
-      Motif.PPG ->
-          when (seriesIndex) {
-            0 -> shootAll1
-            1 -> shootAll1
-            else -> shootAll2
-          }
-      Motif.PGP ->
-          when (seriesIndex) {
-            0 -> shootAll1
-            1 -> shootAll0
-            else -> shootAll2
-          }
-      Motif.GPP ->
-          when (seriesIndex) {
-            0 -> shootAll0
-            1 -> shootAll0
-            else -> shootAll1
-          }
-      Motif.UNKNOWN ->
-          when (seriesIndex) {
-            0 -> shootAll0
-            1 -> shootAll0
-            else -> shootAll0
-          }
-    }
-  }
-
-  private fun shootSequenceForSeries(seriesIndex: Int): Command {
-    return DeferredShootCommand(seriesIndex)
-  }
-
-  inner class DeferredShootCommand(private val seriesIndex: Int) : Command() {
-    private lateinit var actualCommand: Command
-
-    override val isDone: Boolean
-      get() = ::actualCommand.isInitialized && actualCommand.isDone
-
-    override fun start() {
-      actualCommand = getShootSequenceForSeries(seriesIndex)
-      actualCommand.schedule()
-    }
-
-    override fun stop(interrupted: Boolean) {
-      if (::actualCommand.isInitialized) {
-        actualCommand.stop(interrupted)
-      }
-    }
-  }
-
   val shootAll: Command
     get() =
         SequentialGroup(
@@ -263,7 +170,7 @@ class Close : NextFTCOpMode() {
             Indexer.latchUp(),
             Shooter.setSpeed(BotConstants.SHOOTER_SPEED_CLOSE),
             FollowPath(startToShoot, false, PATH_SPEED_FAST),
-            shootSequenceForSeries(0),
+            shootAll,
             Shooter.setSpeed(BotConstants.SHOOTER_SPEED_OFF),
             Indexer.indexerToSlot(0),
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_FORWARD),
@@ -274,7 +181,7 @@ class Close : NextFTCOpMode() {
             Shooter.setSpeed(BotConstants.SHOOTER_SPEED_CLOSE),
             Indexer.indexerToSlot(0),
             FollowPath(spikeOneToShoot, false, PATH_SPEED_FAST),
-            shootSequenceForSeries(1),
+            shootAll,
             Shooter.setSpeed(BotConstants.SHOOTER_SPEED_OFF),
             Indexer.indexerToSlot(0),
             FollowPath(shootToSpikeTwo, false, PATH_SPEED_FAST),
@@ -285,7 +192,7 @@ class Close : NextFTCOpMode() {
             Shooter.setSpeed(BotConstants.SHOOTER_SPEED_CLOSE),
             Indexer.indexerToSlot(0),
             FollowPath(spikeTwoToShoot, false, PATH_SPEED_FAST),
-            shootSequenceForSeries(2),
+            shootAll,
             Indexer.setIntakePower(BotConstants.INTAKE_POWER_OFF),
             Shooter.disable(),
             Turret.disable(),
