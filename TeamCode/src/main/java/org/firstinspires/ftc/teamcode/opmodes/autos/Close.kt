@@ -156,7 +156,7 @@ class Close : NextFTCOpMode() {
           when (seriesIndex) {
             0 -> shootAll0
             1 -> shootAll1
-            else -> shootAll2
+            else -> shootAll0
           }
       Motif.PGP ->
           when (seriesIndex) {
