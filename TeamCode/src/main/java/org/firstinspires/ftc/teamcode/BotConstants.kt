@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode
 
 import com.pedropathing.geometry.Pose
+import org.firstinspires.ftc.teamcode.utils.Motif
 
 /**
  * Shared constants used across multiple opmodes. All constants use SNAKE_CASE naming convention.
@@ -17,6 +18,22 @@ object BotConstants {
   // AprilTag IDs - shared across teleop and autonomous opmodes
   const val RED_ALLIANCE_APRILTAG_ID = 24
   const val BLUE_ALLIANCE_APRILTAG_ID = 20
+
+  // Motif AprilTag IDs
+  const val MOTIF_ATAG_ID_GPP = 21
+  const val MOTIF_ATAG_ID_PGP = 22
+  const val MOTIF_ATAG_ID_PPG = 23
+
+  /**
+   * Map an AprilTag id to a Motif value. Returns Motif.UNKNOWN if no mapping exists.
+   */
+  fun motifForAprilTagId(id: Int): Motif =
+      when (id) {
+        MOTIF_ATAG_ID_GPP -> Motif.GPP
+        MOTIF_ATAG_ID_PGP -> Motif.PGP
+        MOTIF_ATAG_ID_PPG -> Motif.PPG
+        else -> Motif.UNKNOWN
+      }
 
   // Shooter speeds (RPM) - shared across teleop and autonomous opmodes
   const val SHOOTER_SPEED_FAR = 2_300.0
