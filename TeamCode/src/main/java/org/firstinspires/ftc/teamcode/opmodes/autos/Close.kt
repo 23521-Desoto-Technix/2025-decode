@@ -145,10 +145,10 @@ class Close : NextFTCOpMode() {
     get() = buildThreeShotSequence(0, 1, 2)
 
   val shootAll1: Command
-    get() = buildThreeShotSequence(1, 0, -1)
+    get() = buildThreeShotSequence(2, 1, 0)
 
   val shootAll2: Command
-    get() = buildThreeShotSequence(0, -1, -2)
+    get() = buildThreeShotSequence(3, 0, 1)
 
   private fun getShootSequenceForSeries(seriesIndex: Int): Command {
     return when (motif) {
