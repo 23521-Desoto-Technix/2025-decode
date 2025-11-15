@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes.autos
 
-import android.util.Size
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.PathChain
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
@@ -16,10 +15,6 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.milliseconds
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -30,9 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.Motif
 import org.firstinspires.ftc.teamcode.utils.PoseUtils
-import org.firstinspires.ftc.vision.VisionPortal
-import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Close (9 non sorted)")
 class Close : NextFTCOpMode() {
@@ -49,9 +42,6 @@ class Close : NextFTCOpMode() {
     const val PATH_SPEED_SLOW = 0.25
     const val PATH_SPEED_FAST = 1.0
 
-    const val TURRET_ANGLE_RED_UNKNOWN = -100.0
-    const val TURRET_ANGLE_BLUE_UNKNOWN = 0.0
-
     const val TURRET_ANGLE_RED_KNOWN = -45.0
     const val TURRET_ANGLE_BLUE_KNOWN = 45.0
   }
@@ -62,8 +52,6 @@ class Close : NextFTCOpMode() {
   private lateinit var intakeBreakBeam: DigitalChannel
   private lateinit var leftBreakBeam: DigitalChannel
   private lateinit var rightBreakBeam: DigitalChannel
-  private lateinit var aprilTag: AprilTagProcessor
-  private lateinit var portal: VisionPortal
 
   val redStart = Pose(113.0, 131.0, 0.0)
   val redShoot = Pose(87.0, 82.0, 0.0)
@@ -217,32 +205,6 @@ class Close : NextFTCOpMode() {
     Indexer.feed().schedule()
     Indexer.unFeed().schedule()
     Indexer.indexerToSlot(0).schedule()
-
-    aprilTag =
-        AprilTagProcessor.Builder()
-            .setDrawAxes(true)
-            .setDrawCubeProjection(true)
-            .setDrawTagOutline(true)
-            .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-            .setLensIntrinsics(
-                BotConstants.CAMERA_LENS_FX,
-                BotConstants.CAMERA_LENS_FY,
-                BotConstants.CAMERA_LENS_CX,
-                BotConstants.CAMERA_LENS_CY,
-            )
-            .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
-            // ... these parameters are fx, fy, cx, cy.
-            .build()
-
-    portal =
-        VisionPortal.Builder()
-            .setCamera(hardwareMap.get<WebcamName?>(WebcamName::class.java, "turretCamera"))
-            .setCameraResolution(
-                Size(BotConstants.CAMERA_RESOLUTION_WIDTH, BotConstants.CAMERA_RESOLUTION_HEIGHT)
-            )
-            .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-            .addProcessor(aprilTag)
-            .build()
   }
 
   private fun initializePaths() {
@@ -277,8 +239,8 @@ class Close : NextFTCOpMode() {
 
     turretAngle =
         when (alliance) {
-          Alliance.RED -> TURRET_ANGLE_RED_UNKNOWN
-          Alliance.BLUE -> TURRET_ANGLE_BLUE_UNKNOWN
+          Alliance.RED -> TURRET_ANGLE_RED_KNOWN
+          Alliance.BLUE -> TURRET_ANGLE_BLUE_KNOWN
           Alliance.UNKNOWN -> 0.0
         }
   }
@@ -288,49 +250,13 @@ class Close : NextFTCOpMode() {
     blackboard["alliance"] = alliance.toString()
     blackboard["motif"] = motif.toString()
 
-    if (this::aprilTag.isInitialized) {
-      if (aprilTag.detections.isNotEmpty()) {
-        var foundKnownMotif: Motif? = null
-        for (detection in aprilTag.detections) {
-          val detectedMotif = Motif.fromAprilTagId(detection.id)
-          if (detectedMotif.isKnown) {
-            foundKnownMotif = detectedMotif
-          }
-
-          telemetry.addData("AprilTag ID", detection.id)
-          telemetry.addData(
-              "AprilTag Center",
-              "x=%.1f y=%.1f".format(detection.center.x, detection.center.y),
-          )
-          telemetry.addData("AprilTag Pose", detection.ftcPose?.range ?: "null")
-        }
-
-        if (foundKnownMotif != null) {
-          motif = foundKnownMotif
-        }
-
-        telemetry.addData("Motif", motif.toString())
-      } else {
-        telemetry.addData("AprilTag", "no detections")
-      }
-      telemetry.addData("Motif", motif.toString())
-      telemetry.update()
-    }
-
     turretAngle =
-        if (motif.isKnown) {
-          when (alliance) {
-            Alliance.RED -> TURRET_ANGLE_RED_KNOWN
-            Alliance.BLUE -> TURRET_ANGLE_BLUE_KNOWN
-            Alliance.UNKNOWN -> 0.0
-          }
-        } else {
-          when (alliance) {
-            Alliance.RED -> TURRET_ANGLE_RED_UNKNOWN
-            Alliance.BLUE -> TURRET_ANGLE_BLUE_UNKNOWN
-            Alliance.UNKNOWN -> 0.0
-          }
+        when (alliance) {
+          Alliance.RED -> TURRET_ANGLE_RED_KNOWN
+          Alliance.BLUE -> TURRET_ANGLE_BLUE_KNOWN
+          Alliance.UNKNOWN -> 0.0
         }
+
     Turret.setAngle(turretAngle.deg).schedule()
   }
 
