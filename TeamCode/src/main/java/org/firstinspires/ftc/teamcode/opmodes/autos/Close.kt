@@ -339,8 +339,13 @@ class Close : NextFTCOpMode() {
 
     if (this::aprilTag.isInitialized) {
       if (aprilTag.detections.isNotEmpty()) {
+        var foundKnownMotif: Motif? = null
         for (detection in aprilTag.detections) {
-          motif = Motif.fromAprilTagId(detection.id)
+          val detectedMotif = Motif.fromAprilTagId(detection.id)
+          if (detectedMotif.isKnown) {
+            foundKnownMotif = detectedMotif
+          }
+
           telemetry.addData("AprilTag ID", detection.id)
           telemetry.addData(
               "AprilTag Center",
@@ -348,6 +353,11 @@ class Close : NextFTCOpMode() {
           )
           telemetry.addData("AprilTag Pose", detection.ftcPose?.range ?: "null")
         }
+
+        if (foundKnownMotif != null) {
+          motif = foundKnownMotif
+        }
+
         telemetry.addData("Motif", motif.toString())
       } else {
         telemetry.addData("AprilTag", "no detections")
