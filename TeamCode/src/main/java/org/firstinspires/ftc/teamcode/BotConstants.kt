@@ -41,7 +41,7 @@ object BotConstants {
   const val SHOOTER_SPEED_OFF = 0.0
 
   // Intake power levels - shared across teleop and autonomous opmodes
-  const val INTAKE_POWER_FORWARD = 1.0
+  const val INTAKE_POWER_FORWARD = 0.8
   const val INTAKE_POWER_REVERSE = -1.0
   const val INTAKE_POWER_OFF = 0.0
 
