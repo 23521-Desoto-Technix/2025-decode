@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple
 @TeleOp(name = "Intake Test")
 class intakeTest : LinearOpMode() {
     override fun runOpMode() {
-        val front = hardwareMap.dcMotor["frontIntake"]
-        val back = hardwareMap.dcMotor["backIntake"]
+        val front = hardwareMap.dcMotor["intakeFront"]
+        val back = hardwareMap.dcMotor["intakeBack"]
         waitForStart()
         while (opModeIsActive()) {
             front.power = gamepad1.left_stick_y.toDouble()
