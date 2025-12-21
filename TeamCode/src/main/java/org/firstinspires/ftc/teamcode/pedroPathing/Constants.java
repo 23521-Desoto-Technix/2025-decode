@@ -44,8 +44,8 @@ public class Constants {
                     .hardwareMapName("pinpoint")
                     .strafePodX(-3.51)
                     .forwardPodY(-2.92)
-                    .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-                    .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
+                    .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
+                    .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
                     .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
     public static PathConstraints pathConstraints = new PathConstraints(
