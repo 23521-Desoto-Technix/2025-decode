@@ -44,7 +44,7 @@ class teleop : NextFTCOpMode() {
             range { rotatedTurn },
         )
     driverControlled()
-      button { gamepad1.a }
+      val intake = button { gamepad1.a }
           .whenBecomesTrue { Tube.intakeAll }
   }
 
