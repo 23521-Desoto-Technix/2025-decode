@@ -50,13 +50,15 @@ class teleop : NextFTCOpMode() {
     val stopIntake = button { gamepad1.cross }.whenBecomesTrue { Tube.stopAll.schedule() }
     val shootAll = button { gamepad1.triangle }.whenBecomesTrue { Tube.shootAll.schedule() }
     val flywheelLong =
-        button { gamepad1.dpad_up }.whenBecomesTrue { Flywheel.setSpeed(2_200.0).schedule() }
+        button { gamepad1.dpad_up }
+            .whenBecomesTrue { Flywheel.enable().then(Flywheel.setSpeed(2_200.0)).schedule() }
     val flywheelShort =
-        button { gamepad1.dpad_down }.whenBecomesTrue { Flywheel.setSpeed(2_100.0).schedule() }
+        button { gamepad1.dpad_down }
+            .whenBecomesTrue { Flywheel.enable().then(Flywheel.setSpeed(2_100.0)).schedule() }
     val flywheelTesting =
-        button { gamepad1.dpad_left }.whenBecomesTrue { Flywheel.setSpeed(500.0).schedule() }
-    val flywheelOff =
-        button { gamepad1.dpad_right }.whenBecomesTrue { Flywheel.setSpeed(0.0).schedule() }
+        button { gamepad1.dpad_left }
+            .whenBecomesTrue { Flywheel.enable().then(Flywheel.setSpeed(500.0)).schedule() }
+    val flywheelOff = button { gamepad1.dpad_right }.whenBecomesTrue { Flywheel.disable().schedule() }
   }
 
   override fun onUpdate() {
