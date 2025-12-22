@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystems
 
 import com.qualcomm.robotcore.hardware.DigitalChannel
+import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.delays.WaitUntil
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.ftc.ActiveOpMode
 import dev.nextftc.hardware.impl.MotorEx
+import kotlin.time.Duration.Companion.milliseconds
 
 object Tube : Subsystem {
   val intake = MotorEx("intake").reversed()
@@ -36,7 +38,10 @@ object Tube : Subsystem {
           }
           .then(WaitUntil { !top.state })
           .then(InstantCommand { transfer.power = 0.0 })
-          .then(WaitUntil { !top.state && !middle.state && !bottom.state })
+          .then(Delay(200.milliseconds))
+          .then(WaitUntil { !middle.state })
+          .then(Delay(200.milliseconds))
+          .then(WaitUntil { !bottom.state })
           .then(InstantCommand { intake.power = 0.0 })
 
   val stopAll = InstantCommand {
