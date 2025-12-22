@@ -24,11 +24,11 @@ object Tube : Subsystem {
     bottom.mode = DigitalChannel.Mode.INPUT
   }
 
-    override fun periodic() {
-        ActiveOpMode.telemetry.addData("Top", top.state)
-        ActiveOpMode.telemetry.addData("Middle", middle.state)
-        ActiveOpMode.telemetry.addData("Bottom", bottom.state)
-    }
+  override fun periodic() {
+    ActiveOpMode.telemetry.addData("Top", top.state)
+    ActiveOpMode.telemetry.addData("Middle", middle.state)
+    ActiveOpMode.telemetry.addData("Bottom", bottom.state)
+  }
 
   val intakeAll =
       ParallelGroup(
@@ -38,7 +38,9 @@ object Tube : Subsystem {
           },
           WaitUntil { !top.state },
           InstantCommand { transfer.power = 0.0 },
-          WaitUntil { !top.state && !middle.state && !bottom.state },
-          InstantCommand { intake.power = 0.0 },
       )
+  val stopAll = InstantCommand {
+    intake.power = 0.0
+    transfer.power = 0.0
+  }
 }
