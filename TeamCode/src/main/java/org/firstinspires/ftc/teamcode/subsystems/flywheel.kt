@@ -38,6 +38,11 @@ object Flywheel : Subsystem {
 
 
         this.speed = -shooterEncoder.velocity
+        if (this.targetSpeed == 0.0) {
+            upperShooterMotor.power = 0.0
+            lowerShooterMotor.power = 0.0
+            return
+        }
         if (this.usingPID) {
             PID.goal = KineticState(Double.POSITIVE_INFINITY, this.targetSpeed, 0.0)
             val pidOutput =
