@@ -8,7 +8,7 @@ import dev.nextftc.ftc.ActiveOpMode
 import dev.nextftc.hardware.impl.MotorEx
 
 object Tube : Subsystem {
-  val intake = MotorEx("intake")
+  val intake = MotorEx("intake").reversed()
   val transfer = MotorEx("transfer")
   lateinit var top: DigitalChannel
   lateinit var middle: DigitalChannel
