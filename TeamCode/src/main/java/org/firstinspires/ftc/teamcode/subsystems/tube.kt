@@ -30,6 +30,7 @@ object Tube : Subsystem {
   lateinit var bottom: DigitalChannel
   private var state = TubeState.IDLE
   private var stepStartedAt = now()
+  private var shootSpeed = 1.0
 
   override fun initialize() {
     top = ActiveOpMode.hardwareMap.digitalChannel["top"]
@@ -55,7 +56,10 @@ object Tube : Subsystem {
 
   val stopAll = InstantCommand { transitionTo(TubeState.IDLE) }
 
-  val shootAll = InstantCommand { transitionTo(TubeState.SHOOTING_WAIT_CLEAR) }
+  fun shootAll(speed: Double = 1.0) = InstantCommand {
+    shootSpeed = speed
+    transitionTo(TubeState.SHOOTING_WAIT_CLEAR)
+  }
 
   private fun advanceStateMachine() {
     when (state) {
@@ -110,8 +114,8 @@ object Tube : Subsystem {
       }
       TubeState.SHOOTING_WAIT_CLEAR,
       TubeState.SHOOTING_DELAY_BEFORE_IDLE -> {
-        intake.power = 1.0
-        transfer.power = 1.0
+        intake.power = shootSpeed
+        transfer.power = shootSpeed
         hardStop.position = 0.65
       }
     }
