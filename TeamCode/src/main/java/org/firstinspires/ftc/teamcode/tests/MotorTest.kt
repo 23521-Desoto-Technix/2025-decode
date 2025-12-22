@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes
+package org.firstinspires.ftc.teamcode.tests
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.ftc.NextFTCOpMode
@@ -84,5 +84,3 @@ class MotorTest : NextFTCOpMode() {
         backRight.power = 0.0
     }
 }
-
-
