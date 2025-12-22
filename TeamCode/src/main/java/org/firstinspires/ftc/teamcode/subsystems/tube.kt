@@ -7,11 +7,13 @@ import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.ftc.ActiveOpMode
 import dev.nextftc.hardware.impl.MotorEx
+import dev.nextftc.hardware.impl.ServoEx
 import kotlin.time.Duration.Companion.milliseconds
 
 object Tube : Subsystem {
   val intake = MotorEx("intake").reversed()
   val transfer = MotorEx("transfer")
+  val hardStop = ServoEx("hardStop")
   lateinit var top: DigitalChannel
   lateinit var middle: DigitalChannel
   lateinit var bottom: DigitalChannel
@@ -35,6 +37,7 @@ object Tube : Subsystem {
       InstantCommand {
             intake.power = 1.0
             transfer.power = 1.0
+            hardStop.position = 0.0
           }
           .then(WaitUntil { !top.state })
           .then(InstantCommand { transfer.power = 0.0 })
@@ -48,4 +51,19 @@ object Tube : Subsystem {
     intake.power = 0.0
     transfer.power = 0.0
   }
+
+  val shootAll =
+      InstantCommand {
+            intake.power = 1.0
+            transfer.power = 1.0
+            hardStop.position = 1.0
+          }
+          .then(WaitUntil { top.state && middle.state && bottom.state })
+          .then(Delay(500.milliseconds))
+          .then(
+              InstantCommand {
+                intake.power = 0.0
+                transfer.power = 0.0
+              }
+          )
 }
