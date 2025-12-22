@@ -30,9 +30,9 @@ object Tube : Subsystem {
             intake.power = 1.0
             transfer.power = 1.0
           },
-          WaitUntil { top.state },
+          WaitUntil { !top.state },
           InstantCommand { transfer.power = 0.0 },
-          WaitUntil { top.state && middle.state && bottom.state },
+          WaitUntil { !top.state && !middle.state && !bottom.state },
           InstantCommand { intake.power = 0.0 },
       )
 }
