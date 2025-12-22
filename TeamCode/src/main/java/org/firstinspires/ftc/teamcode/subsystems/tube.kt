@@ -37,7 +37,7 @@ object Tube : Subsystem {
       InstantCommand {
             intake.power = 1.0
             transfer.power = 1.0
-            hardStop.position = 0.0
+            hardStop.position = 0.9
           }
           .then(WaitUntil { !top.state })
           .then(InstantCommand { transfer.power = 0.0 })
@@ -56,7 +56,7 @@ object Tube : Subsystem {
       InstantCommand {
             intake.power = 1.0
             transfer.power = 1.0
-            hardStop.position = 1.0
+            hardStop.position = 0.65
           }
           .then(WaitUntil { top.state && middle.state && bottom.state })
           .then(Delay(500.milliseconds))
