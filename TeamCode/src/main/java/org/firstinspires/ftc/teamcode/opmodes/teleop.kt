@@ -48,9 +48,9 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Heading", PedroComponent.follower.pose.heading)
     BindingManager.update()
     telemetry.update()
-    rotatedForward = gamepad1.left_stick_y.toDouble()
-    rotatedStrafe = gamepad1.left_stick_x.toDouble()
-    rotatedTurn = gamepad1.right_stick_x.toDouble()
+    rotatedForward = -gamepad1.left_stick_y.toDouble()
+    rotatedStrafe = -gamepad1.left_stick_x.toDouble()
+    rotatedTurn = -gamepad1.right_stick_x.toDouble()
   }
 
   override fun onStop() {
