@@ -11,6 +11,7 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
+import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Tube
 
@@ -21,7 +22,7 @@ class teleop : NextFTCOpMode() {
         BulkReadComponent,
         BindingsComponent,
         PedroComponent(Constants::createFollower),
-        SubsystemComponent(Tube),
+        SubsystemComponent(Tube, Shooter, Flywheel),
     )
   }
 
