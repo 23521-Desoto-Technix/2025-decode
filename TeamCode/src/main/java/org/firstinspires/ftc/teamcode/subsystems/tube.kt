@@ -25,6 +25,8 @@ object Tube : Subsystem {
     top.mode = DigitalChannel.Mode.INPUT
     middle.mode = DigitalChannel.Mode.INPUT
     bottom.mode = DigitalChannel.Mode.INPUT
+    hardStop.position = 0.65
+    hardStop.position = 0.9
   }
 
   override fun periodic() {
