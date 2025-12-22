@@ -11,6 +11,7 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
+import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Tube
 
 @TeleOp
@@ -46,7 +47,11 @@ class teleop : NextFTCOpMode() {
     driverControlled()
     val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
     val stopIntake = button { gamepad1.cross }.whenBecomesTrue { Tube.stopAll.schedule() }
-    val shoot = button { gamepad1.square }.whenBecomesTrue { Tube.shootAll.schedule() }
+    val shootLong = button { gamepad1.dpad_up }.whenBecomesTrue { Shooter.shootAllLong.schedule() }
+    val shootShort =
+        button { gamepad1.dpad_down }.whenBecomesTrue { Shooter.shootAllShort.schedule() }
+    val shootTesting =
+        button { gamepad1.dpad_left }.whenBecomesTrue { Shooter.shootAllTesting.schedule() }
   }
 
   override fun onUpdate() {

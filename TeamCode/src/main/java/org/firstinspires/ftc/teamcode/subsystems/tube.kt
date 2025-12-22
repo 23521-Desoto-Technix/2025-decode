@@ -50,8 +50,8 @@ object Tube : Subsystem {
           .then(InstantCommand { intake.power = 0.0 })
 
   val stopAll = InstantCommand {
-    intake.power = 0.0
-    transfer.power = 0.0
+      intake.power = 0.0
+      transfer.power = 0.0
   }
 
   val shootAll =
