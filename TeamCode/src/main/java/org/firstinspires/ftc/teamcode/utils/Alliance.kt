@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.utils
 
 import com.pedropathing.geometry.Pose
 import org.firstinspires.ftc.teamcode.BotConstants
-import org.firstinspires.ftc.teamcode.subsystems.LightsState
 
 enum class Alliance {
   RED,
@@ -21,13 +20,6 @@ enum class Alliance {
         RED -> BotConstants.RED_TARGET_POSE
         BLUE -> BotConstants.BLUE_TARGET_POSE
         UNKNOWN -> BotConstants.FIELD_CENTER
-      }
-
-  fun lightsState(): LightsState =
-      when (this) {
-        RED -> LightsState.ALLIANCE_RED
-        BLUE -> LightsState.ALLIANCE_BLUE
-        UNKNOWN -> LightsState.ALLIANCE_UNKNOWN
       }
 
   override fun toString(): String =
