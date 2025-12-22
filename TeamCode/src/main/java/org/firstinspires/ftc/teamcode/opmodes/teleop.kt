@@ -39,6 +39,7 @@ class teleop : NextFTCOpMode() {
             range { rotatedStrafe },
             range { rotatedTurn },
         )
+    driverControlled()
   }
 
   override fun onUpdate() {
