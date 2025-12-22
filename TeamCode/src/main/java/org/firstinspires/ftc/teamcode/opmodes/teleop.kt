@@ -21,9 +21,9 @@ class teleop : NextFTCOpMode() {
     )
   }
 
-  private val frontLeft = MotorEx("frontLeft").brakeMode().reversed()
+  private val frontLeft = MotorEx("frontLeft").brakeMode()
   private val frontRight = MotorEx("frontRight").brakeMode()
-  private val backLeft = MotorEx("backLeft").brakeMode().reversed()
+  private val backLeft = MotorEx("backLeft").brakeMode()
   private val backRight = MotorEx("backRight").brakeMode()
 
   override fun onInit() {
