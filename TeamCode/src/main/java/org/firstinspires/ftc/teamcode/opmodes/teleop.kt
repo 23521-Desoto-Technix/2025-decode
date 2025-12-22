@@ -2,13 +2,12 @@
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.bindings.BindingManager
+import dev.nextftc.bindings.range
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.extensions.pedro.PedroComponent
-import dev.nextftc.ftc.Gamepads
+import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import dev.nextftc.hardware.driving.MecanumDriverControlled
-import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 
 @TeleOp
@@ -21,10 +20,9 @@ class teleop : NextFTCOpMode() {
     )
   }
 
-  private val frontLeft = MotorEx("frontLeft").brakeMode()
-  private val frontRight = MotorEx("frontRight").brakeMode()
-  private val backLeft = MotorEx("backLeft").brakeMode()
-  private val backRight = MotorEx("backRight").brakeMode()
+  var rotatedForward = 0.0
+  var rotatedStrafe = 0.0
+  var rotatedTurn = 0.0
 
   override fun onInit() {
     // Initialize opmode
@@ -36,17 +34,11 @@ class teleop : NextFTCOpMode() {
 
   override fun onStartButtonPressed() {
     val driverControlled =
-        MecanumDriverControlled(
-            frontLeft,
-            frontRight,
-            backLeft,
-            backRight,
-            Gamepads.gamepad1.leftStickY,
-            Gamepads.gamepad1.leftStickX,
-            Gamepads.gamepad1.rightStickX,
+        PedroDriverControlled(
+            range { rotatedForward },
+            range { rotatedStrafe },
+            range { rotatedTurn },
         )
-      driverControlled()
-
   }
 
   override fun onUpdate() {
@@ -55,6 +47,9 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Heading", PedroComponent.follower.pose.heading)
     BindingManager.update()
     telemetry.update()
+    rotatedForward = gamepad1.left_stick_y.toDouble()
+    rotatedStrafe = gamepad1.left_stick_x.toDouble()
+    rotatedTurn = gamepad1.right_stick_x.toDouble()
   }
 
   override fun onStop() {
