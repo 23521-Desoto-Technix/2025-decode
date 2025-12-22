@@ -2,13 +2,16 @@
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.bindings.BindingManager
+import dev.nextftc.bindings.button
 import dev.nextftc.bindings.range
 import dev.nextftc.core.components.BindingsComponent
+import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
+import org.firstinspires.ftc.teamcode.subsystems.Tube
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -17,6 +20,7 @@ class teleop : NextFTCOpMode() {
         BulkReadComponent,
         BindingsComponent,
         PedroComponent(Constants::createFollower),
+        SubsystemComponent(Tube),
     )
   }
 
@@ -40,6 +44,8 @@ class teleop : NextFTCOpMode() {
             range { rotatedTurn },
         )
     driverControlled()
+      button { gamepad1.a }
+          .whenBecomesTrue { Tube.intakeAll }
   }
 
   override fun onUpdate() {
