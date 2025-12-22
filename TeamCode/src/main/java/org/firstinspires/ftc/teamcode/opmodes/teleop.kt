@@ -48,7 +48,9 @@ class teleop : NextFTCOpMode() {
     driverControlled()
     val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
     val stopIntake = button { gamepad1.cross }.whenBecomesTrue { Tube.stopAll.schedule() }
-    val shootAll = button { gamepad1.triangle }.whenBecomesTrue { Tube.shootAll.schedule() }
+    val shootAll = button { gamepad1.triangle }.whenBecomesTrue { Tube.shootAll().schedule() }
+    val shootAllSlow =
+        button { gamepad1.triangle }.whenBecomesTrue { Tube.shootAll(0.7).schedule() }
     val flywheelLong =
         button { gamepad1.dpad_up }
             .whenBecomesTrue { Flywheel.enable().then(Flywheel.setSpeed(2_200.0)).schedule() }
