@@ -17,6 +17,7 @@ private enum class TubeState {
   INTAKE_DELAY_AFTER_MIDDLE,
   INTAKE_WAIT_BOTTOM,
   INTAKE_DELAY_AFTER_BOTTOM,
+  SHOOTING_HARDSTOP_SETTLE,
   SHOOTING_WAIT_CLEAR,
   SHOOTING_DELAY_BEFORE_IDLE,
 }
@@ -58,7 +59,7 @@ object Tube : Subsystem {
 
   fun shootAll(speed: Double = 1.0) = InstantCommand {
     shootSpeed = speed
-    transitionTo(TubeState.SHOOTING_WAIT_CLEAR)
+    transitionTo(TubeState.SHOOTING_HARDSTOP_SETTLE)
   }
 
   private fun advanceStateMachine() {
@@ -74,6 +75,8 @@ object Tube : Subsystem {
           if (!bottom.state) transitionTo(TubeState.INTAKE_DELAY_AFTER_BOTTOM)
       TubeState.INTAKE_DELAY_AFTER_BOTTOM ->
           if (elapsedSinceStep() >= 100.milliseconds) transitionTo(TubeState.IDLE)
+      TubeState.SHOOTING_HARDSTOP_SETTLE ->
+          if (elapsedSinceStep() >= 200.milliseconds) transitionTo(TubeState.SHOOTING_WAIT_CLEAR)
       TubeState.SHOOTING_WAIT_CLEAR ->
           if (top.state && middle.state && bottom.state) {
             transitionTo(TubeState.SHOOTING_DELAY_BEFORE_IDLE)
@@ -111,6 +114,11 @@ object Tube : Subsystem {
         intake.power = 1.0
         transfer.power = 0.0
         hardStop.position = 0.9
+      }
+      TubeState.SHOOTING_HARDSTOP_SETTLE -> {
+        intake.power = 0.0
+        transfer.power = 0.0
+        hardStop.position = 0.65
       }
       TubeState.SHOOTING_WAIT_CLEAR,
       TubeState.SHOOTING_DELAY_BEFORE_IDLE -> {
