@@ -31,8 +31,16 @@ class teleop : NextFTCOpMode() {
   var rotatedStrafe = 0.0
   var rotatedTurn = 0.0
 
+  private lateinit var backRight: com.qualcomm.robotcore.hardware.DcMotor
+  private lateinit var frontLeft: com.qualcomm.robotcore.hardware.DcMotor
+  private lateinit var backLeft: com.qualcomm.robotcore.hardware.DcMotor
+  private lateinit var frontRight: com.qualcomm.robotcore.hardware.DcMotor
+
   override fun onInit() {
-    // Initialize opmode
+    backRight = hardwareMap.dcMotor["backRight"]
+    frontLeft = hardwareMap.dcMotor["frontLeft"]
+    backLeft = hardwareMap.dcMotor["backLeft"]
+    frontRight = hardwareMap.dcMotor["frontRight"]
   }
 
   override fun onWaitForStart() {
@@ -50,8 +58,7 @@ class teleop : NextFTCOpMode() {
     val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
     val stopIntake = button { gamepad1.cross }.whenBecomesTrue { Tube.stopAll.schedule() }
     val shootAll = button { gamepad1.triangle }.whenBecomesTrue { Tube.shootAll().schedule() }
-    val shootAllSlow =
-        button { gamepad1.square }.whenBecomesTrue { Tube.shootAll(0.7).schedule() }
+    val shootAllSlow = button { gamepad1.square }.whenBecomesTrue { Tube.shootAll(0.7).schedule() }
     val flywheelLong =
         button { gamepad1.dpad_up }
             .whenBecomesTrue { Flywheel.enable().then(Flywheel.setSpeed(2_200.0)).schedule() }
@@ -63,10 +70,8 @@ class teleop : NextFTCOpMode() {
             .whenBecomesTrue { Flywheel.enable().then(Flywheel.setSpeed(500.0)).schedule() }
     val flywheelOff =
         button { gamepad1.dpad_right }.whenBecomesTrue { Flywheel.disable().schedule() }
-    val hoodUp =
-        button { gamepad1.left_bumper }.whenBecomesTrue { Hood.bumpUp().schedule() }
-    val hoodDown =
-        button { gamepad1.right_bumper }.whenBecomesTrue { Hood.bumpDown().schedule() }
+    val hoodUp = button { gamepad1.left_bumper }.whenBecomesTrue { Hood.bumpUp().schedule() }
+    val hoodDown = button { gamepad1.right_bumper }.whenBecomesTrue { Hood.bumpDown().schedule() }
   }
 
   override fun onUpdate() {
@@ -75,9 +80,22 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Heading", PedroComponent.follower.pose.heading)
     BindingManager.update()
     telemetry.update()
-    rotatedForward = -gamepad1.left_stick_y.toDouble()
-    rotatedStrafe = -gamepad1.left_stick_x.toDouble()
-    rotatedTurn = -gamepad1.right_stick_x.toDouble()
+
+    if (gamepad2.left_stick_y != 0f) {
+      rotatedForward = 0.0
+      rotatedStrafe = 0.0
+      rotatedTurn = 0.0
+
+      val stickValue = gamepad2.left_stick_y.toDouble()
+      backRight.power = stickValue
+      frontLeft.power = stickValue
+      backLeft.power = -stickValue
+      frontRight.power = -stickValue
+    } else {
+      rotatedForward = -gamepad1.left_stick_y.toDouble()
+      rotatedStrafe = -gamepad1.left_stick_x.toDouble()
+      rotatedTurn = -gamepad1.right_stick_x.toDouble()
+    }
   }
 
   override fun onStop() {

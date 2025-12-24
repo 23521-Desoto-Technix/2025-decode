@@ -5,7 +5,7 @@ import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.ServoEx
 
 object Hood : Subsystem {
-  private val servo = ServoEx("hood")
+  val servo = ServoEx("hood")
   private var position = 0.5
   private const val BUMP_AMOUNT = 0.25
 
