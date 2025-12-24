@@ -1,4 +1,4 @@
-﻿package org.firstinspires.ftc.teamcode.opmodes
+package org.firstinspires.ftc.teamcode.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.bindings.BindingManager
@@ -12,6 +12,7 @@ import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
+import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Tube
 
@@ -22,7 +23,7 @@ class teleop : NextFTCOpMode() {
         BulkReadComponent,
         BindingsComponent,
         PedroComponent(Constants::createFollower),
-        SubsystemComponent(Tube, Shooter, Flywheel),
+        SubsystemComponent(Tube, Shooter, Flywheel, Hood),
     )
   }
 
@@ -62,6 +63,10 @@ class teleop : NextFTCOpMode() {
             .whenBecomesTrue { Flywheel.enable().then(Flywheel.setSpeed(500.0)).schedule() }
     val flywheelOff =
         button { gamepad1.dpad_right }.whenBecomesTrue { Flywheel.disable().schedule() }
+    val hoodUp =
+        button { gamepad1.left_bumper }.whenBecomesTrue { Hood.bumpUp().schedule() }
+    val hoodDown =
+        button { gamepad1.right_bumper }.whenBecomesTrue { Hood.bumpDown().schedule() }
   }
 
   override fun onUpdate() {
