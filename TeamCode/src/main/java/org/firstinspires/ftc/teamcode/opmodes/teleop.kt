@@ -31,6 +31,8 @@ class teleop : NextFTCOpMode() {
   var rotatedStrafe = 0.0
   var rotatedTurn = 0.0
 
+  var flywheelTargetSpeed = 0.0
+
   private lateinit var backRight: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var frontLeft: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var backLeft: com.qualcomm.robotcore.hardware.DcMotor
@@ -61,15 +63,36 @@ class teleop : NextFTCOpMode() {
     val shootAllSlow = button { gamepad1.square }.whenBecomesTrue { Tube.shootAll(0.7).schedule() }
     val flywheelLong =
         button { gamepad1.dpad_up }
-            .whenBecomesTrue { Flywheel.enable().then(Flywheel.setSpeed(2_200.0)).schedule() }
+            .whenBecomesTrue {
+              flywheelTargetSpeed = 2_200.0
+              Flywheel.enable().then(Flywheel.setSpeed(2_200.0)).schedule()
+            }
     val flywheelShort =
         button { gamepad1.dpad_down }
-            .whenBecomesTrue { Flywheel.enable().then(Flywheel.setSpeed(2_100.0)).schedule() }
+            .whenBecomesTrue {
+              flywheelTargetSpeed = 2_100.0
+              Flywheel.enable().then(Flywheel.setSpeed(2_100.0)).schedule()
+            }
     val flywheelTesting =
         button { gamepad1.dpad_left }
-            .whenBecomesTrue { Flywheel.enable().then(Flywheel.setSpeed(500.0)).schedule() }
+            .whenBecomesTrue {
+              flywheelTargetSpeed = 500.0
+              Flywheel.enable().then(Flywheel.setSpeed(500.0)).schedule()
+            }
     val flywheelOff =
         button { gamepad1.dpad_right }.whenBecomesTrue { Flywheel.disable().schedule() }
+    val flywheelSpeedUp =
+        button { gamepad1.left_trigger > 0.5 }
+            .whenBecomesTrue {
+              flywheelTargetSpeed += 100.0
+              Flywheel.enable().then(Flywheel.setSpeed(flywheelTargetSpeed)).schedule()
+            }
+    val flywheelSpeedDown =
+        button { gamepad1.right_trigger > 0.5 }
+            .whenBecomesTrue {
+              flywheelTargetSpeed = maxOf(0.0, flywheelTargetSpeed - 100.0)
+              Flywheel.enable().then(Flywheel.setSpeed(flywheelTargetSpeed)).schedule()
+            }
     val hoodUp = button { gamepad1.left_bumper }.whenBecomesTrue { Hood.bumpUp().schedule() }
     val hoodDown = button { gamepad1.right_bumper }.whenBecomesTrue { Hood.bumpDown().schedule() }
   }
@@ -78,6 +101,7 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("X", PedroComponent.follower.pose.x)
     telemetry.addData("Y", PedroComponent.follower.pose.y)
     telemetry.addData("Heading", PedroComponent.follower.pose.heading)
+    telemetry.addData("Flywheel Target Speed", flywheelTargetSpeed)
     BindingManager.update()
     telemetry.update()
 
