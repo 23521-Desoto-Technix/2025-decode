@@ -16,9 +16,9 @@ class ptoTest : LinearOpMode() {
 
       val stickValue = gamepad2.left_stick_y.toDouble()
       backRight.power = stickValue
-      frontLeft.power = stickValue
+      frontLeft.power = 0.0 //stickValue
       backLeft.power = -stickValue
-      frontRight.power = -stickValue
+      frontRight.power = 0.0 //-stickValue
 
       if (gamepad1.a) {
         pto.position = 0.0
