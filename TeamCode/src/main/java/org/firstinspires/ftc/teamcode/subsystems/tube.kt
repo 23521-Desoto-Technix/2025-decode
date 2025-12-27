@@ -17,6 +17,7 @@ private enum class TubeState {
   INTAKE_DELAY_AFTER_MIDDLE,
   INTAKE_WAIT_BOTTOM,
   INTAKE_DELAY_AFTER_BOTTOM,
+  INTAKE_FINAL_PUSH,
   SHOOTING_HARDSTOP_SETTLE,
   SHOOTING_WAIT_CLEAR,
   SHOOTING_DELAY_BEFORE_IDLE,
@@ -74,6 +75,8 @@ object Tube : Subsystem {
       TubeState.INTAKE_WAIT_BOTTOM ->
           if (!bottom.state) transitionTo(TubeState.INTAKE_DELAY_AFTER_BOTTOM)
       TubeState.INTAKE_DELAY_AFTER_BOTTOM ->
+          if (elapsedSinceStep() >= 100.milliseconds) transitionTo(TubeState.INTAKE_FINAL_PUSH)
+      TubeState.INTAKE_FINAL_PUSH ->
           if (elapsedSinceStep() >= 100.milliseconds) transitionTo(TubeState.IDLE)
       TubeState.SHOOTING_HARDSTOP_SETTLE ->
           if (elapsedSinceStep() >= 200.milliseconds) transitionTo(TubeState.SHOOTING_WAIT_CLEAR)
@@ -113,6 +116,11 @@ object Tube : Subsystem {
       TubeState.INTAKE_DELAY_AFTER_BOTTOM -> {
         intake.power = 1.0
         transfer.power = 0.0
+        hardStop.position = 0.9
+      }
+      TubeState.INTAKE_FINAL_PUSH -> {
+        intake.power = 1.0
+        transfer.power = 1.0
         hardStop.position = 0.9
       }
       TubeState.SHOOTING_HARDSTOP_SETTLE -> {
