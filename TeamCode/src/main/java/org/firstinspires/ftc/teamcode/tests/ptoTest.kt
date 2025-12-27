@@ -15,10 +15,12 @@ class ptoTest : LinearOpMode() {
     while (opModeIsActive()) {
 
       val stickValue = gamepad2.left_stick_y.toDouble()
+      telemetry.addData("Power", stickValue)
+      telemetry.update()
       backRight.power = stickValue
-      frontLeft.power = 0.0 //stickValue
+      frontLeft.power = 0.0 // stickValue
       backLeft.power = -stickValue
-      frontRight.power = 0.0 //-stickValue
+      frontRight.power = 0.0 // -stickValue
 
       if (gamepad1.a) {
         pto.position = 0.0
