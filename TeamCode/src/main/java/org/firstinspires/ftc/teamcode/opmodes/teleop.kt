@@ -102,6 +102,7 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Y", PedroComponent.follower.pose.y)
     telemetry.addData("Heading", PedroComponent.follower.pose.heading)
     telemetry.addData("Flywheel Target Speed", flywheelTargetSpeed)
+    telemetry.addData("Hood position", Hood.position)
     BindingManager.update()
     telemetry.update()
 
