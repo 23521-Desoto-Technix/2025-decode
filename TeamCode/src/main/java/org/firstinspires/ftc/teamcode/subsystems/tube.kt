@@ -67,7 +67,7 @@ object Tube : Subsystem {
     when (state) {
       TubeState.INTAKE_PHASE0 -> if (!top.state) transitionTo(TubeState.INTAKE_DELAY_AFTER_TOP)
       TubeState.INTAKE_DELAY_AFTER_TOP ->
-          if (elapsedSinceStep() >= 200.milliseconds) transitionTo(TubeState.INTAKE_WAIT_MIDDLE)
+          if (elapsedSinceStep() >= 300.milliseconds) transitionTo(TubeState.INTAKE_WAIT_MIDDLE)
       TubeState.INTAKE_WAIT_MIDDLE ->
           if (!middle.state) transitionTo(TubeState.INTAKE_DELAY_AFTER_MIDDLE)
       TubeState.INTAKE_DELAY_AFTER_MIDDLE ->
