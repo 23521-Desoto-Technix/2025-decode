@@ -7,7 +7,7 @@ import dev.nextftc.hardware.impl.ServoEx
 object Hood : Subsystem {
   val servo = ServoEx("hood")
   var position = 0.5
-  private const val BUMP_AMOUNT = 0.25
+  private const val BUMP_AMOUNT = 0.05
 
   override fun initialize() {
     servo.position = position

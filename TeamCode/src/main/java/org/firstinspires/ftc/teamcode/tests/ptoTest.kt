@@ -22,7 +22,8 @@ class ptoTest : LinearOpMode() {
       backLeft.power = -stickValue
       frontRight.power = 0.0 // -stickValue
 
-      if (gamepad1.a) {
+      if (gamepad1.a
+        ) {
         pto.position = 0.0
       } else if (gamepad1.b) {
         pto.position = .95
