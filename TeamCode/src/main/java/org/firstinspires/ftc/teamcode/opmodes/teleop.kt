@@ -7,6 +7,7 @@ import dev.nextftc.bindings.range
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
+import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
@@ -120,7 +121,7 @@ class teleop : NextFTCOpMode() {
 
     BindingManager.update()
     telemetry.update()
-    val rotateBy = PedroComponent.follower.pose.heading.deg + 90.deg
+    val rotateBy = PedroComponent.follower.pose.heading.rad + 90.deg
     telemetry.addData("Current angle", rotateBy.normalized.inDeg)
     val rotated =
         rotateJoystickInput(
