@@ -11,14 +11,14 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.cos
+import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Tube
-import kotlin.math.cos
-import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -58,26 +58,10 @@ class teleop : NextFTCOpMode() {
     frontLeft = hardwareMap.dcMotor["frontLeft"]
     backLeft = hardwareMap.dcMotor["backLeft"]
     frontRight = hardwareMap.dcMotor["frontRight"]
-      telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
+    telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
   }
 
-  override fun onWaitForStart() {
-    telemetry.addLine("<b>Bold text</b>")
-    telemetry.addLine("<i>Italic text</i>")
-    telemetry.addLine("<u>Underlined text</u>")
-    telemetry.addLine("<font color=\"red\">Red text</font>")
-    telemetry.addLine("<font color=\"#00FF00\">Green text</font>")
-    telemetry.addLine("<b><i>Bold and italic</i></b>")
-    telemetry.addLine("<font color=\"blue\"><u>Blue and underlined</u></font>")
-    telemetry.addLine("<span style=\"background-color:red\">Red background</span>")
-    telemetry.addLine("<span style=\"background-color:#00FF00\">Green background</span>")
-    telemetry.addLine("<span style=\"background-color:blue\">Blue background</span>")
-    telemetry.addLine("<span style=\"background-color:yellow\">Yellow background</span>")
-    telemetry.addLine("<font color=\"white\" style=\"background-color:black\">White text on black</font>")
-    telemetry.addLine("<font color=\"black\" style=\"background-color:yellow\">Black text on yellow</font>")
-
-    telemetry.update()
-  }
+  override fun onWaitForStart() {}
 
   override fun onStartButtonPressed() {
     val driverControlled =
@@ -133,6 +117,13 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Heading", PedroComponent.follower.pose.heading)
     telemetry.addData("Flywheel Target Speed", flywheelTargetSpeed)
     telemetry.addData("Hood position", Hood.position)
+
+    telemetry.addLine("<b>Bold text</b>")
+    telemetry.addLine("<i>Italic text</i>")
+    telemetry.addLine("<u>Underlined text</u>")
+    telemetry.addLine("<font color=\"red\">Red text</font>")
+    telemetry.addLine("<font color=\"#00FF00\">Green text</font>")
+    telemetry.addLine("<b><i>Bold and italic</i></b>")
 
     BindingManager.update()
     telemetry.update()
