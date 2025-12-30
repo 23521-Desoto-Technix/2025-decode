@@ -121,7 +121,7 @@ class teleop : NextFTCOpMode() {
 
     BindingManager.update()
     telemetry.update()
-    val rotateBy = -PedroComponent.follower.pose.heading.rad + 90.deg
+    val rotateBy = -PedroComponent.follower.pose.heading.rad
     telemetry.addData("Current angle", rotateBy.normalized.inDeg)
     val rotated =
         rotateJoystickInput(
