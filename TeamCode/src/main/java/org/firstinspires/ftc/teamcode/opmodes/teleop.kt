@@ -11,13 +11,13 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.cos
-import kotlin.math.sin
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Tube
+import kotlin.math.cos
+import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -119,12 +119,14 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Hood position", Hood.position)
     BindingManager.update()
     telemetry.update()
-
-    rotateJoystickInput(
-        -gamepad1.left_stick_y.toDouble(),
-        -gamepad1.left_stick_x.toDouble(),
-        90.deg,
-    )
+    val rotated =
+        rotateJoystickInput(
+            -gamepad1.left_stick_y.toDouble(),
+            -gamepad1.left_stick_x.toDouble(),
+            90.deg,
+        )
+    rotatedForward = rotated.first
+    rotatedStrafe = rotated.second
     rotatedTurn = -gamepad1.right_stick_x.toDouble()
   }
 
