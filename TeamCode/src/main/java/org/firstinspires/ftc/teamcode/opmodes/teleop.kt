@@ -6,10 +6,13 @@ import dev.nextftc.bindings.button
 import dev.nextftc.bindings.range
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.core.units.deg
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.cos
+import kotlin.math.sin
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -37,6 +40,17 @@ class teleop : NextFTCOpMode() {
   private lateinit var frontLeft: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var backLeft: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var frontRight: com.qualcomm.robotcore.hardware.DcMotor
+
+  fun rotateJoystickInput(
+      forward: Double,
+      strafe: Double,
+      angle: dev.nextftc.core.units.Angle,
+  ): Pair<Double, Double> {
+    val angleRadians = angle.value
+    val rotatedForward = forward * cos(angleRadians) - strafe * sin(angleRadians)
+    val rotatedStrafe = forward * sin(angleRadians) + strafe * cos(angleRadians)
+    return Pair(rotatedForward, rotatedStrafe)
+  }
 
   override fun onInit() {
     backRight = hardwareMap.dcMotor["backRight"]
@@ -106,21 +120,12 @@ class teleop : NextFTCOpMode() {
     BindingManager.update()
     telemetry.update()
 
-    if (gamepad2.left_stick_y != 0f) {
-      rotatedForward = 0.0
-      rotatedStrafe = 0.0
-      rotatedTurn = 0.0
-
-      val stickValue = gamepad2.left_stick_y.toDouble()
-      backRight.power = stickValue
-      frontLeft.power = -stickValue
-      backLeft.power = stickValue
-      frontRight.power = -stickValue
-    } else {
-      rotatedForward = -gamepad1.left_stick_y.toDouble()
-      rotatedStrafe = -gamepad1.left_stick_x.toDouble()
-      rotatedTurn = -gamepad1.right_stick_x.toDouble()
-    }
+    rotateJoystickInput(
+        -gamepad1.left_stick_y.toDouble(),
+        -gamepad1.left_stick_x.toDouble(),
+        90.deg,
+    )
+    rotatedTurn = -gamepad1.right_stick_x.toDouble()
   }
 
   override fun onStop() {
