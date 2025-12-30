@@ -11,14 +11,16 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.cos
-import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Tube
+import org.firstinspires.ftc.teamcode.utils.Alliance
+import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.math.cos
+import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -36,6 +38,8 @@ class teleop : NextFTCOpMode() {
   var rotatedTurn = 0.0
 
   var flywheelTargetSpeed = 0.0
+
+  private var allianceFlashTimer = 0L
 
   private lateinit var backRight: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var frontLeft: com.qualcomm.robotcore.hardware.DcMotor
@@ -59,9 +63,51 @@ class teleop : NextFTCOpMode() {
     backLeft = hardwareMap.dcMotor["backLeft"]
     frontRight = hardwareMap.dcMotor["frontRight"]
     telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
+    telemetry.msTransmissionInterval = 25
   }
 
-  override fun onWaitForStart() {}
+  override fun onWaitForStart() {
+    allianceFlashTimer = System.currentTimeMillis()
+    BindingManager.layer = "init"
+
+    val selectRed =
+        button { gamepad1.circle }
+            .inLayer("init")
+            .whenBecomesTrue { BotState.alliance = Alliance.RED }
+    val selectBlue =
+        button { gamepad1.cross }
+            .inLayer("init")
+            .whenBecomesTrue { BotState.alliance = Alliance.BLUE }
+
+    while (opModeIsActive() && !isStarted) {
+      telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
+
+      val allianceDisplay =
+          when (BotState.alliance) {
+            Alliance.RED ->
+                "<span style=\"background-color: #FF0000; color: white;\">  RED  </span>"
+            Alliance.BLUE ->
+                "<span style=\"background-color: #0000FF; color: white;\">  BLUE  </span>"
+            Alliance.UNKNOWN -> {
+              val currentTime = System.currentTimeMillis()
+              val elapsedTime = currentTime - allianceFlashTimer
+
+              if ((elapsedTime / 250) % 2 == 0L) {
+                "<span style=\"background-color: yellow; color: black;\">  !!  UNKNOWN  !!  </span>"
+              } else {
+                "  !!  UNKNOWN  !!  "
+              }
+            }
+          }
+
+      telemetry.addLine(allianceDisplay)
+      telemetry.addLine("RED: Circle ●")
+      telemetry.addLine("BLUE: Cross ✕")
+
+      BindingManager.update()
+      telemetry.update()
+    }
+  }
 
   override fun onStartButtonPressed() {
     val driverControlled =
@@ -71,6 +117,7 @@ class teleop : NextFTCOpMode() {
             range { rotatedTurn },
         )
     driverControlled()
+    BindingManager.layer = null
     val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
     val stopIntake = button { gamepad1.cross }.whenBecomesTrue { Tube.stopAll.schedule() }
     val shootAll = button { gamepad1.triangle }.whenBecomesTrue { Tube.shootAll().schedule() }
@@ -124,9 +171,15 @@ class teleop : NextFTCOpMode() {
     telemetry.addLine("<font color=\"#FF0000\">Red text</font>")
     telemetry.addLine("<font color=\"#00FF00\">Green text</font>")
     telemetry.addLine("<b><i>Bold and italic</i></b>")
-    telemetry.addLine("<span style=\"background-color: yellow; color: black;\">Yellow background</span>")
-    telemetry.addLine("<span style=\"background-color: #FF0000; color: white;\">Red-ish background</span>")
-    telemetry.addLine("<span style=\"background-color: #0000FF; color: white;\">Blue background</span>")
+    telemetry.addLine(
+        "<span style=\"background-color: yellow; color: black;\">Yellow background</span>"
+    )
+    telemetry.addLine(
+        "<span style=\"background-color: #FF0000; color: white;\">Red-ish background</span>"
+    )
+    telemetry.addLine(
+        "<span style=\"background-color: #0000FF; color: white;\">Blue background</span>"
+    )
 
     BindingManager.update()
     telemetry.update()
