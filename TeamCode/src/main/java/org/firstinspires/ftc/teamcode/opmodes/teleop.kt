@@ -158,7 +158,7 @@ class teleop : NextFTCOpMode() {
     val currentY = PedroComponent.follower.pose.y
     val deltaX = targetPose.x - currentX
     val deltaY = targetPose.y - currentY
-    val angleToTarget = Math.toDegrees(atan2(deltaY, deltaX))
+    val angleToTarget = Math.toDegrees(atan2(deltaX, deltaY))
 
     telemetry.addData("X", PedroComponent.follower.pose.x)
     telemetry.addData("Y", PedroComponent.follower.pose.y)
