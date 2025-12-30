@@ -121,9 +121,12 @@ class teleop : NextFTCOpMode() {
     telemetry.addLine("<b>Bold text</b>")
     telemetry.addLine("<i>Italic text</i>")
     telemetry.addLine("<u>Underlined text</u>")
-    telemetry.addLine("<font color=\"red\">Red text</font>")
+    telemetry.addLine("<font color=\"#FF0000\">Red text</font>")
     telemetry.addLine("<font color=\"#00FF00\">Green text</font>")
     telemetry.addLine("<b><i>Bold and italic</i></b>")
+    telemetry.addLine("<span style=\"background-color: yellow; color: black;\">Yellow background</span>")
+    telemetry.addLine("<span style=\"background-color: #FF0000; color: white;\">Red-ish background</span>")
+    telemetry.addLine("<span style=\"background-color: #0000FF; color: white;\">Blue background</span>")
 
     BindingManager.update()
     telemetry.update()
