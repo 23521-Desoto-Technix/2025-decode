@@ -117,13 +117,16 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Heading", PedroComponent.follower.pose.heading)
     telemetry.addData("Flywheel Target Speed", flywheelTargetSpeed)
     telemetry.addData("Hood position", Hood.position)
+
     BindingManager.update()
     telemetry.update()
+    val rotateBy = PedroComponent.follower.pose.heading.deg + 90.deg
+    telemetry.addData("Current angle", rotateBy.normalized.inDeg)
     val rotated =
         rotateJoystickInput(
             -gamepad1.left_stick_y.toDouble(),
             -gamepad1.left_stick_x.toDouble(),
-            90.deg,
+            rotateBy,
         )
     rotatedForward = rotated.first
     rotatedStrafe = rotated.second
