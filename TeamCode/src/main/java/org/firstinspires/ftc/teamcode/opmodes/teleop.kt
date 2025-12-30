@@ -1,18 +1,18 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
+import com.pedropathing.geometry.Pose
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.bindings.range
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.cos
-import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -21,6 +21,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -62,6 +65,7 @@ class teleop : NextFTCOpMode() {
     frontRight = hardwareMap.dcMotor["frontRight"]
     telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
     telemetry.msTransmissionInterval = 25
+    PedroComponent.follower.pose = Pose(72.0, 72.0, 90.0.deg.inRad)
   }
 
   override fun onWaitForStart() {
@@ -75,18 +79,18 @@ class teleop : NextFTCOpMode() {
         button { gamepad1.cross }
             .inLayer("init")
             .whenBecomesTrue { BotState.alliance = Alliance.BLUE }
-
     val allianceDisplay =
         when (BotState.alliance) {
-          Alliance.RED -> "<span style=\"background-color: #FF0000; color: white;\">  RED  </span>"
+          Alliance.RED ->
+              "<span style=\"background-color: #FF0000; color: white;\">&nbsp;&nbsp;RED&nbsp;&nbsp;</span>"
           Alliance.BLUE ->
-              "<span style=\"background-color: #0000FF; color: white;\">  BLUE  </span>"
+              "<span style=\"background-color: #0000FF; color: white;\">&nbsp;&nbsp;BLUE&nbsp;&nbsp;</span>"
           Alliance.UNKNOWN -> {
 
-            if ((System.currentTimeMillis() / 500) > 250) {
-              "<span style=\"background-color: yellow; color: black;\">  !!  UNKNOWN  !!  </span>"
+            if (((System.currentTimeMillis() / 500) % 2).toInt() == 0) {
+              "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
             } else {
-              "  !!  UNKNOWN  !!  "
+              "&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;"
             }
           }
         }
@@ -149,9 +153,17 @@ class teleop : NextFTCOpMode() {
   }
 
   override fun onUpdate() {
+    val targetPose = Pose(144.0, 144.0, 0.0)
+    val currentX = PedroComponent.follower.pose.x
+    val currentY = PedroComponent.follower.pose.y
+    val deltaX = targetPose.x - currentX
+    val deltaY = targetPose.y - currentY
+    val angleToTarget = Math.toDegrees(atan2(deltaY, deltaX))
+
     telemetry.addData("X", PedroComponent.follower.pose.x)
     telemetry.addData("Y", PedroComponent.follower.pose.y)
     telemetry.addData("Heading", PedroComponent.follower.pose.heading)
+    telemetry.addData("Angle to (144, 144)", angleToTarget)
     telemetry.addData("Flywheel Target Speed", flywheelTargetSpeed)
     telemetry.addData("Hood position", Hood.position)
 
