@@ -11,6 +11,8 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.cos
+import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -19,8 +21,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
-import kotlin.math.cos
-import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -38,8 +38,6 @@ class teleop : NextFTCOpMode() {
   var rotatedTurn = 0.0
 
   var flywheelTargetSpeed = 0.0
-
-  private var allianceFlashTimer = 0L
 
   private lateinit var backRight: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var frontLeft: com.qualcomm.robotcore.hardware.DcMotor
@@ -67,7 +65,6 @@ class teleop : NextFTCOpMode() {
   }
 
   override fun onWaitForStart() {
-    allianceFlashTimer = System.currentTimeMillis()
     BindingManager.layer = "init"
 
     val selectRed =
@@ -79,34 +76,27 @@ class teleop : NextFTCOpMode() {
             .inLayer("init")
             .whenBecomesTrue { BotState.alliance = Alliance.BLUE }
 
-    while (opModeIsActive() && !isStarted) {
-      telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
+    val allianceDisplay =
+        when (BotState.alliance) {
+          Alliance.RED -> "<span style=\"background-color: #FF0000; color: white;\">  RED  </span>"
+          Alliance.BLUE ->
+              "<span style=\"background-color: #0000FF; color: white;\">  BLUE  </span>"
+          Alliance.UNKNOWN -> {
 
-      val allianceDisplay =
-          when (BotState.alliance) {
-            Alliance.RED ->
-                "<span style=\"background-color: #FF0000; color: white;\">  RED  </span>"
-            Alliance.BLUE ->
-                "<span style=\"background-color: #0000FF; color: white;\">  BLUE  </span>"
-            Alliance.UNKNOWN -> {
-              val currentTime = System.currentTimeMillis()
-              val elapsedTime = currentTime - allianceFlashTimer
-
-              if ((elapsedTime / 250) % 2 == 0L) {
-                "<span style=\"background-color: yellow; color: black;\">  !!  UNKNOWN  !!  </span>"
-              } else {
-                "  !!  UNKNOWN  !!  "
-              }
+            if ((System.currentTimeMillis() / 500) > 250) {
+              "<span style=\"background-color: yellow; color: black;\">  !!  UNKNOWN  !!  </span>"
+            } else {
+              "  !!  UNKNOWN  !!  "
             }
           }
+        }
 
-      telemetry.addLine(allianceDisplay)
-      telemetry.addLine("RED: Circle ●")
-      telemetry.addLine("BLUE: Cross ✕")
+    telemetry.addLine(allianceDisplay)
+    telemetry.addLine("RED: Circle ●")
+    telemetry.addLine("BLUE: Cross ✕")
 
-      BindingManager.update()
-      telemetry.update()
-    }
+    BindingManager.update()
+    telemetry.update()
   }
 
   override fun onStartButtonPressed() {
