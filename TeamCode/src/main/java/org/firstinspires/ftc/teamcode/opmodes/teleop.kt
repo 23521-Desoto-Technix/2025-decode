@@ -13,6 +13,9 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -21,9 +24,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -158,12 +158,14 @@ class teleop : NextFTCOpMode() {
     val currentY = PedroComponent.follower.pose.y
     val deltaX = targetPose.x - currentX
     val deltaY = targetPose.y - currentY
-    val angleToTarget = Math.toDegrees(atan2(deltaX, deltaY))
+    val absoluteAngleToTarget = atan2(deltaY, deltaX).rad
+    val relativeAngleToTarget =
+        (PedroComponent.follower.pose.heading.rad - absoluteAngleToTarget + 180.deg).normalized
 
     telemetry.addData("X", PedroComponent.follower.pose.x)
     telemetry.addData("Y", PedroComponent.follower.pose.y)
     telemetry.addData("Heading", PedroComponent.follower.pose.heading)
-    telemetry.addData("Angle to (144, 144)", angleToTarget)
+    telemetry.addData("Angle to (144, 144)", relativeAngleToTarget.inDeg)
     telemetry.addData("Flywheel Target Speed", flywheelTargetSpeed)
     telemetry.addData("Hood position", Hood.position)
 
