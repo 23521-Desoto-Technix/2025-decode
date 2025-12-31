@@ -19,9 +19,9 @@ object Turret : Subsystem {
   private val MAX_ANGLE = 180.deg - DEADZONE
 
   private var lastVoltage: Double = 0.0
-  private var lastTimeNs: Long = System.nanoTime()
+  private var lastTimeNs: Long = 0L
 
-  init {
+  override fun initialize() {
     lastVoltage = encoder.voltage
     lastTimeNs = System.nanoTime()
   }
