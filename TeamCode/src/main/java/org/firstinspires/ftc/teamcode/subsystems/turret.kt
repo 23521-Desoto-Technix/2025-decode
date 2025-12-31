@@ -47,6 +47,8 @@ object Turret : Subsystem {
     val targetVolts = (pid.goal.position + 180.0) / scale
     ActiveOpMode.telemetry.addData("Turret Current Position (V)", currentVoltage)
     ActiveOpMode.telemetry.addData("Turret Target Position (V)", targetVolts)
+    ActiveOpMode.telemetry.addData("Turret Current Position (deg)", positionDeg)
+    ActiveOpMode.telemetry.addData("Turret Target Position (deg)", pid.goal.position)
   }
 
   fun setTargetAngle(angle: Angle) {
