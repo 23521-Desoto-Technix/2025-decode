@@ -26,6 +26,7 @@ object Turret : Subsystem {
     encoder = ActiveOpMode.hardwareMap.analogInput["turretEncoder"]
     lastVoltage = encoder.voltage
     lastTimeNs = System.nanoTime()
+    pid.goal = KineticState(0.0, 0.0)
   }
 
   override fun periodic() {
@@ -45,6 +46,10 @@ object Turret : Subsystem {
     val power = pid.calculate(KineticState(positionDeg, velocityDegPerSec))
     left.power = power
     right.power = power
+
+    val targetVolts = (pid.goal.position + 180.0) / scale
+    ActiveOpMode.telemetry.addData("Turret Current Position (V)", currentVoltage)
+    ActiveOpMode.telemetry.addData("Turret Target Position (V)", targetVolts)
   }
 
   fun setTargetAngle(angle: Angle) {
