@@ -5,7 +5,6 @@ import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
-import dev.nextftc.core.units.deg
 import dev.nextftc.ftc.ActiveOpMode
 import dev.nextftc.hardware.impl.CRServoEx
 
@@ -14,7 +13,6 @@ object Turret : Subsystem {
   val right = CRServoEx("turretRight")
   lateinit var encoder: AnalogInput
   val pid = controlSystem { posPid(0.3, 0.0, 0.0) }
-
 
   private var lastVoltage: Double = 0.0
   private var lastTimeNs: Long = 0L
@@ -52,7 +50,7 @@ object Turret : Subsystem {
   }
 
   fun setTargetAngle(angle: Angle) {
-    val normalizedAngle = angle.wrapped
+    var normalizedAngle = angle.normalized
     pid.goal = KineticState(normalizedAngle.inDeg, 0.0)
   }
 }
