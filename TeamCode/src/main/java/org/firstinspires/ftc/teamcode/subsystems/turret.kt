@@ -15,9 +15,6 @@ object Turret : Subsystem {
   lateinit var encoder: AnalogInput
   val pid = controlSystem { posPid(0.3, 0.0, 0.0) }
 
-  private val DEADZONE = 45.deg
-  private val MIN_ANGLE = -180.deg + DEADZONE
-  private val MAX_ANGLE = 180.deg - DEADZONE
 
   private var lastVoltage: Double = 0.0
   private var lastTimeNs: Long = 0L
@@ -54,13 +51,6 @@ object Turret : Subsystem {
 
   fun setTargetAngle(angle: Angle) {
     val normalizedAngle = angle.wrapped
-
-    val clampedAngle =
-        when {
-          normalizedAngle >= MIN_ANGLE && normalizedAngle <= MAX_ANGLE -> normalizedAngle
-          normalizedAngle > MAX_ANGLE -> MAX_ANGLE
-          else -> MIN_ANGLE
-        }
-    pid.goal = KineticState(clampedAngle.inDeg, 0.0)
+    pid.goal = KineticState(normalizedAngle.inDeg, 0.0)
   }
 }
