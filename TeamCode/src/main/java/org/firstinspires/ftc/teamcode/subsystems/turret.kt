@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems
 
+import com.qualcomm.robotcore.hardware.AnalogInput
 import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
 import dev.nextftc.core.subsystems.Subsystem
@@ -11,7 +12,7 @@ import dev.nextftc.hardware.impl.CRServoEx
 object Turret : Subsystem {
   val left = CRServoEx("turretLeft")
   val right = CRServoEx("turretRight")
-  val encoder = ActiveOpMode.hardwareMap.analogInput["turretEncoder"]
+  lateinit var encoder: AnalogInput
   val pid = controlSystem { posPid(0.3, 0.0, 0.0) }
 
   private val DEADZONE = 45.deg
@@ -22,6 +23,7 @@ object Turret : Subsystem {
   private var lastTimeNs: Long = 0L
 
   override fun initialize() {
+    encoder = ActiveOpMode.hardwareMap.analogInput["turretEncoder"]
     lastVoltage = encoder.voltage
     lastTimeNs = System.nanoTime()
   }
