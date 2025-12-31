@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystems
 
 import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
-import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
@@ -46,14 +45,15 @@ object Turret : Subsystem {
     right.power = power
   }
 
-  fun setTargetAngle(angle: Angle) = InstantCommand {
+  fun setTargetAngle(angle: Angle) {
     val normalizedAngle = angle.wrapped
 
-    val clampedAngle = when {
-      normalizedAngle >= MIN_ANGLE && normalizedAngle <= MAX_ANGLE -> normalizedAngle
-      normalizedAngle > MAX_ANGLE -> MAX_ANGLE
-      else -> MIN_ANGLE
-    }
+    val clampedAngle =
+        when {
+          normalizedAngle >= MIN_ANGLE && normalizedAngle <= MAX_ANGLE -> normalizedAngle
+          normalizedAngle > MAX_ANGLE -> MAX_ANGLE
+          else -> MIN_ANGLE
+        }
     pid.goal = KineticState(clampedAngle.inDeg, 0.0)
   }
 }
