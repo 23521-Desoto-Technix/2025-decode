@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.Tube
+import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 
@@ -32,7 +33,7 @@ class teleop : NextFTCOpMode() {
         BulkReadComponent,
         BindingsComponent,
         PedroComponent(Constants::createFollower),
-        SubsystemComponent(Tube, Shooter, Flywheel, Hood),
+        SubsystemComponent(Tube, Shooter, Flywheel, Hood, Turret),
     )
   }
 
@@ -168,7 +169,7 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Angle to (144, 144)", relativeAngleToTarget.inDeg)
     telemetry.addData("Flywheel Target Speed", flywheelTargetSpeed)
     telemetry.addData("Hood position", Hood.position)
-
+    /* HTML telemetry reference
     telemetry.addLine("<b>Bold text</b>")
     telemetry.addLine("<i>Italic text</i>")
     telemetry.addLine("<u>Underlined text</u>")
@@ -179,11 +180,11 @@ class teleop : NextFTCOpMode() {
         "<span style=\"background-color: yellow; color: black;\">Yellow background</span>"
     )
     telemetry.addLine(
-        "<span style=\"background-color: #FF0000; color: white;\">Red-ish background</span>"
+        "<span style=\"background-color: #FF0000; color: white;\">Red background</span>"
     )
     telemetry.addLine(
         "<span style=\"background-color: #0000FF; color: white;\">Blue background</span>"
-    )
+    )*/
 
     BindingManager.update()
     telemetry.update()
@@ -198,6 +199,7 @@ class teleop : NextFTCOpMode() {
     rotatedForward = rotated.first
     rotatedStrafe = rotated.second
     rotatedTurn = -gamepad1.right_stick_x.toDouble()
+    Turret.setTargetAngle(relativeAngleToTarget).schedule()
   }
 
   override fun onStop() {
