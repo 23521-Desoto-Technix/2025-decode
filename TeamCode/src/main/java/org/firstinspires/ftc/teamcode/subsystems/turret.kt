@@ -43,7 +43,7 @@ object Turret : Subsystem {
     val positionDeg = currentVoltage * scale - 180.0
     val velocityDegPerSec = velocityVoltsPerSec * scale
 
-    val power = pid.calculate(KineticState(positionDeg, velocityDegPerSec))
+    val power = -pid.calculate(KineticState(positionDeg, velocityDegPerSec))
     left.power = power
     right.power = power
 
