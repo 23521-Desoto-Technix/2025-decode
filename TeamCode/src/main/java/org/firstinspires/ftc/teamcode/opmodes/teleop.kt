@@ -199,7 +199,7 @@ class teleop : NextFTCOpMode() {
     rotatedForward = rotated.first
     rotatedStrafe = rotated.second
     rotatedTurn = -gamepad1.right_stick_x.toDouble()
-    Turret.setTargetAngle(relativeAngleToTarget).schedule()
+    Turret.setTargetAngle(relativeAngleToTarget)
   }
 
   override fun onStop() {
