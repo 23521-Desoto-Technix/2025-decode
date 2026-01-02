@@ -13,9 +13,6 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -25,6 +22,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -66,7 +66,6 @@ class teleop : NextFTCOpMode() {
     frontRight = hardwareMap.dcMotor["frontRight"]
     telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
     telemetry.msTransmissionInterval = 25
-    PedroComponent.follower.pose = Pose(72.0, 72.0, 90.0.deg.inRad)
   }
 
   override fun onWaitForStart() {
@@ -105,6 +104,14 @@ class teleop : NextFTCOpMode() {
   }
 
   override fun onStartButtonPressed() {
+    val startingPose =
+        when (BotState.alliance) {
+          Alliance.RED -> Pose(72.0, 72.0, 90.0.deg.inRad)
+          Alliance.BLUE -> Pose(72.0, 72.0, 90.0.deg.inRad)
+          Alliance.UNKNOWN -> Pose(72.0, 7.0, 90.0.deg.inRad)
+        }
+    PedroComponent.follower.pose = startingPose
+
     val driverControlled =
         PedroDriverControlled(
             range { rotatedForward },
