@@ -205,7 +205,7 @@ class teleop : NextFTCOpMode() {
     if (abs(gamepad2.left_stick_y) > 0.1) {
       backRight.power = gamepad2.left_stick_y.toDouble()
       frontLeft.power = 0.0
-      backLeft.power = -gamepad2.left_stick_y.toDouble()
+      backLeft.power = gamepad2.left_stick_y.toDouble()
       frontRight.power = 0.0
     }
     BindingManager.update()
