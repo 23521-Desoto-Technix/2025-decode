@@ -14,6 +14,10 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -23,10 +27,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -204,9 +204,9 @@ class teleop : NextFTCOpMode() {
     )*/
     if (abs(gamepad2.left_stick_y) > 0.1) {
       backRight.power = gamepad2.left_stick_y.toDouble()
-      frontLeft.power = 0.0
+      frontRight.power = -gamepad2.left_stick_y.toDouble()
       backLeft.power = gamepad2.left_stick_y.toDouble()
-      frontRight.power = 0.0
+      frontLeft.power = -gamepad2.left_stick_y.toDouble()
     }
     BindingManager.update()
     telemetry.update()
