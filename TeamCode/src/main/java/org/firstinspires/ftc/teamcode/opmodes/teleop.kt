@@ -13,6 +13,10 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -22,9 +26,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -158,6 +159,10 @@ class teleop : NextFTCOpMode() {
             }
     val hoodUp = button { gamepad1.left_bumper }.whenBecomesTrue { Hood.bumpUp().schedule() }
     val hoodDown = button { gamepad1.right_bumper }.whenBecomesTrue { Hood.bumpDown().schedule() }
+    val driveCancel =
+        button { abs(gamepad2.left_stick_y) > 0.1 }
+            .whenBecomesTrue { driverControlled.cancel() }
+            .whenBecomesFalse { driverControlled.schedule() }
   }
 
   override fun onUpdate() {
