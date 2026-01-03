@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes
 
 import com.pedropathing.geometry.Pose
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import com.qualcomm.robotcore.hardware.Servo
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.bindings.range
@@ -13,10 +14,6 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -26,6 +23,10 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -48,6 +49,7 @@ class teleop : NextFTCOpMode() {
   private lateinit var frontLeft: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var backLeft: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var frontRight: com.qualcomm.robotcore.hardware.DcMotor
+  private lateinit var pto: Servo
 
   fun rotateJoystickInput(
       forward: Double,
@@ -65,6 +67,7 @@ class teleop : NextFTCOpMode() {
     frontLeft = hardwareMap.dcMotor["frontLeft"]
     backLeft = hardwareMap.dcMotor["backLeft"]
     frontRight = hardwareMap.dcMotor["frontRight"]
+    pto = hardwareMap.servo["pto"]
     telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
     telemetry.msTransmissionInterval = 25
   }
@@ -163,6 +166,8 @@ class teleop : NextFTCOpMode() {
         button { abs(gamepad2.left_stick_y) > 0.1 }
             .whenBecomesTrue { driverControlled.cancel() }
             .whenBecomesFalse { driverControlled.schedule() }
+    val ptoOn = button { gamepad2.circle }.whenBecomesTrue { pto.position = 0.95 }
+    val ptoOff = button { gamepad2.cross }.whenBecomesTrue { pto.position = 0.0 }
   }
 
   override fun onUpdate() {
@@ -197,7 +202,12 @@ class teleop : NextFTCOpMode() {
     telemetry.addLine(
         "<span style=\"background-color: #0000FF; color: white;\">Blue background</span>"
     )*/
-
+    if (abs(gamepad2.left_stick_y) > 0.1) {
+      backRight.power = gamepad2.left_stick_y.toDouble()
+      frontLeft.power = 0.0
+      backLeft.power = -gamepad2.left_stick_y.toDouble()
+      frontRight.power = 0.0
+    }
     BindingManager.update()
     telemetry.update()
     val rotateBy = -PedroComponent.follower.pose.heading.rad
