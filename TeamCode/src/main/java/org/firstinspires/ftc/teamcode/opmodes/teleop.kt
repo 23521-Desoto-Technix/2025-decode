@@ -14,10 +14,6 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -27,6 +23,10 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -42,6 +42,8 @@ class teleop : NextFTCOpMode() {
   var rotatedForward = 0.0
   var rotatedStrafe = 0.0
   var rotatedTurn = 0.0
+
+  var ignorePinpoint = false
 
   var flywheelTargetSpeed = 0.0
 
@@ -168,6 +170,8 @@ class teleop : NextFTCOpMode() {
             .whenBecomesFalse { driverControlled.schedule() }
     val ptoOn = button { gamepad2.circle }.whenBecomesTrue { pto.position = 0.95 }
     val ptoOff = button { gamepad2.cross }.whenBecomesTrue { pto.position = 0.0 }
+    val ignorePinpointToggle =
+        button { gamepad2.square }.whenBecomesTrue { ignorePinpoint = !ignorePinpoint }
   }
 
   override fun onUpdate() {
@@ -179,6 +183,16 @@ class teleop : NextFTCOpMode() {
     val absoluteAngleToTarget = atan2(deltaY, deltaX).rad
     val relativeAngleToTarget =
         (PedroComponent.follower.pose.heading.rad - absoluteAngleToTarget + 180.deg).normalized
+
+    if (ignorePinpoint) {
+      if (((System.currentTimeMillis() / 500) % 2).toInt() == 0) {
+        telemetry.addLine(
+            "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;IGNORING PINPOINT&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
+        )
+      } else {
+        telemetry.addLine("&nbsp;&nbsp;!!&nbsp;&nbsp;IGNORING PINPOINT&nbsp;&nbsp;!!&nbsp;&nbsp;")
+      }
+    }
 
     telemetry.addData("X", PedroComponent.follower.pose.x)
     telemetry.addData("Y", PedroComponent.follower.pose.y)
@@ -210,7 +224,10 @@ class teleop : NextFTCOpMode() {
     }
     BindingManager.update()
     telemetry.update()
-    val rotateBy = -PedroComponent.follower.pose.heading.rad
+    var rotateBy = -PedroComponent.follower.pose.heading.rad
+    if (ignorePinpoint) {
+      rotateBy = 0.0.deg
+    }
     telemetry.addData("Current angle", rotateBy.normalized.inDeg)
     val rotated =
         rotateJoystickInput(
@@ -221,7 +238,11 @@ class teleop : NextFTCOpMode() {
     rotatedForward = rotated.first
     rotatedStrafe = rotated.second
     rotatedTurn = -gamepad1.right_stick_x.toDouble()
-    Turret.setTargetAngle(-relativeAngleToTarget)
+    if (!ignorePinpoint) {
+      Turret.setTargetAngle(-relativeAngleToTarget)
+    } else {
+      Turret.setTargetAngle(0.0.deg)
+    }
   }
 
   override fun onStop() {
