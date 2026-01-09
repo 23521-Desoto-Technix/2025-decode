@@ -79,8 +79,8 @@ object Tube : Subsystem {
       TubeState.INTAKE_FINAL_PUSH ->
           if (elapsedSinceStep() >= 100.milliseconds) {
             transitionTo(TubeState.IDLE)
-            ActiveOpMode.gamepad1.rumble(300)
-            ActiveOpMode.gamepad2.rumble(300)
+            ActiveOpMode.gamepad1.rumbleBlips(3)
+            ActiveOpMode.gamepad2.rumbleBlips(3)
           }
       TubeState.SHOOTING_HARDSTOP_SETTLE ->
           if (elapsedSinceStep() >= 200.milliseconds) transitionTo(TubeState.SHOOTING_WAIT_CLEAR)
