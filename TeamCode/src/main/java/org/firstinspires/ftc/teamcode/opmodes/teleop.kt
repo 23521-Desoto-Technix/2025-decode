@@ -15,6 +15,10 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
@@ -31,10 +35,6 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -168,39 +168,42 @@ class teleop : NextFTCOpMode() {
     val shootAll = button { gamepad1.triangle }.whenBecomesTrue { Tube.shootAll().schedule() }
     val shootAllSlow = button { gamepad1.square }.whenBecomesTrue { Tube.shootAll(0.8).schedule() }
     val flywheelLong =
-        button { gamepad1.dpad_up }
+        button { gamepad1.dpad_up || gamepad2.dpad_up }
             .whenBecomesTrue {
               flywheelTargetSpeed = 2_450.0
+              Hood.position = 0.12345
               Flywheel.enable().then(Flywheel.setSpeed(2_200.0)).schedule()
             }
     val flywheelShort =
-        button { gamepad1.dpad_down }
+        button { gamepad1.dpad_down || gamepad2.dpad_down }
             .whenBecomesTrue {
-              flywheelTargetSpeed = 2_100.0
+              flywheelTargetSpeed = 1_600.0
+              Hood.position = 0.45
               Flywheel.enable().then(Flywheel.setSpeed(2_100.0)).schedule()
             }
     val flywheelTesting =
-        button { gamepad1.dpad_left }
+        button { gamepad1.dpad_left || gamepad1.dpad_left }
             .whenBecomesTrue {
               flywheelTargetSpeed = 500.0
               Flywheel.enable().then(Flywheel.setSpeed(500.0)).schedule()
             }
     val flywheelOff =
-        button { gamepad1.dpad_right }.whenBecomesTrue { Flywheel.disable().schedule() }
+        button { gamepad1.dpad_right || gamepad2.dpad_right }
+            .whenBecomesTrue { Flywheel.disable().schedule() }
     val flywheelSpeedUp =
-        button { gamepad1.left_trigger > 0.5 }
+        button { gamepad2.left_trigger > 0.5 }
             .whenBecomesTrue {
               flywheelTargetSpeed += 100.0
               Flywheel.enable().then(Flywheel.setSpeed(flywheelTargetSpeed)).schedule()
             }
     val flywheelSpeedDown =
-        button { gamepad1.right_trigger > 0.5 }
+        button { gamepad2.right_trigger > 0.5 }
             .whenBecomesTrue {
               flywheelTargetSpeed = maxOf(0.0, flywheelTargetSpeed - 100.0)
               Flywheel.enable().then(Flywheel.setSpeed(flywheelTargetSpeed)).schedule()
             }
-    val hoodUp = button { gamepad1.left_bumper }.whenBecomesTrue { Hood.bumpUp().schedule() }
-    val hoodDown = button { gamepad1.right_bumper }.whenBecomesTrue { Hood.bumpDown().schedule() }
+    val hoodUp = button { gamepad2.left_bumper }.whenBecomesTrue { Hood.bumpUp().schedule() }
+    val hoodDown = button { gamepad2.right_bumper }.whenBecomesTrue { Hood.bumpDown().schedule() }
     val driveCancel =
         button { abs(gamepad2.left_stick_y) > 0.1 }
             .whenBecomesTrue { driverControlled.cancel() }
