@@ -13,15 +13,15 @@ object Hood : Subsystem {
     servo.position = position
   }
 
-  override fun periodic() {}
+  override fun periodic() {
+      servo.position = position
+  }
 
   fun bumpUp() = InstantCommand {
     position = (position + BUMP_AMOUNT).coerceIn(0.0, 1.0)
-    servo.position = position
   }
 
   fun bumpDown() = InstantCommand {
     position = (position - BUMP_AMOUNT).coerceIn(0.0, 1.0)
-    servo.position = position
   }
 }
