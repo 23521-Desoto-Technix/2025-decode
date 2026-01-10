@@ -208,7 +208,7 @@ class teleop : NextFTCOpMode() {
         button { abs(gamepad2.left_stick_y) > 0.1 }
             .whenBecomesTrue { driverControlled.cancel() }
             .whenBecomesFalse { driverControlled.schedule() }
-    val ptoOn = button { gamepad2.circle }.whenBecomesTrue { pto.position = 0.95 }
+    val ptoOn = button { gamepad2.circle && gamepad2.ps }.whenBecomesTrue { pto.position = 0.95 }
     val ptoOff = button { gamepad2.cross }.whenBecomesTrue { pto.position = 0.0 }
     val ignorePinpointToggle =
         button { gamepad2.square }.whenBecomesTrue { ignorePinpoint = !ignorePinpoint }
