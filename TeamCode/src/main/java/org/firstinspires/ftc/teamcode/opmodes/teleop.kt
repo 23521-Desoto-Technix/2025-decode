@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
+import android.util.Size
 import com.pedropathing.geometry.Pose
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.Servo
@@ -15,6 +16,10 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
+import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -23,6 +28,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import org.firstinspires.ftc.vision.VisionPortal
+import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -53,6 +61,9 @@ class teleop : NextFTCOpMode() {
   private lateinit var frontRight: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var pto: Servo
 
+  lateinit var aprilTag: AprilTagProcessor
+  lateinit var portal: VisionPortal
+
   fun rotateJoystickInput(
       forward: Double,
       strafe: Double,
@@ -72,6 +83,32 @@ class teleop : NextFTCOpMode() {
     pto = hardwareMap.servo["pto"]
     telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
     telemetry.msTransmissionInterval = 25
+
+    aprilTag =
+        AprilTagProcessor.Builder()
+            .setDrawAxes(true)
+            .setDrawCubeProjection(true)
+            .setDrawTagOutline(true)
+            .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+            .setLensIntrinsics(
+                BotConstants.CAMERA_LENS_FX,
+                BotConstants.CAMERA_LENS_FY,
+                BotConstants.CAMERA_LENS_CX,
+                BotConstants.CAMERA_LENS_CY,
+            )
+            .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
+            // ... these parameters are fx, fy, cx, cy.
+            .build()
+
+    portal =
+        VisionPortal.Builder()
+            .setCamera(hardwareMap.get<WebcamName?>(WebcamName::class.java, "turretCamera"))
+            .setCameraResolution(
+                Size(BotConstants.CAMERA_RESOLUTION_WIDTH, BotConstants.CAMERA_RESOLUTION_HEIGHT)
+            )
+            .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+            .addProcessor(aprilTag)
+            .build()
   }
 
   override fun onWaitForStart() {
@@ -216,6 +253,27 @@ class teleop : NextFTCOpMode() {
     telemetry.addLine(
         "<span style=\"background-color: #0000FF; color: white;\">Blue background</span>"
     )*/
+
+    var tatag = 0
+
+    if (BotState.alliance == Alliance.RED) {
+      tatag = BotConstants.RED_ALLIANCE_APRILTAG_ID
+    } else if (BotState.alliance == Alliance.BLUE) {
+      tatag = BotConstants.BLUE_ALLIANCE_APRILTAG_ID
+    }
+
+    var targetTagBearing: Double? = null
+    for (detection in aprilTag.detections) {
+      if (detection.id == tatag) {
+        targetTagBearing = detection.ftcPose.bearing
+        break
+      }
+    }
+
+    if (targetTagBearing != null) {
+      telemetry.addData("Target AprilTag Yaw", targetTagBearing)
+    }
+
     if (abs(gamepad2.left_stick_y) > 0.1) {
       backRight.power = gamepad2.left_stick_y.toDouble()
       frontRight.power = -gamepad2.left_stick_y.toDouble()
@@ -240,8 +298,10 @@ class teleop : NextFTCOpMode() {
     rotatedTurn = -gamepad1.right_stick_x.toDouble()
     if (!ignorePinpoint) {
       Turret.setTargetAngle(-relativeAngleToTarget)
-    } else {
+    } else if (targetTagBearing == null) {
       Turret.setTargetAngle(0.0.deg)
+    } else {
+      Turret.setTargetAngle(Turret.currentAngle - targetTagBearing.deg)
     }
   }
 

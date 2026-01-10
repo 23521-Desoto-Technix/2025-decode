@@ -19,6 +19,9 @@ object Turret : Subsystem {
   private var lastVoltage: Double = 0.0
   private var lastTimeNs: Long = 0L
 
+  var currentAngle: Angle = 0.0.deg
+    private set
+
   override fun initialize() {
     encoder = ActiveOpMode.hardwareMap.analogInput["turretEncoder"]
     lastVoltage = encoder.voltage
@@ -39,6 +42,8 @@ object Turret : Subsystem {
     val scale = 360.0 / 3.3
     val positionDeg = currentVoltage * scale - 180.0
     val velocityDegPerSec = velocityVoltsPerSec * scale
+
+    currentAngle = positionDeg.deg
 
     val power = -pid.calculate(KineticState(positionDeg, velocityDegPerSec))
     left.power = power
