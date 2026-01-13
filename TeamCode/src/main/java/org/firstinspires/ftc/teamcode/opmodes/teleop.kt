@@ -60,7 +60,7 @@ class teleop : NextFTCOpMode() {
 
   var headingLocked = false
 
-  val headingPID = controlSystem { angular(AngleType.DEGREES) { posPid(0.1, 0.0, 0.0) } }
+  val headingPID = controlSystem { posPid(0.1, 0.0, 0.1) }
 
   private lateinit var backRight: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var frontLeft: com.qualcomm.robotcore.hardware.DcMotor
@@ -313,9 +313,9 @@ class teleop : NextFTCOpMode() {
 
     if (headingLocked) {
       if (BotState.alliance == Alliance.RED) {
-        headingPID.goal = KineticState(135.0, 0.0)
+        headingPID.goal = KineticState(-45.0, 0.0)
       } else if (BotState.alliance == Alliance.BLUE) {
-        headingPID.goal = KineticState(-135.0, 0.0)
+        headingPID.goal = KineticState(45.0, 0.0)
       }
       rotatedTurn =
           headingPID.calculate(
