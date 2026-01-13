@@ -18,10 +18,6 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
@@ -38,6 +34,10 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -180,14 +180,14 @@ class teleop : NextFTCOpMode() {
             .whenBecomesTrue {
               flywheelTargetSpeed = 2_450.0
               Hood.position = 0.6
-              Flywheel.enable().then(Flywheel.setSpeed(2_200.0)).schedule()
+              Flywheel.enable().then(Flywheel.setSpeed(2_450.0)).schedule()
             }
     val flywheelShort =
         button { gamepad1.dpad_down || gamepad2.dpad_down }
             .whenBecomesTrue {
               flywheelTargetSpeed = 1_600.0
               Hood.position = 0.45
-              Flywheel.enable().then(Flywheel.setSpeed(2_100.0)).schedule()
+              Flywheel.enable().then(Flywheel.setSpeed(1_600.0)).schedule()
             }
     val flywheelTesting =
         button { gamepad1.dpad_left || gamepad1.dpad_left }
@@ -310,7 +310,6 @@ class teleop : NextFTCOpMode() {
         )
     rotatedForward = rotated.first
     rotatedStrafe = rotated.second
-    rotatedTurn = -gamepad1.right_stick_x.toDouble()
 
     if (headingLocked) {
       if (BotState.alliance == Alliance.RED) {
@@ -325,6 +324,8 @@ class teleop : NextFTCOpMode() {
                   PedroComponent.follower.angularVelocity.rad.inDeg,
               )
           )
+    } else {
+      rotatedTurn = -gamepad1.right_stick_x.toDouble()
     }
     telemetry.addData("turn thingy", rotatedTurn)
 
