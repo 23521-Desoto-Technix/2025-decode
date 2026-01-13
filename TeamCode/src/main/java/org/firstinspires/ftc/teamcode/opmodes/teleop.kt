@@ -318,7 +318,7 @@ class teleop : NextFTCOpMode() {
       }
       var error = (PedroComponent.follower.heading.rad - 45.deg).normalized.inDeg
 
-        telemetry.addData("heading error", error)
+      telemetry.addData("heading error", error)
 
       rotatedTurn =
           headingPID.calculate(
@@ -331,13 +331,18 @@ class teleop : NextFTCOpMode() {
       rotatedTurn = -gamepad1.right_stick_x.toDouble()
     }
     telemetry.addData("turn thingy", rotatedTurn)
-
+    /*
     if (!ignorePinpoint) {
       Turret.setTargetAngle(-relativeAngleToTarget)
     } else if (targetTagBearing == null) {
       Turret.setTargetAngle(0.0.deg)
     } else {
       Turret.setTargetAngle(Turret.currentAngle - targetTagBearing.deg)
+    }*/
+    if (!ignorePinpoint) {
+      Turret.setTargetAngle(-relativeAngleToTarget)
+    } else {
+      Turret.setTargetAngle(0.0.deg)
     }
   }
 
