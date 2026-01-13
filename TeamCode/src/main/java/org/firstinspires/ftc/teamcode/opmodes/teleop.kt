@@ -318,6 +318,8 @@ class teleop : NextFTCOpMode() {
       }
       var error = (PedroComponent.follower.heading.rad - 45.deg).normalized.inDeg
 
+        telemetry.addData("heading error", error)
+
       rotatedTurn =
           headingPID.calculate(
               KineticState(
