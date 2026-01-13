@@ -18,6 +18,10 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
@@ -34,10 +38,6 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -58,9 +58,9 @@ class teleop : NextFTCOpMode() {
 
   var flywheelTargetSpeed = 0.0
 
-    var headingLocked = false
+  var headingLocked = false
 
-    val headingPID = controlSystem { angular(AngleType.DEGREES) {posPid(0.1, 0.0, 0.0)} }
+  val headingPID = controlSystem { angular(AngleType.DEGREES) { posPid(0.1, 0.0, 0.0) } }
 
   private lateinit var backRight: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var frontLeft: com.qualcomm.robotcore.hardware.DcMotor
@@ -220,9 +220,10 @@ class teleop : NextFTCOpMode() {
     val ptoOff = button { gamepad2.cross }.whenBecomesTrue { pto.position = 0.0 }
     val ignorePinpointToggle =
         button { gamepad2.square }.whenBecomesTrue { ignorePinpoint = !ignorePinpoint }
-      val headingLock = button { gamepad1.right_bumper }
-          .whenTrue { headingLocked = true }
-          .whenFalse { headingLocked = false }
+    val headingLock =
+        button { gamepad1.right_bumper }
+            .whenTrue { headingLocked = true }
+            .whenFalse { headingLocked = false }
   }
 
   override fun onUpdate() {
@@ -311,14 +312,21 @@ class teleop : NextFTCOpMode() {
     rotatedStrafe = rotated.second
     rotatedTurn = -gamepad1.right_stick_x.toDouble()
 
-      if (headingLocked) {
-          if (BotState.alliance == Alliance.RED) {
-              headingPID.goal = KineticState(135.0, 0.0)
-          } else if (BotState.alliance == Alliance.BLUE) {
-              headingPID.goal = KineticState(-135.0, 0.0)
-          }
-          rotatedTurn = headingPID.calculate(KineticState(PedroComponent.follower.heading.rad.inDeg, PedroComponent.follower.angularVelocity.rad.inDeg))
+    if (headingLocked) {
+      if (BotState.alliance == Alliance.RED) {
+        headingPID.goal = KineticState(135.0, 0.0)
+      } else if (BotState.alliance == Alliance.BLUE) {
+        headingPID.goal = KineticState(-135.0, 0.0)
       }
+      rotatedTurn =
+          headingPID.calculate(
+              KineticState(
+                  PedroComponent.follower.heading.rad.inDeg,
+                  PedroComponent.follower.angularVelocity.rad.inDeg,
+              )
+          )
+    }
+    telemetry.addData("turn thingy", rotatedTurn)
 
     if (!ignorePinpoint) {
       Turret.setTargetAngle(-relativeAngleToTarget)
