@@ -9,7 +9,6 @@ import dev.nextftc.bindings.button
 import dev.nextftc.bindings.range
 import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
-import dev.nextftc.control.feedback.AngleType
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
@@ -313,14 +312,16 @@ class teleop : NextFTCOpMode() {
 
     if (headingLocked) {
       if (BotState.alliance == Alliance.RED) {
-        headingPID.goal = KineticState(-45.0, 0.0)
+        headingPID.goal = KineticState(0.0, 0.0)
       } else if (BotState.alliance == Alliance.BLUE) {
         headingPID.goal = KineticState(45.0, 0.0)
       }
+      var error = (PedroComponent.follower.heading.rad - 45.deg).normalized.inDeg
+
       rotatedTurn =
           headingPID.calculate(
               KineticState(
-                  PedroComponent.follower.heading.rad.inDeg,
+                  error,
                   PedroComponent.follower.angularVelocity.rad.inDeg,
               )
           )
