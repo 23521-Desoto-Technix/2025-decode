@@ -53,7 +53,7 @@ class close : NextFTCOpMode() {
         SequentialGroup(
             Flywheel.setSpeed(1_600.0),
             InstantCommand { Hood.position = 0.45 },
-            InstantCommand { Turret.setTargetAngle(-90.deg) },
+            InstantCommand { Turret.setTargetAngle((-95).deg) },
             FollowPath(startToShoot),
             Tube.shootAll(),
         )
