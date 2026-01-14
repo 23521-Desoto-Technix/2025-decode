@@ -17,12 +17,12 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous
 class close : NextFTCOpMode() {
@@ -122,6 +122,8 @@ class close : NextFTCOpMode() {
             Tube.intakeAll,
             FollowPath(shootToSpike3),
             FollowPath(spike3ToShoot),
+            Tube.shootAll(),
+            Delay(750.milliseconds),
         )
   }
 
