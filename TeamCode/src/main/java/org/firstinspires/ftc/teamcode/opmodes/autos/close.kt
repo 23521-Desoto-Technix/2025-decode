@@ -39,12 +39,15 @@ class close : NextFTCOpMode() {
   val redShoot = Pose(85.0, 85.0, -45.0.deg.inRad)
   val redSpike1 = Pose(125.0, 85.0, 0.0.deg.inRad)
   val redSpike2 = Pose(125.0, 60.0, 0.0.deg.inRad)
+  val redSpike3 = Pose(125.0, 35.0, 0.0.deg.inRad)
 
   lateinit var startToShoot: PathChain
   lateinit var shootToSpike1: PathChain
   lateinit var spike1ToShoot: PathChain
   lateinit var shootToSpike2: PathChain
   lateinit var spike2ToShoot: PathChain
+  lateinit var shootToSpike3: PathChain
+  lateinit var spike3ToShoot: PathChain
 
   lateinit var routine: Command
 
@@ -80,6 +83,18 @@ class close : NextFTCOpMode() {
         PedroComponent.follower
             .pathBuilder()
             .addPath(BezierLine(redSpike2, redShoot))
+            .setConstantHeadingInterpolation(redShoot.heading)
+            .build()
+    shootToSpike3 =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(BezierCurve(redShoot, Pose(redShoot.x, redSpike3.y - 5), redSpike3))
+            .setConstantHeadingInterpolation(redSpike3.heading)
+            .build()
+    spike3ToShoot =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(BezierLine(redSpike3, redShoot))
             .setConstantHeadingInterpolation(redShoot.heading)
             .build()
 
