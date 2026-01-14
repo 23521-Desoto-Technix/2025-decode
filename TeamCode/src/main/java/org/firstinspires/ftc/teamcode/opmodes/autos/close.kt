@@ -73,6 +73,7 @@ class close : NextFTCOpMode() {
             InstantCommand { Hood.position = 0.45 },
             InstantCommand { Turret.setTargetAngle((-92.5).deg) },
             FollowPath(startToShoot),
+            Delay(500.milliseconds),
             Tube.shootAll(),
             Delay(750.milliseconds),
             FollowPath(shootToSpike1),
