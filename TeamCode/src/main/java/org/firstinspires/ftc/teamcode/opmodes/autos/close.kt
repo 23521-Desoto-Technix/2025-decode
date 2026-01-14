@@ -6,6 +6,7 @@ import com.pedropathing.paths.PathChain
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
+import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -20,6 +21,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous
 class close : NextFTCOpMode() {
@@ -34,7 +36,7 @@ class close : NextFTCOpMode() {
 
   val redStart = Pose(127.6, 120.8, -143.8.deg.inRad)
   val redShoot = Pose(85.0, 85.0, -45.0.deg.inRad)
-  val redSpike1 = Pose(85.0, 110.0, -90.0.deg.inRad)
+  val redSpike1 = Pose(125.0, 850.0, 0.0.deg.inRad)
 
   lateinit var startToShoot: PathChain
   lateinit var shootToSpike1: PathChain
@@ -72,6 +74,7 @@ class close : NextFTCOpMode() {
             InstantCommand { Turret.setTargetAngle((-95).deg) },
             FollowPath(startToShoot),
             Tube.shootAll(),
+            Delay(750.milliseconds),
             FollowPath(shootToSpike1),
             Tube.intakeAll,
             FollowPath(spike1ToShoot),
