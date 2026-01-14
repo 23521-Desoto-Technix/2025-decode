@@ -33,7 +33,7 @@ class close : NextFTCOpMode() {
   }
 
   val redStart = Pose(127.6, 120.8, -143.8.deg.inRad)
-  val redShoot = Pose(85.0, 85.0, 45.0.deg.inRad)
+  val redShoot = Pose(85.0, 85.0, -45.0.deg.inRad)
 
   lateinit var startToShoot: PathChain
 
