@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.autos
 
+import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.PathChain
@@ -37,16 +38,19 @@ class close : NextFTCOpMode() {
   val redStart = Pose(127.6, 120.8, -143.8.deg.inRad)
   val redShoot = Pose(85.0, 85.0, -45.0.deg.inRad)
   val redSpike1 = Pose(125.0, 85.0, 0.0.deg.inRad)
+  val redSpike2 = Pose(125.0, 60.0, 0.0.deg.inRad)
 
   lateinit var startToShoot: PathChain
   lateinit var shootToSpike1: PathChain
   lateinit var spike1ToShoot: PathChain
+  lateinit var shootToSpike2: PathChain
+  lateinit var spike2ToShoot: PathChain
 
   lateinit var routine: Command
 
   override fun onInit() {
     val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
-    Turret.setTargetAngle((-90).deg)
+    Turret.setTargetAngle((-92.5).deg)
     startToShoot =
         PedroComponent.follower
             .pathBuilder()
@@ -60,11 +64,23 @@ class close : NextFTCOpMode() {
             .addPath(BezierLine(redShoot, redSpike1))
             .setConstantHeadingInterpolation(redSpike1.heading)
             .build()
-      spike1ToShoot =
+    spike1ToShoot =
         PedroComponent.follower
             .pathBuilder()
             .addPath(BezierLine(redSpike1, redShoot))
             .setLinearHeadingInterpolation(redSpike1.heading, redShoot.heading)
+            .build()
+    shootToSpike2 =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(BezierCurve(redShoot, Pose(redShoot.x, redSpike2.y - 5), redSpike2))
+            .setConstantHeadingInterpolation(redSpike2.heading)
+            .build()
+    spike2ToShoot =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(BezierLine(redSpike2, redShoot))
+            .setConstantHeadingInterpolation(redShoot.heading)
             .build()
 
     routine =
@@ -79,6 +95,12 @@ class close : NextFTCOpMode() {
             Tube.intakeAll,
             FollowPath(shootToSpike1),
             FollowPath(spike1ToShoot),
+            Delay(500.milliseconds),
+            Tube.shootAll(),
+            Delay(750.milliseconds),
+            Tube.intakeAll,
+            FollowPath(shootToSpike2),
+            FollowPath(spike2ToShoot),
             Delay(500.milliseconds),
             Tube.shootAll(),
         )
