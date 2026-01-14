@@ -36,7 +36,7 @@ class close : NextFTCOpMode() {
 
   val redStart = Pose(127.6, 120.8, -143.8.deg.inRad)
   val redShoot = Pose(85.0, 85.0, -45.0.deg.inRad)
-  val redSpike1 = Pose(125.0, 850.0, 0.0.deg.inRad)
+  val redSpike1 = Pose(125.0, 85.0, 0.0.deg.inRad)
 
   lateinit var startToShoot: PathChain
   lateinit var shootToSpike1: PathChain
@@ -71,7 +71,7 @@ class close : NextFTCOpMode() {
         SequentialGroup(
             Flywheel.setSpeed(1_600.0),
             InstantCommand { Hood.position = 0.45 },
-            InstantCommand { Turret.setTargetAngle((-95).deg) },
+            InstantCommand { Turret.setTargetAngle((-92.5).deg) },
             FollowPath(startToShoot),
             Tube.shootAll(),
             Delay(750.milliseconds),
