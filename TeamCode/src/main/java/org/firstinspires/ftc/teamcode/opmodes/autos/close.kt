@@ -118,6 +118,10 @@ class close : NextFTCOpMode() {
             FollowPath(spike2ToShoot),
             Delay(500.milliseconds),
             Tube.shootAll(),
+            Delay(750.milliseconds),
+            Tube.intakeAll,
+            FollowPath(shootToSpike3),
+            FollowPath(spike3ToShoot),
         )
   }
 
