@@ -34,8 +34,11 @@ class close : NextFTCOpMode() {
 
   val redStart = Pose(127.6, 120.8, -143.8.deg.inRad)
   val redShoot = Pose(85.0, 85.0, -45.0.deg.inRad)
+  val redSpike1 = Pose(85.0, 110.0, -90.0.deg.inRad)
 
   lateinit var startToShoot: PathChain
+  lateinit var shootToSpike1: PathChain
+  lateinit var spike1ToShoot: PathChain
 
   lateinit var routine: Command
 
@@ -49,12 +52,29 @@ class close : NextFTCOpMode() {
             .setLinearHeadingInterpolation(redStart.heading, redShoot.heading)
             .build()
 
+    shootToSpike1 =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(BezierLine(redShoot, redSpike1))
+            .setConstantHeadingInterpolation(redSpike1.heading)
+            .build()
+      spike1ToShoot =
+        PedroComponent.follower
+            .pathBuilder()
+            .addPath(BezierLine(redSpike1, redShoot))
+            .setLinearHeadingInterpolation(redSpike1.heading, redShoot.heading)
+            .build()
+
     routine =
         SequentialGroup(
             Flywheel.setSpeed(1_600.0),
             InstantCommand { Hood.position = 0.45 },
             InstantCommand { Turret.setTargetAngle((-95).deg) },
             FollowPath(startToShoot),
+            Tube.shootAll(),
+            FollowPath(shootToSpike1),
+            Tube.intakeAll,
+            FollowPath(spike1ToShoot),
             Tube.shootAll(),
         )
   }
