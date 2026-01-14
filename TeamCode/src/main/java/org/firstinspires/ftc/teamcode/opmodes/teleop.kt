@@ -60,7 +60,7 @@ class teleop : NextFTCOpMode() {
 
   var headingLocked = false
 
-  val headingPID = controlSystem { posPid(0.02, 0.0, 0.0) }
+  val headingPID = controlSystem { posPid(0.0085, 0.0, 0.0) }
 
   private lateinit var backRight: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var frontLeft: com.qualcomm.robotcore.hardware.DcMotor
