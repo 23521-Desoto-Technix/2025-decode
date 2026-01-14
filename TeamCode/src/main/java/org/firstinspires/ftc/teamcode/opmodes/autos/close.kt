@@ -60,6 +60,7 @@ class close : NextFTCOpMode() {
   }
 
   override fun onStartButtonPressed() {
+    PedroComponent.follower.pose = redStart
     routine.schedule()
   }
 }
