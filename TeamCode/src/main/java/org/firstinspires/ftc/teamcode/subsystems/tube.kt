@@ -8,6 +8,7 @@ import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.ServoEx
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
+import org.firstinspires.ftc.teamcode.utils.BotState
 
 private enum class TubeState {
   IDLE,
@@ -35,6 +36,12 @@ object Tube : Subsystem {
   private var shootSpeed = 1.0
 
   override fun initialize() {
+    if (!BotState.enabled) {
+      intake.power = 0.0
+      transfer.power = 0.0
+      hardStop.position = 0.9
+      return
+    }
     top = ActiveOpMode.hardwareMap.digitalChannel["top"]
     middle = ActiveOpMode.hardwareMap.digitalChannel["middle"]
     bottom = ActiveOpMode.hardwareMap.digitalChannel["bottom"]
@@ -47,6 +54,12 @@ object Tube : Subsystem {
   }
 
   override fun periodic() {
+    if (!BotState.enabled) {
+      intake.power = 0.0
+      transfer.power = 0.0
+      hardStop.position = 0.9
+      return
+    }
     advanceStateMachine()
     ActiveOpMode.telemetry.addData("TubeState", state)
     ActiveOpMode.telemetry.addData("Top", top.state)
@@ -54,11 +67,18 @@ object Tube : Subsystem {
     ActiveOpMode.telemetry.addData("Bottom", bottom.state)
   }
 
-  val intakeAll = InstantCommand { transitionTo(TubeState.INTAKE_PHASE0) }
+  val intakeAll = InstantCommand {
+    if (BotState.enabled) {
+      transitionTo(TubeState.INTAKE_PHASE0)
+    }
+  }
 
   val stopAll = InstantCommand { transitionTo(TubeState.IDLE) }
 
   fun shootAll(speed: Double = 1.0) = InstantCommand {
+    if (!BotState.enabled) {
+      return@InstantCommand
+    }
     shootSpeed = speed
     transitionTo(TubeState.SHOOTING_HARDSTOP_SETTLE)
   }

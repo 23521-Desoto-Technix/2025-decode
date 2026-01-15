@@ -220,6 +220,7 @@ class close : NextFTCOpMode() {
   }
 
   override fun onStop() {
+    BotState.enabled = false
     Flywheel.setSpeed(0.0).schedule()
   }
 }

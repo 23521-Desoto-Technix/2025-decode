@@ -8,6 +8,7 @@ import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.ftc.ActiveOpMode
 import dev.nextftc.hardware.impl.CRServoEx
+import org.firstinspires.ftc.teamcode.utils.BotState
 
 object Turret : Subsystem {
   val left = CRServoEx("turretLeft")
@@ -30,6 +31,11 @@ object Turret : Subsystem {
   }
 
   override fun periodic() {
+    if (!BotState.enabled) {
+      left.power = 0.0
+      right.power = 0.0
+      return
+    }
     val now = System.nanoTime()
     val currentVoltage = encoder.voltage
     val dtSeconds = (now - lastTimeNs) / 1e9

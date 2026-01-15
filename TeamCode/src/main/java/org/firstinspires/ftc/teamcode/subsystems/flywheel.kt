@@ -7,6 +7,7 @@ import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.VoltageCompensatingMotor
 import kotlin.math.abs
+import org.firstinspires.ftc.teamcode.utils.BotState
 
 object Flywheel : Subsystem {
 
@@ -29,8 +30,16 @@ object Flywheel : Subsystem {
 
     private const val SPEED_TOLERANCE = 100
 
+    override fun initialize() {
+        if (!BotState.enabled) {
+            upperShooterMotor.power = 0.0
+            lowerShooterMotor.power = 0.0
+        }
+    }
+
     override fun periodic() {
-        if (!enabled) {
+        val hardwareEnabled = enabled && BotState.enabled
+        if (!hardwareEnabled) {
             upperShooterMotor.power = 0.0
             lowerShooterMotor.power = 0.0
             return
