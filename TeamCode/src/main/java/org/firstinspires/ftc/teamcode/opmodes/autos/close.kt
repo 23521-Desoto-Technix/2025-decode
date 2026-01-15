@@ -43,6 +43,9 @@ class close : NextFTCOpMode() {
   private data class PoseSet(
       val start: Pose,
       val shoot: Pose,
+      val farShoot: Pose,
+      val corner: Pose,
+      val gate: Pose,
       val spike1: Pose,
       val spike2: Pose,
       val spike3: Pose,
@@ -52,6 +55,9 @@ class close : NextFTCOpMode() {
       PoseSet(
           start = Pose(127.6, 120.8, -143.8.deg.inRad),
           shoot = Pose(85.0, 85.0, -45.0.deg.inRad),
+          farShoot = Pose(85.0, 16.0, -90.0.deg.inRad),
+          corner = Pose(130.0, 10.0, -20.0.deg.inRad),
+          gate = Pose(130.0, 70.0, 0.0.deg.inRad),
           spike1 = Pose(125.0, 85.0, 0.0.deg.inRad),
           spike2 = Pose(125.0, 60.0, 0.0.deg.inRad),
           spike3 = Pose(125.0, 35.0, 0.0.deg.inRad),
@@ -61,6 +67,9 @@ class close : NextFTCOpMode() {
     return PoseSet(
         start = mirrorPose(start),
         shoot = mirrorPose(shoot),
+        farShoot = mirrorPose(farShoot),
+        corner = mirrorPose(corner),
+        gate = mirrorPose(gate),
         spike1 = mirrorPose(spike1),
         spike2 = mirrorPose(spike2),
         spike3 = mirrorPose(spike3),
@@ -76,10 +85,13 @@ class close : NextFTCOpMode() {
 
   private data class AutoPaths(
       val startToShoot: PathChain,
+      val shootToCorner: PathChain,
+      val cornerToFarShoot: PathChain,
+      val farShootToSpike2: PathChain,
+      val spike2ToGate: PathChain,
+      val gateToShoot: PathChain,
       val shootToSpike1: PathChain,
       val spike1ToShoot: PathChain,
-      val shootToSpike2: PathChain,
-      val spike2ToShoot: PathChain,
       val shootToSpike3: PathChain,
       val spike3ToShoot: PathChain,
   )
@@ -104,6 +116,40 @@ class close : NextFTCOpMode() {
                 .addPath(BezierLine(poses.start, poses.shoot))
                 .setLinearHeadingInterpolation(poses.start.heading, poses.shoot.heading)
                 .build(),
+        shootToCorner =
+            PedroComponent.follower
+                .pathBuilder()
+                .addPath(
+                    BezierCurve(poses.shoot, Pose(poses.shoot.x, poses.corner.y), poses.corner)
+                )
+                .setConstantHeadingInterpolation(poses.corner.heading)
+                .build(),
+        cornerToFarShoot =
+            PedroComponent.follower
+                .pathBuilder()
+                .addPath(BezierLine(poses.corner, poses.farShoot))
+                .setLinearHeadingInterpolation(poses.corner.heading, poses.farShoot.heading)
+                .build(),
+        farShootToSpike2 =
+            PedroComponent.follower
+                .pathBuilder()
+                .addPath(
+                    BezierCurve(poses.farShoot, Pose(poses.farShoot.x, poses.gate.y), poses.gate)
+                )
+                .setConstantHeadingInterpolation(poses.corner.heading)
+                .build(),
+        spike2ToGate =
+            PedroComponent.follower
+                .pathBuilder()
+                .addPath(BezierCurve(poses.spike2, Pose(poses.spike2.x, poses.gate.y), poses.gate))
+                .setConstantHeadingInterpolation(poses.gate.heading)
+                .build(),
+        gateToShoot =
+            PedroComponent.follower
+                .pathBuilder()
+                .addPath(BezierCurve(poses.gate, Pose(poses.gate.x, poses.shoot.y), poses.shoot))
+                .setLinearHeadingInterpolation(poses.gate.heading, poses.shoot.heading)
+                .build(),
         shootToSpike1 =
             PedroComponent.follower
                 .pathBuilder()
@@ -115,18 +161,6 @@ class close : NextFTCOpMode() {
                 .pathBuilder()
                 .addPath(BezierLine(poses.spike1, poses.shoot))
                 .setLinearHeadingInterpolation(poses.spike1.heading, poses.shoot.heading)
-                .build(),
-        shootToSpike2 =
-            PedroComponent.follower
-                .pathBuilder()
-                .addPath(BezierCurve(poses.shoot, shootSpike2Control, poses.spike2))
-                .setConstantHeadingInterpolation(poses.spike2.heading)
-                .build(),
-        spike2ToShoot =
-            PedroComponent.follower
-                .pathBuilder()
-                .addPath(BezierLine(poses.spike2, poses.shoot))
-                .setConstantHeadingInterpolation(poses.shoot.heading)
                 .build(),
         shootToSpike3 =
             PedroComponent.follower
@@ -150,11 +184,34 @@ class close : NextFTCOpMode() {
           Alliance.BLUE -> (92.5).deg
           else -> 0.0.deg
         }
+    val farTurretAngle =
+        when (BotState.alliance) {
+          Alliance.RED -> (-20.0).deg
+          Alliance.BLUE -> (20.0).deg
+          else -> 0.0.deg
+        }
     return SequentialGroup(
         Flywheel.setSpeed(1_600.0),
         InstantCommand { Hood.position = 0.45 },
         InstantCommand { Turret.setTargetAngle(turretAngle) },
         FollowPath(paths.startToShoot),
+        Delay(500.milliseconds),
+        Tube.shootAll(),
+        Delay(750.milliseconds),
+        Tube.intakeAll,
+        Flywheel.setSpeed(2_050.0),
+        InstantCommand { Hood.position = 0.7 },
+        InstantCommand { Turret.setTargetAngle(farTurretAngle) },
+        FollowPath(paths.shootToCorner),
+        FollowPath(paths.cornerToFarShoot),
+        Delay(500.milliseconds),
+        Tube.shootAll(),
+        Delay(750.milliseconds),
+        Tube.intakeAll,
+        FollowPath(paths.farShootToSpike2),
+        FollowPath(paths.spike2ToGate),
+        Delay(1500.milliseconds),
+        FollowPath(paths.gateToShoot),
         Delay(500.milliseconds),
         Tube.shootAll(),
         Delay(750.milliseconds),
@@ -165,16 +222,10 @@ class close : NextFTCOpMode() {
         Tube.shootAll(),
         Delay(750.milliseconds),
         Tube.intakeAll,
-        FollowPath(paths.shootToSpike2),
-        FollowPath(paths.spike2ToShoot),
-        Delay(500.milliseconds),
-        Tube.shootAll(),
-        Delay(750.milliseconds),
-        Tube.intakeAll,
         FollowPath(paths.shootToSpike3),
         FollowPath(paths.spike3ToShoot),
+        Delay(500.milliseconds),
         Tube.shootAll(),
-        Delay(750.milliseconds),
     )
   }
 
