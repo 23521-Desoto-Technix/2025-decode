@@ -18,6 +18,7 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -27,7 +28,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous
 class close : NextFTCOpMode() {
@@ -128,7 +128,7 @@ class close : NextFTCOpMode() {
             PedroComponent.follower
                 .pathBuilder()
                 .addPath(BezierLine(poses.corner, poses.farShoot))
-                .setLinearHeadingInterpolation(poses.corner.heading, poses.farShoot.heading)
+                .setLinearHeadingInterpolation(-poses.farShoot.heading, poses.farShoot.heading)
                 .build(),
         farShootToSpike2 =
             PedroComponent.follower
@@ -186,8 +186,8 @@ class close : NextFTCOpMode() {
         }
     val farTurretAngle =
         when (BotState.alliance) {
-          Alliance.RED -> (-20.0).deg
-          Alliance.BLUE -> (20.0).deg
+          Alliance.RED -> (-25.0).deg
+          Alliance.BLUE -> (25.0).deg
           else -> 0.0.deg
         }
     return SequentialGroup(
@@ -206,10 +206,13 @@ class close : NextFTCOpMode() {
         FollowPath(paths.cornerToFarShoot),
         Delay(500.milliseconds),
         Tube.shootAll(),
+        Flywheel.setSpeed(1_600.0),
+        InstantCommand { Hood.position = 0.45 },
+        InstantCommand { Turret.setTargetAngle(turretAngle) },
         Delay(750.milliseconds),
         Tube.intakeAll,
         FollowPath(paths.farShootToSpike2),
-        //FollowPath(paths.spike2ToGate),
+        // FollowPath(paths.spike2ToGate),
         Delay(500.milliseconds),
         FollowPath(paths.gateToShoot),
         Delay(500.milliseconds),
