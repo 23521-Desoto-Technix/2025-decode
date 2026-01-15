@@ -17,6 +17,10 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
@@ -33,10 +37,6 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -230,7 +230,10 @@ class teleop : NextFTCOpMode() {
   }
 
   override fun onUpdate() {
-    val targetPose = Pose(144.0, 144.0, 0.0)
+    var targetPose = Pose(144.0, 144.0, 0.0)
+    if (BotState.alliance == Alliance.BLUE) {
+      targetPose = Pose(0.0, 144.0, 0.0)
+    }
     val currentX = PedroComponent.follower.pose.x
     val currentY = PedroComponent.follower.pose.y
     val deltaX = targetPose.x - currentX
@@ -301,6 +304,9 @@ class teleop : NextFTCOpMode() {
     BindingManager.update()
     telemetry.update()
     var rotateBy = -PedroComponent.follower.pose.heading.rad
+    if (BotState.alliance == Alliance.BLUE) {
+      rotateBy = (rotateBy + 180.deg).normalized
+    }
     if (ignorePinpoint) {
       rotateBy = 0.0.deg
     }
