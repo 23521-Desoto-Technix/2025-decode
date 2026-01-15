@@ -9,7 +9,6 @@ import dev.nextftc.bindings.button
 import dev.nextftc.bindings.range
 import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
-import dev.nextftc.control.feedback.AngleType
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
@@ -18,10 +17,6 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
@@ -38,6 +33,10 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -160,7 +159,11 @@ class teleop : NextFTCOpMode() {
           Alliance.BLUE -> Pose(72.0, 72.0, 90.0.deg.inRad)
           Alliance.UNKNOWN -> Pose(72.0, 7.0, 90.0.deg.inRad)
         }
-    PedroComponent.follower.pose = startingPose
+    if (BotState.pose != null) {
+      PedroComponent.follower.pose = BotState.pose!!
+    } else {
+      PedroComponent.follower.pose = startingPose
+    }
 
     val driverControlled =
         PedroDriverControlled(

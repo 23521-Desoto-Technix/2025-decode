@@ -5,14 +5,15 @@ import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.Path
 import com.pedropathing.paths.PathChain
+import dev.nextftc.core.units.deg
+import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 
 object PoseUtils {
 
   fun mirrorPose(pose: Pose): Pose {
-    return Pose(pose.x, 144.0 - pose.y, pose.heading)
+    return Pose(144.0 - pose.x, pose.y, (180.deg - pose.heading.rad).normalized.inRad)
   }
-
 
   fun createBasicPath(start: Pose, end: Pose): PathChain {
     return PedroComponent.follower
@@ -31,4 +32,3 @@ object PoseUtils {
         .build()
   }
 }
-
