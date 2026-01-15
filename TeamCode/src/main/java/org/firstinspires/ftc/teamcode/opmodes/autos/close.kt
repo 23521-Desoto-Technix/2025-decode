@@ -57,7 +57,7 @@ class close : NextFTCOpMode() {
           shoot = Pose(85.0, 85.0, -45.0.deg.inRad),
           farShoot = Pose(85.0, 16.0, -90.0.deg.inRad),
           corner = Pose(130.0, 10.0, -20.0.deg.inRad),
-          gate = Pose(130.0, 70.0, 0.0.deg.inRad),
+          gate = Pose(125.0, 70.0, 0.0.deg.inRad),
           spike1 = Pose(125.0, 85.0, 0.0.deg.inRad),
           spike2 = Pose(125.0, 60.0, 0.0.deg.inRad),
           spike3 = Pose(125.0, 35.0, 0.0.deg.inRad),
@@ -136,7 +136,7 @@ class close : NextFTCOpMode() {
                 .addPath(
                     BezierCurve(poses.farShoot, Pose(poses.farShoot.x, poses.gate.y), poses.gate)
                 )
-                .setConstantHeadingInterpolation(poses.corner.heading)
+                .setConstantHeadingInterpolation(poses.spike2.heading)
                 .build(),
         spike2ToGate =
             PedroComponent.follower
@@ -209,8 +209,8 @@ class close : NextFTCOpMode() {
         Delay(750.milliseconds),
         Tube.intakeAll,
         FollowPath(paths.farShootToSpike2),
-        FollowPath(paths.spike2ToGate),
-        Delay(1500.milliseconds),
+        //FollowPath(paths.spike2ToGate),
+        Delay(500.milliseconds),
         FollowPath(paths.gateToShoot),
         Delay(500.milliseconds),
         Tube.shootAll(),
