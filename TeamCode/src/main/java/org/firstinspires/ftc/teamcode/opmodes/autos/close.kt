@@ -18,6 +18,8 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.milliseconds
+import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -26,7 +28,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous
 class close : NextFTCOpMode() {
@@ -88,6 +89,8 @@ class close : NextFTCOpMode() {
   override fun onInit() {
     val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
     Turret.setTargetAngle((-92.5).deg)
+    telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
+    telemetry.msTransmissionInterval = 25
   }
 
   private fun buildPaths(poses: PoseSet): AutoPaths {
@@ -141,10 +144,16 @@ class close : NextFTCOpMode() {
   }
 
   private fun buildRoutine(paths: AutoPaths): Command {
+    val turretAngle =
+        when (BotState.alliance) {
+          Alliance.RED -> (-92.5).deg
+          Alliance.BLUE -> (92.5).deg
+          else -> 0.0.deg
+        }
     return SequentialGroup(
         Flywheel.setSpeed(1_600.0),
         InstantCommand { Hood.position = 0.45 },
-        InstantCommand { Turret.setTargetAngle((-92.5).deg) },
+        InstantCommand { Turret.setTargetAngle(turretAngle) },
         FollowPath(paths.startToShoot),
         Delay(500.milliseconds),
         Tube.shootAll(),
@@ -171,26 +180,22 @@ class close : NextFTCOpMode() {
 
   override fun onWaitForStart() {
 
-    val selectRed =
-        button { gamepad1.circle }
-            .whenBecomesTrue { BotState.alliance = Alliance.RED }
-    val selectBlue =
-        button { gamepad1.cross }
-            .whenBecomesTrue { BotState.alliance = Alliance.BLUE }
+    val selectRed = button { gamepad1.circle }.whenBecomesTrue { BotState.alliance = Alliance.RED }
+    val selectBlue = button { gamepad1.cross }.whenBecomesTrue { BotState.alliance = Alliance.BLUE }
     val allianceDisplay =
         when (BotState.alliance) {
-            Alliance.RED ->
-                "<span style=\"background-color: #FF0000; color: white;\">&nbsp;&nbsp;RED&nbsp;&nbsp;</span>"
-            Alliance.BLUE ->
-                "<span style=\"background-color: #0000FF; color: white;\">&nbsp;&nbsp;BLUE&nbsp;&nbsp;</span>"
-            Alliance.UNKNOWN -> {
+          Alliance.RED ->
+              "<span style=\"background-color: #FF0000; color: white;\">&nbsp;&nbsp;RED&nbsp;&nbsp;</span>"
+          Alliance.BLUE ->
+              "<span style=\"background-color: #0000FF; color: white;\">&nbsp;&nbsp;BLUE&nbsp;&nbsp;</span>"
+          Alliance.UNKNOWN -> {
 
-                if (((System.currentTimeMillis() / 500) % 2).toInt() == 0) {
-                    "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
-                } else {
-                    "&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;"
-                }
+            if (((System.currentTimeMillis() / 500) % 2).toInt() == 0) {
+              "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
+            } else {
+              "&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;"
             }
+          }
         }
 
     telemetry.addLine(allianceDisplay)
