@@ -14,7 +14,10 @@ object Turret : Subsystem {
   val left = CRServoEx("turretLeft")
   val right = CRServoEx("turretRight")
   lateinit var encoder: AnalogInput
-  val pid = controlSystem { posPid(0.013, 0.0, 0.00015) }
+  val pid = controlSystem {
+    posPid(0.013, 0.0, 0.00015)
+    basicFF(0.1, 0.0, 0.1)
+  }
   val DEADZONE = 65.deg
 
   private var lastVoltage: Double = 0.0
