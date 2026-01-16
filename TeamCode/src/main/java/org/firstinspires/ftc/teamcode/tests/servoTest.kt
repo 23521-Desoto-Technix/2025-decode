@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 
 @TeleOp
+@Disabled
 class servoTest : LinearOpMode() {
     override fun runOpMode() {
         val servo0 = hardwareMap.servo.get("weThePeople")

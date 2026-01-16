@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.tests
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.hardware.impl.MotorEx
 
 @TeleOp
+@Disabled
 class MotorTest : NextFTCOpMode() {
     private lateinit var frontLeft: MotorEx
     private lateinit var frontRight: MotorEx
