@@ -164,7 +164,7 @@ class close : NextFTCOpMode() {
     val turretAngle =
         when (BotState.alliance) {
           Alliance.RED -> (-92.5).deg
-          Alliance.BLUE -> (92.5).deg
+          Alliance.BLUE -> (95).deg
           else -> 0.0.deg
         }
     return SequentialGroup(
