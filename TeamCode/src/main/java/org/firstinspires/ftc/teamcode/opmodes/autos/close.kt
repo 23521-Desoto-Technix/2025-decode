@@ -18,7 +18,6 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -28,6 +27,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous
 class close : NextFTCOpMode() {
@@ -56,9 +56,9 @@ class close : NextFTCOpMode() {
           start = Pose(127.6, 120.8, -143.8.deg.inRad),
           shoot = Pose(85.0, 85.0, -45.0.deg.inRad),
           spike1 = Pose(125.0, 85.0, 0.0.deg.inRad),
-          spike2 = Pose(125.0, 60.0, 0.0.deg.inRad),
+          spike2 = Pose(123.0, 60.0, 0.0.deg.inRad),
           gate = Pose(125.0, 70.0, 0.0.deg.inRad),
-          gateMid = Pose(115.0, 75.0, 0.0.deg.inRad),
+          gateMid = Pose(110.0, 65.0, 0.0.deg.inRad),
           spike3 = Pose(125.0, 35.0, 0.0.deg.inRad),
           park = Pose(110.0, 70.0, 0.0.deg.inRad),
       )
