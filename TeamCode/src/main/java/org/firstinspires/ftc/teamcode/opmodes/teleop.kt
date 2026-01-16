@@ -184,9 +184,9 @@ class teleop : NextFTCOpMode() {
     val flywheelLong =
         button { gamepad1.dpad_up || gamepad2.dpad_up }
             .whenBecomesTrue {
-              flywheelTargetSpeed = 2_450.0
-              Hood.position = 0.6
-              Flywheel.enable().then(Flywheel.setSpeed(2_450.0)).schedule()
+              flywheelTargetSpeed = 2_050.0
+              Hood.position = 0.7
+              Flywheel.enable().then(Flywheel.setSpeed(2_050.0)).schedule()
             }
     val flywheelShort =
         button { gamepad1.dpad_down || gamepad2.dpad_down }
