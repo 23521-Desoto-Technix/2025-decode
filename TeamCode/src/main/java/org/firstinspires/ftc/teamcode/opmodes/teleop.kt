@@ -358,7 +358,7 @@ class teleop : NextFTCOpMode() {
       if (BotState.alliance == Alliance.RED) {
         headingPID.goal = KineticState(135.0, 0.0)
       } else if (BotState.alliance == Alliance.BLUE) {
-        headingPID.goal = KineticState(-135.0, 0.0)
+        headingPID.goal = KineticState(45.0, 0.0)
       }
 
       rotatedTurn =
