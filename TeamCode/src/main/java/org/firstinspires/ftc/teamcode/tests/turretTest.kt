@@ -12,16 +12,31 @@ class turretTest : LinearOpMode() {
     val turretRight = hardwareMap.servo["turretRight"]
     val encoder = hardwareMap.analogInput["turretEncoder"]
 
+    var offset = 0.0
+
     waitForStart()
     while (opModeIsActive()) {
-      val joystickValue = gamepad1.left_stick_y.toDouble()
-      val servoPower = (joystickValue + 1.0) / 2.0
+      if (gamepad1.dpadLeftWasPressed()) {
+        offset -= 0.01
+      }
+      if (gamepad1.dpadRightWasPressed()) {
+        offset += 0.01
+      }
+      if (gamepad1.circleWasPressed()) {
+        offset = 0.0
+      }
+      if (gamepad1.leftBumperWasPressed()) {
+        offset -= 0.001
+      }
+      if (gamepad1.rightBumperWasPressed()) {
+        offset += 0.001
+      }
 
-      turretLeft.position = servoPower
-      turretRight.position = servoPower
+      turretLeft.position = 0.5
+      turretRight.position = 0.5 + offset
 
-      telemetry.addData("Servo Power", servoPower)
       telemetry.addData("Encoder Value", (encoder.voltage / 3.3 * 2) - 1)
+      telemetry.addData("Offset", offset)
       telemetry.update()
     }
   }
