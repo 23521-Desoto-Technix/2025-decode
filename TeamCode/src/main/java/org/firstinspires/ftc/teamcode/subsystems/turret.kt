@@ -50,7 +50,7 @@ object Turret : Subsystem {
     val normalizedAngle =
         angle.normalized.inDeg.coerceIn(((-180).deg + DEADZONE).inDeg, (180.deg - DEADZONE).inDeg)
     val targetPosition = (normalizedAngle + 177.5) / 355.0
-    left.position = targetPosition
-    right.position = targetPosition + RIGHT_OFFSET
+    left.position = -targetPosition
+    right.position = -targetPosition + RIGHT_OFFSET
   }
 }
