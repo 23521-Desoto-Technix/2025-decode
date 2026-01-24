@@ -1,24 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystems
 
 import com.qualcomm.robotcore.hardware.AnalogInput
-import dev.nextftc.control.KineticState
-import dev.nextftc.control.builder.controlSystem
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.ftc.ActiveOpMode
-import dev.nextftc.hardware.impl.CRServoEx
-import org.firstinspires.ftc.teamcode.utils.BotState
+import dev.nextftc.hardware.impl.ServoEx
 
 object Turret : Subsystem {
-  val left = CRServoEx("turretLeft")
-  val right = CRServoEx("turretRight")
+  val left = ServoEx("turretLeft")
+  val right = ServoEx("turretRight")
   lateinit var encoder: AnalogInput
-  val pid = controlSystem {
-    posPid(0.013, 0.0, 0.00015)
-    basicFF(0.1, 0.0, 0.1)
-  }
-  val DEADZONE = 65.deg
+  val DEADZONE = 60.deg
+  val RIGHT_OFFSET = 0.028
 
   private var lastVoltage: Double = 0.0
   private var lastTimeNs: Long = 0L
@@ -30,15 +24,9 @@ object Turret : Subsystem {
     encoder = ActiveOpMode.hardwareMap.analogInput["turretEncoder"]
     lastVoltage = encoder.voltage
     lastTimeNs = System.nanoTime()
-    pid.goal = KineticState(0.0, 0.0)
   }
 
   override fun periodic() {
-    if (!BotState.enabled) {
-      left.power = 0.0
-      right.power = 0.0
-      return
-    }
     val now = System.nanoTime()
     val currentVoltage = encoder.voltage
     val dtSeconds = (now - lastTimeNs) / 1e9
@@ -54,20 +42,15 @@ object Turret : Subsystem {
 
     currentAngle = positionDeg.deg
 
-    val power = -pid.calculate(KineticState(positionDeg, velocityDegPerSec))
-    left.power = power
-    right.power = power
-
-    val targetVolts = (pid.goal.position + 180.0) / scale
     ActiveOpMode.telemetry.addData("Turret Current Position (V)", currentVoltage)
-    ActiveOpMode.telemetry.addData("Turret Target Position (V)", targetVolts)
     ActiveOpMode.telemetry.addData("Turret Current Position (deg)", positionDeg)
-    ActiveOpMode.telemetry.addData("Turret Target Position (deg)", pid.goal.position)
   }
 
   fun setTargetAngle(angle: Angle) {
     val normalizedAngle =
         angle.normalized.inDeg.coerceIn(((-180).deg + DEADZONE).inDeg, (180.deg - DEADZONE).inDeg)
-    pid.goal = KineticState(normalizedAngle, 0.0)
+    val targetPosition = (normalizedAngle + 177.5) / 355.0
+    left.position = targetPosition
+    right.position = targetPosition + RIGHT_OFFSET
   }
 }
