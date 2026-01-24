@@ -12,7 +12,7 @@ object Turret : Subsystem {
   val right = ServoEx("turretRight")
   lateinit var encoder: AnalogInput
   val DEADZONE = 60.deg
-  val RIGHT_OFFSET = 0.028
+  const val RIGHT_OFFSET = 0.028
 
   private var lastVoltage: Double = 0.0
   private var lastTimeNs: Long = 0L
@@ -49,8 +49,8 @@ object Turret : Subsystem {
   fun setTargetAngle(angle: Angle) {
     val normalizedAngle =
         angle.normalized.inDeg.coerceIn(((-180).deg + DEADZONE).inDeg, (180.deg - DEADZONE).inDeg)
-    val targetPosition = (normalizedAngle + 177.5) / 355.0
-    left.position = -targetPosition
-    right.position = -targetPosition + RIGHT_OFFSET
+    val targetPosition = (-normalizedAngle + 177.5) / 355.0
+    left.position = targetPosition
+    right.position = targetPosition + RIGHT_OFFSET
   }
 }
