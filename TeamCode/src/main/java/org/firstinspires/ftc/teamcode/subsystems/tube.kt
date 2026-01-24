@@ -95,9 +95,9 @@ object Tube : Subsystem {
       TubeState.INTAKE_WAIT_BOTTOM ->
           if (!bottom.state) transitionTo(TubeState.INTAKE_DELAY_AFTER_BOTTOM)
       TubeState.INTAKE_DELAY_AFTER_BOTTOM ->
-          if (elapsedSinceStep() >= 100.milliseconds) transitionTo(TubeState.INTAKE_FINAL_PUSH)
+          if (elapsedSinceStep() >= 50.milliseconds) transitionTo(TubeState.INTAKE_FINAL_PUSH)
       TubeState.INTAKE_FINAL_PUSH ->
-          if (elapsedSinceStep() >= 100.milliseconds) {
+          if (elapsedSinceStep() >= 50.milliseconds) {
             transitionTo(TubeState.IDLE)
             ActiveOpMode.gamepad1.rumbleBlips(3)
             ActiveOpMode.gamepad2.rumbleBlips(3)
