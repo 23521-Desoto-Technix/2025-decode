@@ -257,7 +257,7 @@ class teleop : NextFTCOpMode() {
               offsetX = offsetValues[(currentIndex + 1) % offsetValues.size]
             }
     val offsetYToggle =
-        button { gamepad2.triangle && gamepad2.ps }
+        button { gamepad2.ps }
             .whenBecomesTrue {
               val currentIndex = offsetValues.indexOf(offsetY)
               offsetY = offsetValues[(currentIndex + 1) % offsetValues.size]
