@@ -252,8 +252,11 @@ class teleop : NextFTCOpMode() {
     if (BotState.alliance == Alliance.BLUE) {
       targetPose = Pose(0.0, 144.0, 0.0)
     }
-    val currentX = PedroComponent.follower.pose.x
-    val currentY = PedroComponent.follower.pose.y
+    val headingRadians = PedroComponent.follower.pose.heading
+    val offsetX = -1.634 * cos(headingRadians)
+    val offsetY = -1.634 * sin(headingRadians)
+    val currentX = PedroComponent.follower.pose.x + offsetX
+    val currentY = PedroComponent.follower.pose.y + offsetY
     val deltaX = targetPose.x - currentX
     val deltaY = targetPose.y - currentY
     val absoluteAngleToTarget = atan2(deltaY, deltaX).rad
