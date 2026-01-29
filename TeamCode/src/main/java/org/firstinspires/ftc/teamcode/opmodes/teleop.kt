@@ -17,10 +17,6 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
@@ -37,6 +33,18 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
+
+data class ShootingConfig(
+    val minDistance: Double,
+    val maxDistance: Double,
+    val flywheelSpeed: Double,
+    val hoodPosition: Double,
+)
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -61,10 +69,29 @@ class teleop : NextFTCOpMode() {
 
   var slowMode = false
 
-  var offsetX = 0.0
-  var offsetY = 0.0
+  var autoRangingEnabled = true
 
-  val offsetValues = listOf(-1.634, 0.0, 1.634)
+  val shootingConfigs =
+      listOf(
+          ShootingConfig(
+              25.0,
+              50.0,
+              1_600.0,
+              0.45,
+          ),
+          ShootingConfig(
+              50.0,
+              100.0,
+              1_800.0,
+              0.55,
+          ),
+          ShootingConfig(
+              100.0,
+              150.0,
+              2_000.0,
+              0.65,
+          ),
+      )
 
   val headingPID = controlSystem { posPid(0.0085, 0.0, 0.0) }
 
@@ -86,6 +113,10 @@ class teleop : NextFTCOpMode() {
     val rotatedForward = forward * cos(angleRadians) - strafe * sin(angleRadians)
     val rotatedStrafe = forward * sin(angleRadians) + strafe * cos(angleRadians)
     return Pair(rotatedForward, rotatedStrafe)
+  }
+
+  fun getShootingConfigForDistance(distance: Double): ShootingConfig? {
+    return shootingConfigs.firstOrNull { distance >= it.minDistance && distance < it.maxDistance }
   }
 
   override fun onInit() {
@@ -187,43 +218,70 @@ class teleop : NextFTCOpMode() {
     val stopIntake = button { gamepad1.cross }.whenBecomesTrue { Tube.stopAll.schedule() }
     val shootAll = button { gamepad1.triangle }.whenBecomesTrue { Tube.shootAll().schedule() }
     val shootAllSlow = button { gamepad1.square }.whenBecomesTrue { Tube.shootAll(0.8).schedule() }
+
     val flywheelLong =
         button { gamepad1.dpad_up || gamepad2.dpad_up }
             .whenBecomesTrue {
-              flywheelTargetSpeed = 2_050.0
-              Hood.position = 0.65
-              Flywheel.enable().then(Flywheel.setSpeed(2_050.0)).schedule()
+              if (!autoRangingEnabled) {
+                flywheelTargetSpeed = 2_050.0
+                Hood.position = 0.65
+                Flywheel.enable().then(Flywheel.setSpeed(2_050.0)).schedule()
+              }
             }
     val flywheelShort =
         button { gamepad1.dpad_down || gamepad2.dpad_down }
             .whenBecomesTrue {
-              flywheelTargetSpeed = 1_600.0
-              Hood.position = 0.45
-              Flywheel.enable().then(Flywheel.setSpeed(1_600.0)).schedule()
+              if (!autoRangingEnabled) {
+                flywheelTargetSpeed = 1_600.0
+                Hood.position = 0.45
+                Flywheel.enable().then(Flywheel.setSpeed(1_600.0)).schedule()
+              }
             }
     val flywheelTesting =
         button { gamepad1.dpad_left || gamepad1.dpad_left }
             .whenBecomesTrue {
-              flywheelTargetSpeed = 500.0
-              Flywheel.enable().then(Flywheel.setSpeed(500.0)).schedule()
+              if (!autoRangingEnabled) {
+                flywheelTargetSpeed = 500.0
+                Flywheel.enable().then(Flywheel.setSpeed(500.0)).schedule()
+              }
             }
     val flywheelOff =
         button { gamepad1.dpad_right || gamepad2.dpad_right }
-            .whenBecomesTrue { Flywheel.disable().schedule() }
+            .whenBecomesTrue {
+              if (!autoRangingEnabled) {
+                Flywheel.disable().schedule()
+              }
+            }
     val flywheelSpeedUp =
         button { gamepad2.left_trigger > 0.5 }
             .whenBecomesTrue {
-              flywheelTargetSpeed += 100.0
-              Flywheel.enable().then(Flywheel.setSpeed(flywheelTargetSpeed)).schedule()
+              if (!autoRangingEnabled) {
+                flywheelTargetSpeed += 100.0
+                Flywheel.enable().then(Flywheel.setSpeed(flywheelTargetSpeed)).schedule()
+              }
             }
     val flywheelSpeedDown =
         button { gamepad2.right_trigger > 0.5 }
             .whenBecomesTrue {
-              flywheelTargetSpeed = maxOf(0.0, flywheelTargetSpeed - 100.0)
-              Flywheel.enable().then(Flywheel.setSpeed(flywheelTargetSpeed)).schedule()
+              if (!autoRangingEnabled) {
+                flywheelTargetSpeed = maxOf(0.0, flywheelTargetSpeed - 100.0)
+                Flywheel.enable().then(Flywheel.setSpeed(flywheelTargetSpeed)).schedule()
+              }
             }
-    val hoodUp = button { gamepad2.left_bumper }.whenBecomesTrue { Hood.bumpUp().schedule() }
-    val hoodDown = button { gamepad2.right_bumper }.whenBecomesTrue { Hood.bumpDown().schedule() }
+    val hoodUp =
+        button { gamepad2.left_bumper }
+            .whenBecomesTrue {
+              if (!autoRangingEnabled) {
+                Hood.bumpUp().schedule()
+              }
+            }
+    val hoodDown =
+        button { gamepad2.right_bumper }
+            .whenBecomesTrue {
+              if (!autoRangingEnabled) {
+                Hood.bumpDown().schedule()
+              }
+            }
     val driveCancel =
         button { abs(gamepad2.left_stick_y) > 0.1 }
             .whenBecomesTrue { driverControlled.cancel() }
@@ -250,18 +308,8 @@ class teleop : NextFTCOpMode() {
             .whenFalse { headingLocked = false }
     val slow =
         button { gamepad1.left_bumper }.whenTrue { slowMode = true }.whenFalse { slowMode = false }
-    val offsetXToggle =
-        button { gamepad2.triangle }
-            .whenBecomesTrue {
-              val currentIndex = offsetValues.indexOf(offsetX)
-              offsetX = offsetValues[(currentIndex + 1) % offsetValues.size]
-            }
-    val offsetYToggle =
-        button { gamepad2.ps }
-            .whenBecomesTrue {
-              val currentIndex = offsetValues.indexOf(offsetY)
-              offsetY = offsetValues[(currentIndex + 1) % offsetValues.size]
-            }
+    val autoAimToggle =
+        button { gamepad2.ps }.whenBecomesTrue { autoRangingEnabled = !autoRangingEnabled }
   }
 
   override fun onUpdate() {
@@ -269,13 +317,25 @@ class teleop : NextFTCOpMode() {
     if (BotState.alliance == Alliance.BLUE) {
       targetPose = Pose(0.0, 144.0, 0.0)
     }
-    val currentX = PedroComponent.follower.pose.x + offsetX
-    val currentY = PedroComponent.follower.pose.y + offsetY
+    val currentX = PedroComponent.follower.pose.x
+    val currentY = PedroComponent.follower.pose.y
     val deltaX = targetPose.x - currentX
     val deltaY = targetPose.y - currentY
+    val distanceToTarget = sqrt(deltaX * deltaX + deltaY * deltaY)
     val absoluteAngleToTarget = atan2(deltaY, deltaX).rad
     val relativeAngleToTarget =
         (PedroComponent.follower.pose.heading.rad - absoluteAngleToTarget + 180.deg).normalized
+
+    val config = getShootingConfigForDistance(distanceToTarget)
+    if (config != null && autoRangingEnabled) {
+      if (flywheelTargetSpeed != config.flywheelSpeed) {
+        flywheelTargetSpeed = config.flywheelSpeed
+        Flywheel.enable().then(Flywheel.setSpeed(config.flywheelSpeed)).schedule()
+      }
+      if (Hood.position != config.hoodPosition) {
+        Hood.position = config.hoodPosition
+      }
+    }
 
     if (ignorePinpoint) {
       if (((System.currentTimeMillis() / 500) % 2).toInt() == 0) {
@@ -290,11 +350,17 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("X", PedroComponent.follower.pose.x)
     telemetry.addData("Y", PedroComponent.follower.pose.y)
     telemetry.addData("Heading", PedroComponent.follower.pose.heading)
+    telemetry.addData("Distance to Target", distanceToTarget)
+    val shootingModeDisplay =
+        if (autoRangingEnabled) {
+          "<span style=\"background-color: #00FF00; color: black;\">&nbsp;&nbsp;AUTO&nbsp;&nbsp;</span>"
+        } else {
+          "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;MANUAL&nbsp;&nbsp;</span>"
+        }
+    telemetry.addData("Shooting Mode", shootingModeDisplay)
     telemetry.addData("Angle to (144, 144)", relativeAngleToTarget.inDeg)
     telemetry.addData("Flywheel Target Speed", flywheelTargetSpeed)
     telemetry.addData("Hood position", Hood.position)
-    telemetry.addData("Offset X", offsetX)
-    telemetry.addData("Offset Y", offsetY)
     /* HTML telemetry reference
     telemetry.addLine("<b>Bold text</b>")
     telemetry.addLine("<i>Italic text</i>")
