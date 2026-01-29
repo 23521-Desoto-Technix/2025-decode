@@ -61,6 +61,11 @@ class teleop : NextFTCOpMode() {
 
   var slowMode = false
 
+  var offsetX = 0.0
+  var offsetY = 0.0
+
+  val offsetValues = listOf(-1.634, 0.0, 1.634)
+
   val headingPID = controlSystem { posPid(0.0085, 0.0, 0.0) }
 
   private lateinit var backRight: com.qualcomm.robotcore.hardware.DcMotor
@@ -245,6 +250,18 @@ class teleop : NextFTCOpMode() {
             .whenFalse { headingLocked = false }
     val slow =
         button { gamepad1.left_bumper }.whenTrue { slowMode = true }.whenFalse { slowMode = false }
+    val offsetXToggle =
+        button { gamepad2.triangle }
+            .whenBecomesTrue {
+              val currentIndex = offsetValues.indexOf(offsetX)
+              offsetX = offsetValues[(currentIndex + 1) % offsetValues.size]
+            }
+    val offsetYToggle =
+        button { gamepad2.triangle && gamepad2.ps }
+            .whenBecomesTrue {
+              val currentIndex = offsetValues.indexOf(offsetY)
+              offsetY = offsetValues[(currentIndex + 1) % offsetValues.size]
+            }
   }
 
   override fun onUpdate() {
@@ -252,9 +269,6 @@ class teleop : NextFTCOpMode() {
     if (BotState.alliance == Alliance.BLUE) {
       targetPose = Pose(0.0, 144.0, 0.0)
     }
-    val headingRadians = PedroComponent.follower.pose.heading
-    val offsetX = -1.634 * sin(headingRadians)
-    val offsetY = 1.634 * cos(headingRadians)
     val currentX = PedroComponent.follower.pose.x + offsetX
     val currentY = PedroComponent.follower.pose.y + offsetY
     val deltaX = targetPose.x - currentX
@@ -279,6 +293,8 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Angle to (144, 144)", relativeAngleToTarget.inDeg)
     telemetry.addData("Flywheel Target Speed", flywheelTargetSpeed)
     telemetry.addData("Hood position", Hood.position)
+    telemetry.addData("Offset X", offsetX)
+    telemetry.addData("Offset Y", offsetY)
     /* HTML telemetry reference
     telemetry.addLine("<b>Bold text</b>")
     telemetry.addLine("<i>Italic text</i>")
