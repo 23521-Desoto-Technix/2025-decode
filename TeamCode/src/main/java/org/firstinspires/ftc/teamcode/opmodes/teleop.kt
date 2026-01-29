@@ -253,8 +253,8 @@ class teleop : NextFTCOpMode() {
       targetPose = Pose(0.0, 144.0, 0.0)
     }
     val headingRadians = PedroComponent.follower.pose.heading
-    val offsetX = 1.634 * sin(headingRadians)
-    val offsetY = -1.634 * cos(headingRadians)
+    val offsetX = -1.634 * sin(headingRadians)
+    val offsetY = 1.634 * cos(headingRadians)
     val currentX = PedroComponent.follower.pose.x + offsetX
     val currentY = PedroComponent.follower.pose.y + offsetY
     val deltaX = targetPose.x - currentX
