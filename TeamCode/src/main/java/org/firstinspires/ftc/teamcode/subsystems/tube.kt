@@ -6,9 +6,9 @@ import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.ftc.ActiveOpMode
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.ServoEx
+import org.firstinspires.ftc.teamcode.utils.BotState
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
-import org.firstinspires.ftc.teamcode.utils.BotState
 
 private enum class TubeState {
   IDLE,
@@ -72,6 +72,8 @@ object Tube : Subsystem {
       transitionTo(TubeState.INTAKE_PHASE0)
     }
   }
+
+  fun isFull() = !top.state && !middle.state && !bottom.state
 
   val stopAll = InstantCommand { transitionTo(TubeState.IDLE) }
 

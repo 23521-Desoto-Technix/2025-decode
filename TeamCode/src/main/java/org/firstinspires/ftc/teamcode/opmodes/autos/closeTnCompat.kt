@@ -6,6 +6,7 @@ import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
+import dev.nextftc.core.commands.delays.WaitUntil
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -15,7 +16,6 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -24,6 +24,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Autonomous(name = "Close TechNova Compatible", group = "Close", preselectTeleOp = "teleop")
 class closeTnCompat : NextFTCOpMode() {
@@ -52,14 +54,13 @@ class closeTnCompat : NextFTCOpMode() {
           Alliance.BLUE -> (105).deg
           else -> 0.0.deg
         }
-      val gateIntake = SequentialGroup(
-          Tube.intakeAll,
-          FollowPath(paths.getValue("shootToGateIntake")),
-          Delay(1000.milliseconds),
-          //FollowPath(paths.getValue("gateIntake")),
-          //Delay(500.milliseconds),
-          FollowPath(paths.getValue("gateIntakeToShoot")),
-      )
+    val gateIntake =
+        SequentialGroup(
+            Tube.intakeAll,
+            FollowPath(paths.getValue("shootToGateIntake")),
+            WaitUntil { Tube.isFull() }.endAfter(1.5.seconds),
+            FollowPath(paths.getValue("gateIntakeToShoot")),
+        )
     return SequentialGroup(
         Flywheel.setSpeed(1_500.0),
         InstantCommand { Hood.position = 0.55 },
