@@ -53,8 +53,9 @@ class closeTnCompat : NextFTCOpMode() {
           else -> 0.0.deg
         }
       val gateIntake = SequentialGroup(
+          Tube.intakeAll,
           FollowPath(paths.getValue("shootToGateIntake")),
-          Delay(500.milliseconds),
+          Delay(1000.milliseconds),
           //FollowPath(paths.getValue("gateIntake")),
           //Delay(500.milliseconds),
           FollowPath(paths.getValue("gateIntakeToShoot")),
@@ -74,11 +75,11 @@ class closeTnCompat : NextFTCOpMode() {
         FollowPath(paths.getValue("spike2ToShoot")),
         Delay(150.milliseconds),
         Tube.shootAll(),
-        Delay(750.milliseconds),
-        Tube.intakeAll,
+        Delay(500.milliseconds),
         gateIntake,
         Delay(150.milliseconds),
         Tube.shootAll(),
+        Delay(500.milliseconds),
         gateIntake,
         Delay(150.milliseconds),
         Tube.shootAll(),
