@@ -20,7 +20,7 @@ object AutoConstants {
           pose("spike2", Pose(123.0, 60.0, 0.0.deg.inRad))
           pose("gate", Pose(125.0, 70.0, 0.0.deg.inRad))
           pose("gateMid", Pose(110.0, 65.0, 0.0.deg.inRad))
-          pose("gateBonk", Pose(131.0, 60.0, 25.deg.inRad))
+          pose("gateBonk", Pose(130.0, 61.0, 25.deg.inRad))
           pose("gateIntake", Pose(135.0, 52.0, 45.deg.inRad))
           pose("spike3", Pose(125.0, 35.0, 0.0.deg.inRad))
           pose("park", Pose(110.0, 70.0, 0.0.deg.inRad))
@@ -103,16 +103,11 @@ object AutoConstants {
               .setConstantHeadingInterpolation(p("gateBonk").heading)
               .build(),
       )
-        path("gateIntake",follower
-            .pathBuilder()
-            .addPath(BezierLine(p("gateBonk"), p("gateIntake")))
-            .setConstantHeadingInterpolation(p("gateIntake").heading)
-            .build(),)
       path(
           "gateIntakeToShoot",
           follower
               .pathBuilder()
-              .addPath(BezierLine(p("gateIntake"), p("shoot")))
+              .addPath(BezierLine(p("gateBonk"), p("shoot")))
               .setConstantHeadingInterpolation(p("shoot").heading)
               .build(),
       )

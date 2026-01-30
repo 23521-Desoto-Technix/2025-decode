@@ -52,6 +52,13 @@ class closeTnCompat : NextFTCOpMode() {
           Alliance.BLUE -> (105).deg
           else -> 0.0.deg
         }
+      val gateIntake = SequentialGroup(
+          FollowPath(paths.getValue("shootToGateIntake")),
+          Delay(500.milliseconds),
+          //FollowPath(paths.getValue("gateIntake")),
+          //Delay(500.milliseconds),
+          FollowPath(paths.getValue("gateIntakeToShoot")),
+      )
     return SequentialGroup(
         Flywheel.setSpeed(1_500.0),
         InstantCommand { Hood.position = 0.55 },
@@ -69,19 +76,10 @@ class closeTnCompat : NextFTCOpMode() {
         Tube.shootAll(),
         Delay(750.milliseconds),
         Tube.intakeAll,
-        FollowPath(paths.getValue("shootToGateIntake")),
-        Delay(500.milliseconds),
-        //FollowPath(paths.getValue("gateIntake")),
-        //Delay(500.milliseconds),
-        FollowPath(paths.getValue("gateIntakeToShoot")),
+        gateIntake,
         Delay(150.milliseconds),
         Tube.shootAll(),
-        Delay(500.milliseconds),
-        Tube.intakeAll,
-        FollowPath(paths.getValue("shootToGateIntake")),
-        FollowPath(paths.getValue("gateIntake")),
-        Delay(500.milliseconds),
-        FollowPath(paths.getValue("gateIntakeToShoot")),
+        gateIntake,
         Delay(150.milliseconds),
         Tube.shootAll(),
         Delay(500.milliseconds),
