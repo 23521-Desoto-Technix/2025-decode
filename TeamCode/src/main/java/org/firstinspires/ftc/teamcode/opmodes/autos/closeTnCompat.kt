@@ -75,6 +75,13 @@ class closeTnCompat : NextFTCOpMode() {
         Delay(250.milliseconds),
         Tube.shootAll(),
         Delay(500.milliseconds),
+        Tube.intakeAll,
+        FollowPath(paths.getValue("shootToGateIntake")),
+        Delay(750.milliseconds),
+        FollowPath(paths.getValue("gateIntakeToShoot")),
+        Delay(250.milliseconds),
+        Tube.shootAll(),
+        Delay(500.milliseconds),
         FollowPath(paths.getValue("shootToPark")),
     )
   }
