@@ -100,7 +100,8 @@ object AutoConstants {
           follower
               .pathBuilder()
               .addPath(BezierCurve(p("shoot"), p("s2Ctrl"), p("gateBonk")))
-              .setTimeoutConstraint(350.0)
+              .setTimeoutConstraint(500.0)
+              .setTranslationalConstraint(0.0)
               .setConstantHeadingInterpolation(p("gateBonk").heading)
               .addPath(BezierLine(p("gateBonk"), p("gateIntake")))
               .setConstantHeadingInterpolation(p("gateIntake").heading)
