@@ -74,22 +74,40 @@ class teleop : NextFTCOpMode() {
   val shootingConfigs =
       listOf(
           ShootingConfig(
-              25.0,
-              50.0,
-              1_600.0,
+              60.0,
+              75.0,
+              1_400.0,
               0.45,
           ),
           ShootingConfig(
-              50.0,
-              100.0,
-              1_800.0,
+              75.0,
+              93.0,
+              1_500.0,
               0.55,
           ),
           ShootingConfig(
-              100.0,
+              93.0,
+              110.0,
+              1_600.0,
+              0.6,
+          ),
+          ShootingConfig(
+              110.0,
+              130.0,
+              1_700.0,
+              0.6,
+          ),
+          ShootingConfig(
+              140.0,
               150.0,
-              2_000.0,
-              0.65,
+              2_050.0,
+              0.9,
+          ),
+          ShootingConfig(
+              150.0,
+              160.0,
+              2_100.0,
+              0.9,
           ),
       )
 
