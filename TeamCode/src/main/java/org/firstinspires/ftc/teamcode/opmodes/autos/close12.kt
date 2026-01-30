@@ -15,6 +15,7 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -23,7 +24,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Close 12", group = "Close", preselectTeleOp = "teleop")
 class close12 : NextFTCOpMode() {
@@ -48,13 +48,13 @@ class close12 : NextFTCOpMode() {
   private fun buildRoutine(paths: Map<String, PathChain>): Command {
     val turretAngle =
         when (BotState.alliance) {
-          Alliance.RED -> (-92.5).deg
-          Alliance.BLUE -> (95).deg
+          Alliance.RED -> (-85.0).deg
+          Alliance.BLUE -> (85).deg
           else -> 0.0.deg
         }
     return SequentialGroup(
-        Flywheel.setSpeed(1_600.0),
-        InstantCommand { Hood.position = 0.45 },
+        Flywheel.setSpeed(1_500.0),
+        InstantCommand { Hood.position = 0.55 },
         InstantCommand { Turret.setTargetAngle(turretAngle) },
         FollowPath(paths.getValue("startToShoot")),
         Delay(500.milliseconds),

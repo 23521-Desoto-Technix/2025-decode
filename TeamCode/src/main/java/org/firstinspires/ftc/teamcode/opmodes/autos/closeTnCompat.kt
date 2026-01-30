@@ -48,13 +48,13 @@ class closeTnCompat : NextFTCOpMode() {
     private fun buildRoutine(paths: Map<String, PathChain>): Command {
         val turretAngle =
             when (BotState.alliance) {
-                Alliance.RED -> (-92.5).deg
-                Alliance.BLUE -> (95).deg
+                Alliance.RED -> (-85.0).deg
+                Alliance.BLUE -> (85).deg
                 else -> 0.0.deg
             }
         return SequentialGroup(
-            Flywheel.setSpeed(1_600.0),
-            InstantCommand { Hood.position = 0.45 },
+            Flywheel.setSpeed(1_500.0),
+            InstantCommand { Hood.position = 0.55 },
             InstantCommand { Turret.setTargetAngle(turretAngle) },
             FollowPath(paths.getValue("startToShoot")),
             Delay(250.milliseconds),
@@ -64,6 +64,7 @@ class closeTnCompat : NextFTCOpMode() {
             FollowPath(paths.getValue("shootToSpike2")),
             Delay(250.milliseconds),
             FollowPath(paths.getValue("spike2ToShoot")),
+            FollowPath(paths.getValue("spike2ToGate")),
             Delay(250.milliseconds),
             Tube.shootAll(),
             Delay(250.milliseconds),
