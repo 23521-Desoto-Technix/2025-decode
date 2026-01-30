@@ -20,6 +20,8 @@ object AutoConstants {
           pose("spike2", Pose(123.0, 60.0, 0.0.deg.inRad))
           pose("gate", Pose(125.0, 70.0, 0.0.deg.inRad))
           pose("gateMid", Pose(110.0, 65.0, 0.0.deg.inRad))
+          pose("gateBonk", Pose(129.0, 55.0, -40.deg.inRad))
+          pose("gateIntake", Pose(128.0, 44.0, -90.deg.inRad))
           pose("spike3", Pose(125.0, 35.0, 0.0.deg.inRad))
           pose("park", Pose(110.0, 70.0, 0.0.deg.inRad))
           pose("s2Ctrl", Pose(85.0, 55.0, 0.0))
@@ -91,6 +93,30 @@ object AutoConstants {
               .pathBuilder()
               .addPath(BezierCurve(p("spike2"), p("gateMid"), p("gate")))
               .setConstantHeadingInterpolation(p("spike2").heading)
+              .build(),
+      )
+      path(
+          "shootToGateBonk",
+          follower
+              .pathBuilder()
+              .addPath(BezierLine(p("shoot"), p("gateBonk")))
+              .setConstantHeadingInterpolation(p("gateBonk").heading)
+              .build(),
+      )
+      path(
+          "gateBonkToGateIntake",
+          follower
+              .pathBuilder()
+              .addPath(BezierLine(p("gateBonk"), p("gateIntake")))
+              .setConstantHeadingInterpolation(p("gateIntake").heading)
+              .build(),
+      )
+      path(
+          "gateIntakeToShoot",
+          follower
+              .pathBuilder()
+              .addPath(BezierLine(p("gateIntake"), p("shoot")))
+              .setConstantHeadingInterpolation(p("shoot").heading)
               .build(),
       )
       path(

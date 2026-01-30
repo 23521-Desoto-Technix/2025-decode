@@ -15,7 +15,6 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -24,6 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Close TechNova Compatible", group = "Close", preselectTeleOp = "teleop")
 class closeTnCompat : NextFTCOpMode() {
@@ -69,14 +69,11 @@ class closeTnCompat : NextFTCOpMode() {
         Tube.shootAll(),
         Delay(500.milliseconds),
         Tube.intakeAll,
-        FollowPath(paths.getValue("shootToSpike1")),
-        FollowPath(paths.getValue("spike1ToShoot")),
+        FollowPath(paths.getValue("shootToGateBonk")),
         Delay(250.milliseconds),
-        Tube.shootAll(),
-        Delay(500.milliseconds),
-        Tube.intakeAll,
-        FollowPath(paths.getValue("shootToSpike3")),
-        FollowPath(paths.getValue("spike3ToShoot")),
+        FollowPath(paths.getValue("gateBonkToIntake")),
+        Delay(750.milliseconds),
+        FollowPath(paths.getValue("gateBonkToShoot")),
         Delay(250.milliseconds),
         Tube.shootAll(),
         Delay(500.milliseconds),
