@@ -58,7 +58,8 @@ class closeTnCompat : NextFTCOpMode() {
         SequentialGroup(
             Tube.intakeAll,
             FollowPath(paths.getValue("shootToGateIntake")),
-            WaitUntil { Tube.isFull() },
+            //WaitUntil { Tube.isFull() }.endAfter(1.5.seconds),
+            Delay(1000.milliseconds),
             FollowPath(paths.getValue("gateIntakeToShoot")),
         )
     return SequentialGroup(
