@@ -50,9 +50,9 @@ class closeTnCompat : NextFTCOpMode() {
   private fun buildRoutine(paths: Map<String, PathChain>): Command {
     val turretAngle =
         when (BotState.alliance) {
-          Alliance.RED -> (-105.0).deg
-          Alliance.BLUE -> (105).deg
-          else -> 90.0.deg
+          Alliance.RED -> (-101.0).deg
+          Alliance.BLUE -> (101).deg
+          else -> 0.0.deg
         }
     val gateIntake =
         SequentialGroup(
