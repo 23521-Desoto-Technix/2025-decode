@@ -59,7 +59,7 @@ class close18 : NextFTCOpMode() {
                 Tube.intakeAll,
                 FollowPath(paths.getValue("shootToGateIntake")),
                 //WaitUntil { Tube.isFull() }.endAfter(1.5.seconds),
-                Delay(1000.milliseconds),
+                Delay(2000.milliseconds),
                 FollowPath(paths.getValue("gateIntakeToShoot")),
             )
         return SequentialGroup(

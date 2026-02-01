@@ -1,42 +1,66 @@
 package org.firstinspires.ftc.teamcode.tests
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import dev.nextftc.core.components.BindingsComponent
+import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.core.units.deg
+import dev.nextftc.ftc.NextFTCOpMode
+import dev.nextftc.ftc.components.BulkReadComponent
+import org.firstinspires.ftc.teamcode.subsystems.Turret
 
 @TeleOp(name = "Turret Test")
-class turretTest : LinearOpMode() {
-  override fun runOpMode() {
-    val turretLeft = hardwareMap.servo["turretLeft"]
-    val turretRight = hardwareMap.servo["turretRight"]
-    val encoder = hardwareMap.analogInput["turretEncoder"]
+class turretTest : NextFTCOpMode() {
+  init {
+    addComponents(
+        SubsystemComponent(Turret),
+        BulkReadComponent,
+        BindingsComponent,
+    )
+  }
 
-    var offset = 0.0
+  var angle = 0.0
+  var usingRaw = false
+  var raw = 0.5
 
-    waitForStart()
-    while (opModeIsActive()) {
-      if (gamepad1.dpadLeftWasPressed()) {
-        offset -= 0.01
-      }
-      if (gamepad1.dpadRightWasPressed()) {
-        offset += 0.01
-      }
-      if (gamepad1.circleWasPressed()) {
-        offset = 0.0
-      }
-      if (gamepad1.leftBumperWasPressed()) {
-        offset -= 0.001
-      }
-      if (gamepad1.rightBumperWasPressed()) {
-        offset += 0.001
-      }
-
-      turretLeft.position = 0.5
-      turretRight.position = 0.5 + offset
-
-      telemetry.addData("Encoder Value", (encoder.voltage / 3.3 * 2) - 1)
-      telemetry.addData("Offset", offset)
-      telemetry.update()
+  override fun onUpdate() {
+    if (gamepad1.aWasPressed()) {
+      usingRaw = !usingRaw
     }
+
+    if (usingRaw) {
+      if (gamepad1.dpad_up) {
+        raw += 0.01
+      }
+      if (gamepad1.dpad_down) {
+        raw -= 0.01
+      }
+      if (gamepad1.dpad_left) {
+        raw += 0.001
+      }
+      if (gamepad1.dpad_right) {
+        raw -= 0.001
+      }
+      raw = raw.coerceIn(0.0, 1.0)
+      telemetry.addData("Mode", "Raw")
+      telemetry.addData("Raw Position", raw)
+      Turret.setRawPosition(raw)
+    } else {
+      if (gamepad1.dpad_up) {
+        angle += 15.0
+      }
+      if (gamepad1.dpad_down) {
+        angle -= 15.0
+      }
+      if (gamepad1.dpad_left) {
+        angle += 1.0
+      }
+      if (gamepad1.dpad_right) {
+        angle -= 1.0
+      }
+      telemetry.addData("Mode", "Angle")
+      telemetry.addData("Target Angle", angle)
+      Turret.setTargetAngle(angle.deg)
+    }
+    telemetry.update()
   }
 }
