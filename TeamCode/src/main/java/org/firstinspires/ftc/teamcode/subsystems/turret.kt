@@ -12,7 +12,7 @@ object Turret : Subsystem {
   val right = ServoEx("turretRight")
   lateinit var encoder: AnalogInput
   val DEADZONE = 60.deg
-    val MAGIC_NUMBER = 1.05
+  val MAGIC_NUMBER = 1.04
   const val RIGHT_OFFSET = 0.028
 
   private var lastVoltage: Double = 0.0
