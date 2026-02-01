@@ -52,7 +52,7 @@ class closeTnCompat : NextFTCOpMode() {
         when (BotState.alliance) {
           Alliance.RED -> (-105.0).deg
           Alliance.BLUE -> (105).deg
-          else -> 0.0.deg
+          else -> 90.0.deg
         }
     val gateIntake =
         SequentialGroup(
