@@ -87,27 +87,33 @@ class teleop : NextFTCOpMode() {
           ),
           ShootingConfig(
               93.0,
-              110.0,
+              104.0,
               1_600.0,
               0.6,
+          ),
+          ShootingConfig(
+              104.0,
+              110.0,
+              1_700.0,
+              0.65,
           ),
           ShootingConfig(
               110.0,
               130.0,
               1_700.0,
               0.6,
-          ),
-          ShootingConfig(
-              140.0,
-              150.0,
-              2_050.0,
-              0.9,
-          ),
-          ShootingConfig(
-              150.0,
-              160.0,
-              2_100.0,
-              0.9,
+         // ),
+          //ShootingConfig(
+             // 140.0,
+              //150.0,
+             // 2_050.0,
+             // 0.9,
+        //  ),
+         // ShootingConfig(
+             // 150.0,
+             // 160.0,
+             // 2_150.0,
+            //  0.95,
           ),
       )
 
@@ -235,14 +241,14 @@ class teleop : NextFTCOpMode() {
     val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
     val stopIntake = button { gamepad1.cross }.whenBecomesTrue { Tube.stopAll.schedule() }
     val shootAll = button { gamepad1.triangle }.whenBecomesTrue { Tube.shootAll().schedule() }
-    val shootAllSlow = button { gamepad1.square }.whenBecomesTrue { Tube.shootAll(0.8).schedule() }
+    val shootAllSlow = button { gamepad1.square }.whenBecomesTrue { Tube.shootAll(0.6).schedule() }
 
     val flywheelLong =
         button { gamepad1.dpad_up || gamepad2.dpad_up }
             .whenBecomesTrue {
               if (!autoRangingEnabled) {
                 flywheelTargetSpeed = 2_050.0
-                Hood.position = 0.65
+                Hood.position = 0.9
                 Flywheel.enable().then(Flywheel.setSpeed(2_050.0)).schedule()
               }
             }
