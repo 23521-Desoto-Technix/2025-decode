@@ -17,6 +17,11 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
@@ -33,11 +38,6 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
 
 data class ShootingConfig(
     val minDistance: Double,
@@ -238,9 +238,13 @@ class teleop : NextFTCOpMode() {
     driverControlled()
     BindingManager.layer = null
 
-    val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
+    val intake =
+        button { gamepad1.circle || gamepad1.left_trigger > 0.2 }
+            .whenBecomesTrue { Tube.intakeAll.schedule() }
     val stopIntake = button { gamepad1.cross }.whenBecomesTrue { Tube.stopAll.schedule() }
-    val shootAll = button { gamepad1.triangle }.whenBecomesTrue { Tube.shootAll().schedule() }
+    val shootAll =
+        button { gamepad1.triangle || gamepad1.right_trigger > 0.2 }
+            .whenBecomesTrue { Tube.shootAll().schedule() }
     val shootAllSlow = button { gamepad1.square }.whenBecomesTrue { Tube.shootAll(0.6).schedule() }
 
     val flywheelLong =
