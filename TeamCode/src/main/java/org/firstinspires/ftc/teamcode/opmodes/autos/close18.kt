@@ -27,8 +27,8 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-@Autonomous(name = "Close TechNova Compatible", group = "Close", preselectTeleOp = "teleop")
-class closeTnCompat : NextFTCOpMode() {
+@Autonomous(name = "Close 18", group = "Close", preselectTeleOp = "teleop")
+class close18 : NextFTCOpMode() {
     init {
         addComponents(
             SubsystemComponent(Flywheel, Hood, Turret, Tube),
