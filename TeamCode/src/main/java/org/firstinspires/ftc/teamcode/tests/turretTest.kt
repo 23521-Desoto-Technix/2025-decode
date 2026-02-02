@@ -28,16 +28,16 @@ class turretTest : NextFTCOpMode() {
     }
 
     if (usingRaw) {
-      if (gamepad1.dpad_up) {
+      if (gamepad1.dpadUpWasPressed()) {
         raw += 0.01
       }
-      if (gamepad1.dpad_down) {
+      if (gamepad1.dpadDownWasPressed()) {
         raw -= 0.01
       }
-      if (gamepad1.dpad_left) {
+      if (gamepad1.dpadLeftWasPressed()) {
         raw += 0.001
       }
-      if (gamepad1.dpad_right) {
+      if (gamepad1.dpadRightWasPressed()) {
         raw -= 0.001
       }
       raw = raw.coerceIn(0.0, 1.0)
@@ -45,16 +45,16 @@ class turretTest : NextFTCOpMode() {
       telemetry.addData("Raw Position", raw)
       Turret.setRawPosition(raw)
     } else {
-      if (gamepad1.dpad_up) {
+      if (gamepad1.dpadUpWasPressed()) {
         angle += 15.0
       }
-      if (gamepad1.dpad_down) {
+      if (gamepad1.dpadDownWasPressed()) {
         angle -= 15.0
       }
-      if (gamepad1.dpad_left) {
+      if (gamepad1.dpadLeftWasPressed()) {
         angle += 1.0
       }
-      if (gamepad1.dpad_right) {
+      if (gamepad1.dpadRightWasPressed()) {
         angle -= 1.0
       }
       telemetry.addData("Mode", "Angle")
