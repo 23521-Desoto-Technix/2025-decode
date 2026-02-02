@@ -6,7 +6,6 @@ import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
-import dev.nextftc.core.commands.delays.WaitUntil
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -25,7 +24,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @Autonomous(name = "Close TechNova Compatible", group = "Close", preselectTeleOp = "teleop")
 class closeTnCompat : NextFTCOpMode() {
@@ -50,15 +48,15 @@ class closeTnCompat : NextFTCOpMode() {
   private fun buildRoutine(paths: Map<String, PathChain>): Command {
     val turretAngle =
         when (BotState.alliance) {
-          Alliance.RED -> (-101.0).deg
-          Alliance.BLUE -> (101).deg
+          Alliance.RED -> AutoConstants.Angles["closeTurretRed"]
+          Alliance.BLUE -> AutoConstants.Angles["closeTurretBlue"]
           else -> 0.0.deg
         }
     val gateIntake =
         SequentialGroup(
             Tube.intakeAll,
             FollowPath(paths.getValue("shootToGateIntake")),
-            //WaitUntil { Tube.isFull() }.endAfter(1.5.seconds),
+            // WaitUntil { Tube.isFull() }.endAfter(1.5.seconds),
             Delay(1000.milliseconds),
             FollowPath(paths.getValue("gateIntakeToShoot")),
         )

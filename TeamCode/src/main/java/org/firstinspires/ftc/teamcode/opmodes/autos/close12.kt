@@ -48,8 +48,8 @@ class close12 : NextFTCOpMode() {
   private fun buildRoutine(paths: Map<String, PathChain>): Command {
     val turretAngle =
         when (BotState.alliance) {
-          Alliance.RED -> (-105.0).deg
-          Alliance.BLUE -> (105).deg
+          Alliance.RED -> AutoConstants.Angles["closeTurretRed"]
+          Alliance.BLUE -> AutoConstants.Angles["closeTurretBlue"]
           else -> 0.0.deg
         }
     return SequentialGroup(

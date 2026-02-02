@@ -5,6 +5,7 @@ import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.PathChain
+import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.extensions.pedro.PedroComponent
 import org.firstinspires.ftc.teamcode.utils.Alliance
@@ -48,6 +49,23 @@ object AutoConstants {
 
     fun forAlliance(alliance: Alliance): Map<String, PathChain> {
       return if (alliance == Alliance.BLUE) blue else red
+    }
+  }
+
+  object Angles {
+    private val angles =
+        linkedMapOf<String, Angle>().apply {
+          angle("closeTurretRed", (-90.0).deg)
+          angle("closeTurretBlue", 90.0.deg)
+        }
+
+    operator fun get(name: String): Angle = angles.getValue(name)
+
+    private fun MutableMap<String, Angle>.angle(
+        name: String,
+        angle: Angle,
+    ) {
+      this[name] = angle
     }
   }
 
