@@ -26,7 +26,7 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Close 18", group = "Close", preselectTeleOp = "teleop")
-class close18 : NextFTCOpMode() {
+class   close18 : NextFTCOpMode() {
   init {
     addComponents(
         SubsystemComponent(Flywheel, Hood, Turret, Tube),
