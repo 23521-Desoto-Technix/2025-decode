@@ -17,11 +17,6 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
@@ -38,6 +33,12 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 data class ShootingConfig(
     val minDistance: Double,
@@ -70,6 +71,8 @@ class teleop : NextFTCOpMode() {
   var slowMode = false
 
   var autoRangingEnabled = true
+
+  private var lastUpdateNs = 0L
 
   val shootingConfigs =
       listOf(
@@ -108,18 +111,18 @@ class teleop : NextFTCOpMode() {
               130.0,
               1_700.0,
               0.6,
-         // ),
-          //ShootingConfig(
-             // 140.0,
-              //150.0,
-             // 2_050.0,
-             // 0.9,
-        //  ),
-         // ShootingConfig(
-             // 150.0,
-             // 160.0,
-             // 2_150.0,
-            //  0.95,
+              // ),
+              // ShootingConfig(
+              // 140.0,
+              // 150.0,
+              // 2_050.0,
+              // 0.9,
+              //  ),
+              // ShootingConfig(
+              // 150.0,
+              // 160.0,
+              // 2_150.0,
+              //  0.95,
           ),
       )
 
@@ -245,11 +248,11 @@ class teleop : NextFTCOpMode() {
     BindingManager.layer = null
 
     val intake =
-        button { gamepad1.circle || gamepad1.left_trigger > 0.2 }
+        button { gamepad1.circle || gamepad1.right_trigger > 0.2 }
             .whenBecomesTrue { Tube.intakeAll.schedule() }
     val stopIntake = button { gamepad1.cross }.whenBecomesTrue { Tube.stopAll.schedule() }
     val shootAll =
-        button { gamepad1.triangle || gamepad1.right_trigger > 0.2 }
+        button { gamepad1.triangle || gamepad1.left_trigger > 0.2 }
             .whenBecomesTrue { Tube.shootAll().schedule() }
     val shootAllSlow = button { gamepad1.square }.whenBecomesTrue { Tube.shootAll(0.6).schedule() }
 
@@ -347,6 +350,10 @@ class teleop : NextFTCOpMode() {
   }
 
   override fun onUpdate() {
+    val nowNs = System.nanoTime()
+    val loopMs = if (lastUpdateNs == 0L) 0.0 else (nowNs - lastUpdateNs) / 1_000_000.0
+    lastUpdateNs = nowNs
+
     var targetPose = Pose(144.0, 144.0, 0.0)
     if (BotState.alliance == Alliance.BLUE) {
       targetPose = Pose(0.0, 144.0, 0.0)
@@ -385,6 +392,7 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Y", PedroComponent.follower.pose.y)
     telemetry.addData("Heading", PedroComponent.follower.pose.heading)
     telemetry.addData("Distance to Target", distanceToTarget)
+    telemetry.addData("Loop Time (ms)", String.format(Locale.US, "%.1f", loopMs))
     val shootingModeDisplay =
         if (autoRangingEnabled) {
           "<span style=\"background-color: #00FF00; color: black;\">&nbsp;&nbsp;AUTO&nbsp;&nbsp;</span>"
