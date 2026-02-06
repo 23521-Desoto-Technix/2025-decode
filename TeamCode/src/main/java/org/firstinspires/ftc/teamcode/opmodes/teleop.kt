@@ -128,6 +128,8 @@ class teleop : NextFTCOpMode() {
 
   val headingPID = controlSystem { posPid(0.0085, 0.0, 0.0) }
 
+  var lockTurret = false
+
   private lateinit var backRight: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var frontLeft: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var backLeft: com.qualcomm.robotcore.hardware.DcMotor
@@ -347,6 +349,7 @@ class teleop : NextFTCOpMode() {
         button { gamepad1.left_bumper }.whenTrue { slowMode = true }.whenFalse { slowMode = false }
     val autoAimToggle =
         button { gamepad2.ps }.whenBecomesTrue { autoRangingEnabled = !autoRangingEnabled }
+    val lockTurretToggle = button { gamepad2.triangle }.whenBecomesTrue { lockTurret = !lockTurret }
   }
 
   override fun onUpdate() {
@@ -515,7 +518,7 @@ class teleop : NextFTCOpMode() {
     } else {
       Turret.setTargetAngle(Turret.currentAngle - targetTagBearing.deg)
     }*/
-    if (!ignorePinpoint) {
+    if (!ignorePinpoint && !lockTurret) {
       Turret.setTargetAngle(-relativeAngleToTarget)
     } else {
       Turret.setTargetAngle(0.0.deg)
