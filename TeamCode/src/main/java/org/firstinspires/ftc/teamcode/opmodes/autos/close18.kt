@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Close 18", group = "Close", preselectTeleOp = "teleop")
@@ -52,14 +53,15 @@ class   close18 : NextFTCOpMode() {
           Alliance.BLUE -> AutoConstants.Angles["closeTurretBlue"]
           else -> 0.0.deg
         }
-    val gateIntake =
+    val gateIntake: (Duration) -> Command = { delay ->
         SequentialGroup(
             Tube.intakeAll,
             FollowPath(paths.getValue("shootToGateIntake")),
             // WaitUntil { Tube.isFull() }.endAfter(1.5.seconds),
-            Delay(2000.milliseconds),
+            Delay(delay),
             FollowPath(paths.getValue("gateIntakeToShoot")),
         )
+    }
     return SequentialGroup(
         Flywheel.setSpeed(1_500.0),
         InstantCommand { Hood.position = 0.55 },
@@ -74,11 +76,11 @@ class   close18 : NextFTCOpMode() {
         Delay(150.milliseconds),
         Tube.shootAll(),
         Delay(500.milliseconds),
-        gateIntake,
+        gateIntake(2000.milliseconds),
         Delay(150.milliseconds),
         Tube.shootAll(),
         Delay(500.milliseconds),
-        gateIntake,
+        gateIntake(2000.milliseconds),
         Delay(150.milliseconds),
         Tube.shootAll(),
         Delay(500.milliseconds),
