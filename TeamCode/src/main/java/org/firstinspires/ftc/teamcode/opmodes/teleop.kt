@@ -30,6 +30,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
@@ -138,6 +139,9 @@ class teleop : NextFTCOpMode() {
 
   lateinit var aprilTag: AprilTagProcessor
   lateinit var portal: VisionPortal
+
+  val redReference = Pose(110.0, 131.3, -90.0.deg.inRad)
+  val blueReference = mirrorPose(redReference)
 
   fun rotateJoystickInput(
       forward: Double,
@@ -350,6 +354,15 @@ class teleop : NextFTCOpMode() {
     val autoAimToggle =
         button { gamepad2.ps }.whenBecomesTrue { autoRangingEnabled = !autoRangingEnabled }
     val lockTurretToggle = button { gamepad2.triangle }.whenBecomesTrue { lockTurret = !lockTurret }
+    val resetPose =
+        button { gamepad1.ps }
+            .whenBecomesTrue {
+              if (BotState.alliance == Alliance.RED) {
+                PedroComponent.follower.pose = redReference
+              } else if (BotState.alliance == Alliance.BLUE) {
+                PedroComponent.follower.pose = blueReference
+              }
+            }
   }
 
   override fun onUpdate() {
