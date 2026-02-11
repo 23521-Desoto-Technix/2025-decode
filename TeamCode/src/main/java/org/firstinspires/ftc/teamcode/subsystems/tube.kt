@@ -34,6 +34,8 @@ object Tube : Subsystem {
   private var state = TubeState.IDLE
   private var stepStartedAt = now()
   private var shootSpeed = 1.0
+  private var bottomTripStartedAt: Long? = null
+  private var lastBottomState = true
 
   override fun initialize() {
     if (!BotState.enabled) {
@@ -86,18 +88,51 @@ object Tube : Subsystem {
   }
 
   private fun advanceStateMachine() {
+    updateBottomTripTimer()
+
     when (state) {
-      TubeState.INTAKE_PHASE0 -> if (!top.state) transitionTo(TubeState.INTAKE_DELAY_AFTER_TOP)
-      TubeState.INTAKE_DELAY_AFTER_TOP ->
-          if (elapsedSinceStep() >= 300.milliseconds) transitionTo(TubeState.INTAKE_WAIT_MIDDLE)
-      TubeState.INTAKE_WAIT_MIDDLE ->
-          if (!middle.state) transitionTo(TubeState.INTAKE_DELAY_AFTER_MIDDLE)
-      TubeState.INTAKE_DELAY_AFTER_MIDDLE ->
-          if (elapsedSinceStep() >= 200.milliseconds) transitionTo(TubeState.INTAKE_WAIT_BOTTOM)
-      TubeState.INTAKE_WAIT_BOTTOM ->
-          if (!bottom.state) transitionTo(TubeState.INTAKE_DELAY_AFTER_BOTTOM)
-      TubeState.INTAKE_DELAY_AFTER_BOTTOM ->
-          if (elapsedSinceStep() >= 50.milliseconds) transitionTo(TubeState.INTAKE_FINAL_PUSH)
+      TubeState.INTAKE_PHASE0 -> {
+        if (isBottomContinuouslyTripped(1000.milliseconds)) {
+          transitionTo(TubeState.INTAKE_FINAL_PUSH)
+        } else if (!top.state) {
+          transitionTo(TubeState.INTAKE_DELAY_AFTER_TOP)
+        }
+      }
+      TubeState.INTAKE_DELAY_AFTER_TOP -> {
+        if (isBottomContinuouslyTripped(1000.milliseconds)) {
+          transitionTo(TubeState.INTAKE_FINAL_PUSH)
+        } else if (elapsedSinceStep() >= 300.milliseconds) {
+          transitionTo(TubeState.INTAKE_WAIT_MIDDLE)
+        }
+      }
+      TubeState.INTAKE_WAIT_MIDDLE -> {
+        if (isBottomContinuouslyTripped(1000.milliseconds)) {
+          transitionTo(TubeState.INTAKE_FINAL_PUSH)
+        } else if (!middle.state) {
+          transitionTo(TubeState.INTAKE_DELAY_AFTER_MIDDLE)
+        }
+      }
+      TubeState.INTAKE_DELAY_AFTER_MIDDLE -> {
+        if (isBottomContinuouslyTripped(1000.milliseconds)) {
+          transitionTo(TubeState.INTAKE_FINAL_PUSH)
+        } else if (elapsedSinceStep() >= 200.milliseconds) {
+          transitionTo(TubeState.INTAKE_WAIT_BOTTOM)
+        }
+      }
+      TubeState.INTAKE_WAIT_BOTTOM -> {
+        if (isBottomContinuouslyTripped(1000.milliseconds)) {
+          transitionTo(TubeState.INTAKE_FINAL_PUSH)
+        } else if (!bottom.state) {
+          transitionTo(TubeState.INTAKE_DELAY_AFTER_BOTTOM)
+        }
+      }
+      TubeState.INTAKE_DELAY_AFTER_BOTTOM -> {
+        if (isBottomContinuouslyTripped(1000.milliseconds)) {
+          transitionTo(TubeState.INTAKE_FINAL_PUSH)
+        } else if (elapsedSinceStep() >= 50.milliseconds) {
+          transitionTo(TubeState.INTAKE_FINAL_PUSH)
+        }
+      }
       TubeState.INTAKE_FINAL_PUSH ->
           if (elapsedSinceStep() >= 50.milliseconds) {
             transitionTo(TubeState.IDLE)
@@ -120,7 +155,29 @@ object Tube : Subsystem {
     if (state == newState) return
     state = newState
     markStepStart()
+    resetBottomTripTimer()
     applyStateOutputs(newState)
+  }
+
+  private fun updateBottomTripTimer() {
+    val currentBottomTripped = !bottom.state
+
+    if (currentBottomTripped && !lastBottomState) {
+      bottomTripStartedAt = now()
+    } else if (!currentBottomTripped && lastBottomState) {
+      bottomTripStartedAt = null
+    }
+
+    lastBottomState = currentBottomTripped
+  }
+
+  private fun isBottomContinuouslyTripped(duration: kotlin.time.Duration): Boolean {
+    if (bottomTripStartedAt == null) return false
+    return (now() - bottomTripStartedAt!!) >= duration.inWholeNanoseconds
+  }
+
+  private fun resetBottomTripTimer() {
+    bottomTripStartedAt = null
   }
 
   private fun applyStateOutputs(targetState: TubeState) {
