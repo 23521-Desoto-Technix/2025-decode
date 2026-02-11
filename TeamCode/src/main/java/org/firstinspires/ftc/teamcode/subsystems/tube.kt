@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.subsystems
 
 import com.qualcomm.robotcore.hardware.DigitalChannel
 import dev.nextftc.core.commands.utility.InstantCommand
+import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.ftc.ActiveOpMode
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.ServoEx
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
 
@@ -86,6 +88,17 @@ object Tube : Subsystem {
     shootSpeed = speed
     transitionTo(TubeState.SHOOTING_HARDSTOP_SETTLE)
   }
+
+  fun waitForAll(d: Duration? = null) =
+      LambdaCommand()
+          .setStart { markStepStart() }
+          .setIsDone {
+            if (d == null) {
+              this.isFull()
+            } else {
+              this.isFull() || elapsedSinceStep() >= d
+            }
+          }
 
   private fun advanceStateMachine() {
     updateBottomTripTimer()
