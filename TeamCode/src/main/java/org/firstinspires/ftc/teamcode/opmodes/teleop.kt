@@ -140,7 +140,7 @@ class teleop : NextFTCOpMode() {
   lateinit var aprilTag: AprilTagProcessor
   lateinit var portal: VisionPortal
 
-  val redReference = Pose(110.0, 131.3, -90.0.deg.inRad)
+  val redReference = Pose(110.0, 131.3, 90.0.deg.inRad)
   val blueReference = mirrorPose(redReference)
 
   fun rotateJoystickInput(
@@ -483,7 +483,7 @@ class teleop : NextFTCOpMode() {
     if (ignorePinpoint) {
       rotateBy = 0.0.deg
     }
-    telemetry.addData("Current angle", rotateBy.normalized.inDeg)
+    telemetry.addData("Current angle", PedroComponent.follower.pose.heading.rad.normalized.inDeg)
     val rotated =
         rotateJoystickInput(
             -gamepad1.left_stick_y.toDouble(),
