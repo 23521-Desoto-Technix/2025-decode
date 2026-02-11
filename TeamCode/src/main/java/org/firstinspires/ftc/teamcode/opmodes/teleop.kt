@@ -256,13 +256,13 @@ class teleop : NextFTCOpMode() {
     val shootAll =
         button { gamepad1.triangle || gamepad1.left_trigger > 0.2 }
             .whenBecomesTrue { Tube.shootAll().schedule() }
-    val shootAllSlow = button { gamepad1.square }.whenBecomesTrue { Tube.shootAll(0.8).schedule() }
+    val shootAllSlow = button { gamepad1.square }.whenBecomesTrue { Tube.shootAll(0.7).schedule() }
 
     val flywheelLong =
         button { gamepad1.dpad_up || gamepad2.dpad_up }
             .whenBecomesTrue {
               if (!autoRangingEnabled) {
-                flywheelTargetSpeed = 2_050.0
+                flywheelTargetSpeed = 1_950.0
                 Hood.position = 0.935
                 Flywheel.enable().then(Flywheel.setSpeed(2_050.0)).schedule()
               }
