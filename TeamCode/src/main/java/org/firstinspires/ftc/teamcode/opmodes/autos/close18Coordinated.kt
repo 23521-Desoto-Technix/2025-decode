@@ -56,7 +56,7 @@ class close18Coordinated : NextFTCOpMode() {
         SequentialGroup(
             Tube.intakeAll,
             FollowPath(paths.getValue("shootToGateIntake")),
-            Tube.waitForAll(1800.milliseconds),
+            Tube.waitForAll(1000.milliseconds),
             FollowPath(paths.getValue("gateIntakeToShoot")),
         )
     return SequentialGroup(
@@ -69,8 +69,7 @@ class close18Coordinated : NextFTCOpMode() {
         Delay(500.milliseconds),
         Tube.intakeAll,
         FollowPath(paths.getValue("shootToSpike2")),
-        FollowPath(paths.getValue("spike2ToGate"), true, 0.6),
-        Delay(250.milliseconds),
+        FollowPath(paths.getValue("spike2ToGate"), true, 0.8),
         FollowPath(paths.getValue("spike2ToShoot")),
         Delay(150.milliseconds),
         Tube.shootAll(),
