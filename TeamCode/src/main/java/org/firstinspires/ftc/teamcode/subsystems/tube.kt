@@ -38,6 +38,7 @@ object Tube : Subsystem {
   private var shootSpeed = 1.0
   private var bottomTripStartedAt: Long? = null
   private var lastBottomState = true
+  private var waitForAllStartedAt: Long? = null
 
   override fun initialize() {
     if (!BotState.enabled) {
@@ -91,12 +92,12 @@ object Tube : Subsystem {
 
   fun waitForAll(d: Duration? = null) =
       LambdaCommand()
-          .setStart { markStepStart() }
+          .setStart { waitForAllStartedAt = now() }
           .setIsDone {
             if (d == null) {
               this.isFull()
             } else {
-              this.isFull() || elapsedSinceStep() >= d
+              this.isFull() || elapsedSinceWaitStart() >= d
             }
           }
 
@@ -238,6 +239,14 @@ object Tube : Subsystem {
   }
 
   private fun elapsedSinceStep() = (now() - stepStartedAt).nanoseconds
+
+  private fun elapsedSinceWaitStart(): Duration {
+    return if (waitForAllStartedAt != null) {
+      (now() - waitForAllStartedAt!!).nanoseconds
+    } else {
+      0.nanoseconds
+    }
+  }
 
   private fun now() = System.nanoTime()
 }
