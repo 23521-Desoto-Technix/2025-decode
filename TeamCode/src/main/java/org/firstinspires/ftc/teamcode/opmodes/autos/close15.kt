@@ -15,6 +15,8 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -23,11 +25,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
-@Autonomous(name = "Close 18", group = "Close", preselectTeleOp = "teleop")
-class close18 : NextFTCOpMode() {
+@Autonomous(name = "Close 15", group = "Close", preselectTeleOp = "teleop")
+class close15 : NextFTCOpMode() {
   init {
     addComponents(
         SubsystemComponent(Flywheel, Hood, Turret, Tube),
@@ -80,10 +80,10 @@ class close18 : NextFTCOpMode() {
         Delay(150.milliseconds),
         Tube.shootAll(),
         Delay(500.milliseconds),
-        gateIntake(1200.milliseconds),
-        Delay(150.milliseconds),
-        Tube.shootAll(),
-        Delay(500.milliseconds),
+        // gateIntake(1200.milliseconds),
+        // Delay(150.milliseconds),
+        // Tube.shootAll(),
+        // Delay(500.milliseconds),
         Tube.intakeAll,
         FollowPath(paths.getValue("shootToSpike1")),
         FollowPath(paths.getValue("spike1ToShoot")),
