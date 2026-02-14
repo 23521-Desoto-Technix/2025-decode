@@ -25,8 +25,8 @@ import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import kotlin.time.Duration.Companion.milliseconds
 
-@Autonomous(name = "Close TechNova Compatible", group = "Close", preselectTeleOp = "teleop")
-class closeTnCompat : NextFTCOpMode() {
+@Autonomous(name = "Close 18 Coordinated", group = "Close", preselectTeleOp = "teleop")
+class close18Coordinated : NextFTCOpMode() {
   init {
     addComponents(
         SubsystemComponent(Flywheel, Hood, Turret, Tube),
@@ -72,6 +72,10 @@ class closeTnCompat : NextFTCOpMode() {
         FollowPath(paths.getValue("spike2ToGate"), true, 0.6),
         Delay(250.milliseconds),
         FollowPath(paths.getValue("spike2ToShoot")),
+        Delay(150.milliseconds),
+        Tube.shootAll(),
+        Delay(500.milliseconds),
+        gateIntake,
         Delay(150.milliseconds),
         Tube.shootAll(),
         Delay(500.milliseconds),
