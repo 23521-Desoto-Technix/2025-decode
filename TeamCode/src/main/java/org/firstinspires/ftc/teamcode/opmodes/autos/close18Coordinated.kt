@@ -15,7 +15,6 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -24,6 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Close 18 Coordinated", group = "Close", preselectTeleOp = "teleop")
 class close18Coordinated : NextFTCOpMode() {
@@ -135,6 +135,7 @@ class close18Coordinated : NextFTCOpMode() {
 
   override fun onUpdate() {
     BotState.pose = PedroComponent.follower.pose
+    telemetry.update()
   }
 
   override fun onStop() {
