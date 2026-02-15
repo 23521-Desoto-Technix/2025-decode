@@ -25,6 +25,7 @@ object AutoConstants {
           pose("gateIntake", Pose(128.0, 52.0, 32.deg.inRad))
           pose("spike3", Pose(125.0, 35.0, 0.0.deg.inRad))
           pose("park", Pose(110.0, 70.0, 0.0.deg.inRad))
+          pose("fastPark", Pose(85.0, 70.0, -90.0.deg.inRad))
           pose("s2Ctrl", Pose(85.0, 55.0, 0.0))
           pose("s3Ctrl", Pose(85.0, 30.0, 0.0))
         }
@@ -159,6 +160,14 @@ object AutoConstants {
               .pathBuilder()
               .addPath(BezierLine(p("shoot"), p("park")))
               .setConstantHeadingInterpolation(p("park").heading)
+              .build(),
+      )
+      path(
+          "shootToFastPark",
+          follower
+              .pathBuilder()
+              .addPath(BezierLine(p("shoot"), p("fastPark")))
+              .setConstantHeadingInterpolation(p("fastPark").heading)
               .build(),
       )
     }
