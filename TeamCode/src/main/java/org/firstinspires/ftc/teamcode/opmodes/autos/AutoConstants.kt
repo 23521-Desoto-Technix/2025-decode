@@ -28,6 +28,8 @@ object AutoConstants {
           pose("fastPark", Pose(93.0, 77.0, -45.0.deg.inRad))
           pose("s2Ctrl", Pose(85.0, 55.0, 0.0))
           pose("s3Ctrl", Pose(85.0, 30.0, 0.0))
+          pose("startFar", Pose(79.2, 7.8, 90.0.deg.inRad))
+          pose("shootFar", Pose(85.0, 15.0, 0.0.deg.inRad))
         }
 
     val red: Map<String, Pose>
@@ -58,6 +60,8 @@ object AutoConstants {
         linkedMapOf<String, Angle>().apply {
           angle("closeTurretRed", (-90.0).deg)
           angle("closeTurretBlue", 90.0.deg)
+          angle("farTurretRed", 115.0.deg)
+          angle("farTurretBlue", 115.0.deg)
         }
 
     operator fun get(name: String): Angle = angles.getValue(name)
@@ -168,6 +172,14 @@ object AutoConstants {
               .pathBuilder()
               .addPath(BezierLine(p("shoot"), p("fastPark")))
               .setConstantHeadingInterpolation(p("fastPark").heading)
+              .build(),
+      )
+      path(
+          "farStartToShoot",
+          follower
+              .pathBuilder()
+              .addPath(BezierLine(p("startFar"), p("shootFar")))
+              .setConstantHeadingInterpolation(p("shootFar").heading)
               .build(),
       )
     }
