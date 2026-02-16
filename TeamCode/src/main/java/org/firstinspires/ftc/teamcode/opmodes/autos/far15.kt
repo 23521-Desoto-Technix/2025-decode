@@ -61,7 +61,7 @@ class far15 : NextFTCOpMode() {
         InstantCommand { Turret.setTargetAngle(turretAngle) },
         Flywheel.waitForSpeed(),
         Delay(150.milliseconds),
-        Tube.shootAll(),
+        Tube.shootAll(0.7),
         Delay(500.milliseconds),
     )
   }
