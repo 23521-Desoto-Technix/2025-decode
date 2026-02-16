@@ -32,6 +32,7 @@ object AutoConstants {
           pose("shootFar", Pose(85.0, 15.0, 0.0.deg.inRad))
           pose("human", Pose(132.0, 8.7, 0.0.deg.inRad))
           pose("randomIntake", Pose(132.0, 35.0, 0.0.deg.inRad))
+          pose("parkFar", Pose(100.0, 30.0, 0.0.deg.inRad))
         }
 
     val red: Map<String, Pose>
@@ -225,6 +226,46 @@ object AutoConstants {
                   )
               )
               .setConstantHeadingInterpolation(p("shootFar").heading)
+              .build(),
+      )
+      path(
+          "shootFarToSpike3",
+          follower
+              .pathBuilder()
+              .addPath(
+                  BezierCurve(
+                      p("shootFar"),
+                      Pose(p("shootFar").x, p("spike3").y),
+                      p("spike3"),
+                  )
+              )
+              .setConstantHeadingInterpolation(p("spike3").heading)
+              .build(),
+      )
+      path(
+          "spike3ToShootFar",
+          follower
+              .pathBuilder()
+              .addPath(
+                  BezierLine(
+                      p("spike3"),
+                      p("shootFar"),
+                  )
+              )
+              .setConstantHeadingInterpolation(p("shootFar").heading)
+              .build(),
+      )
+      path(
+          "shootFarToParkFar",
+          follower
+              .pathBuilder()
+              .addPath(
+                  BezierLine(
+                      p("shootFar"),
+                      p("parkFar"),
+                  )
+              )
+              .setConstantHeadingInterpolation(p("parkFar").heading)
               .build(),
       )
     }

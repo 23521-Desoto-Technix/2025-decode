@@ -74,6 +74,13 @@ class far15 : NextFTCOpMode() {
         Delay(500.milliseconds),
         Tube.shootAll(0.7),
         Delay(500.milliseconds),
+        Tube.intakeAll,
+        FollowPath(paths.getValue("shootFarToSpike3")),
+        FollowPath(paths.getValue("spike3ToShootFar")),
+        Delay(500.milliseconds),
+        Tube.shootAll(0.7),
+        Delay(500.milliseconds),
+        FollowPath(paths.getValue("shootFarToParkFar")),
     )
   }
 
