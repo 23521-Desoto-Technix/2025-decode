@@ -60,8 +60,8 @@ object AutoConstants {
         linkedMapOf<String, Angle>().apply {
           angle("closeTurretRed", (-90.0).deg)
           angle("closeTurretBlue", 90.0.deg)
-          angle("farTurretRed", (-120.0).deg)
-          angle("farTurretBlue", 120.0.deg)
+          angle("farTurretRed", (-118.0).deg)
+          angle("farTurretBlue", 118.0.deg)
         }
 
     operator fun get(name: String): Angle = angles.getValue(name)
