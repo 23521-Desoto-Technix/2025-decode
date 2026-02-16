@@ -60,6 +60,7 @@ class far15 : NextFTCOpMode() {
         FollowPath(paths.getValue("farStartToShoot")),
         InstantCommand { Turret.setTargetAngle(turretAngle) },
         Flywheel.waitForSpeed(),
+        Delay(150.milliseconds),
         Tube.shootAll(),
         Delay(500.milliseconds),
     )
