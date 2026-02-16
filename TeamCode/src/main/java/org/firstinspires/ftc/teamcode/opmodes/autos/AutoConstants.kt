@@ -60,7 +60,7 @@ object AutoConstants {
         linkedMapOf<String, Angle>().apply {
           angle("closeTurretRed", (-90.0).deg)
           angle("closeTurretBlue", 90.0.deg)
-          angle("farTurretRed", -115.0.deg)
+          angle("farTurretRed", (-115.0).deg)
           angle("farTurretBlue", 115.0.deg)
         }
 

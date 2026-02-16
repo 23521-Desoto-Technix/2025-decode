@@ -41,7 +41,7 @@ class far15 : NextFTCOpMode() {
 
   override fun onInit() {
     val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
-    Turret.setTargetAngle(90.0.deg)
+    Turret.setTargetAngle(45.0.deg)
     telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
     telemetry.msTransmissionInterval = 25
   }
@@ -59,7 +59,8 @@ class far15 : NextFTCOpMode() {
         InstantCommand { Hood.position = 0.935 },
         InstantCommand { Turret.setTargetAngle(turretAngle) },
         FollowPath(paths.getValue("farStartToShoot")),
-        Delay(150.milliseconds),
+        InstantCommand { Turret.setTargetAngle(turretAngle) },
+        Flywheel.waitForSpeed(),
         Tube.shootAll(),
         Delay(500.milliseconds),
     )
