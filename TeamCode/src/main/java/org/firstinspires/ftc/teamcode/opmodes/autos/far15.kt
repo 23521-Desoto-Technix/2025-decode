@@ -15,8 +15,6 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -25,6 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Far 15", group = "Far", preselectTeleOp = "teleop")
 class far15 : NextFTCOpMode() {
@@ -63,6 +62,11 @@ class far15 : NextFTCOpMode() {
         Delay(150.milliseconds),
         Tube.shootAll(0.7),
         Delay(500.milliseconds),
+        Tube.intakeAll,
+        FollowPath(paths.getValue("farShootToHuman")),
+        FollowPath(paths.getValue("humanToFarShoot")),
+        Delay(150.milliseconds),
+        Tube.shootAll(0.7),
     )
   }
 
