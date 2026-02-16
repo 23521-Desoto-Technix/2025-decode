@@ -54,7 +54,7 @@ class far15 : NextFTCOpMode() {
         }
 
     return SequentialGroup(
-        Flywheel.setSpeed(2_200.0),
+        Flywheel.setSpeed(2_000.0),
         InstantCommand { Hood.position = 0.935 },
         FollowPath(paths.getValue("farStartToShoot")),
         InstantCommand { Turret.setTargetAngle(turretAngle) },
@@ -67,6 +67,13 @@ class far15 : NextFTCOpMode() {
         FollowPath(paths.getValue("humanToFarShoot")),
         Delay(150.milliseconds),
         Tube.shootAll(0.7),
+        Delay(500.milliseconds),
+        Tube.intakeAll,
+        FollowPath(paths.getValue("farShootToRandomIntake")),
+        FollowPath(paths.getValue("randomIntakeToFarShoot")),
+        Delay(150.milliseconds),
+        Tube.shootAll(0.7),
+        Delay(500.milliseconds),
     )
   }
 
