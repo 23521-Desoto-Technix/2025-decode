@@ -57,7 +57,6 @@ class far15 : NextFTCOpMode() {
     return SequentialGroup(
         Flywheel.setSpeed(2_050.0),
         InstantCommand { Hood.position = 0.935 },
-        InstantCommand { Turret.setTargetAngle(turretAngle) },
         FollowPath(paths.getValue("farStartToShoot")),
         InstantCommand { Turret.setTargetAngle(turretAngle) },
         Flywheel.waitForSpeed(),
