@@ -98,7 +98,7 @@ class far15 : NextFTCOpMode() {
     val paths = AutoConstants.Paths.forAlliance(BotState.alliance)
     routine = buildRoutine(paths)
 
-    PedroComponent.follower.pose = poses.getValue("start")
+    PedroComponent.follower.pose = poses.getValue("startFar")
     routine.schedule()
   }
 
