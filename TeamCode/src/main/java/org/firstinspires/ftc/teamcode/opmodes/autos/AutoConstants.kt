@@ -195,8 +195,8 @@ object AutoConstants {
           "humanToFarShoot",
           follower
               .pathBuilder()
-              .addPath(BezierLine(p("human"), p("farShoot")))
-              .setConstantHeadingInterpolation(p("farShoot").heading)
+              .addPath(BezierLine(p("human"), p("shootFar")))
+              .setConstantHeadingInterpolation(p("shootFar").heading)
               .build(),
       )
     }
