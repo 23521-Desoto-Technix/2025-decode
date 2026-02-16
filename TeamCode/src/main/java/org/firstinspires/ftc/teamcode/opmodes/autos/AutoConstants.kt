@@ -201,13 +201,13 @@ object AutoConstants {
               .build(),
       )
       path(
-          "farShootToRandomIntake",
+          "shootFarToRandomIntake",
           follower
               .pathBuilder()
               .addPath(
                   BezierCurve(
-                      p("farShoot"),
-                      Pose(p("farShoot").x, p("randomIntake").y),
+                      p("shootFar"),
+                      Pose(p("shootFar").x, p("randomIntake").y),
                       p("randomIntake"),
                   )
               )
@@ -215,16 +215,16 @@ object AutoConstants {
               .build(),
       )
       path(
-          "randomIntakeToFarShoot",
+          "randomIntakeToShootFar",
           follower
               .pathBuilder()
               .addPath(
                   BezierLine(
                       p("randomIntake"),
-                      p("farShoot"),
+                      p("shootFar"),
                   )
               )
-              .setConstantHeadingInterpolation(p("farShoot").heading)
+              .setConstantHeadingInterpolation(p("shootFar").heading)
               .build(),
       )
     }
