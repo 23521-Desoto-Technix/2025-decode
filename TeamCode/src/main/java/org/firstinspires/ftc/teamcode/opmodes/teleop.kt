@@ -239,6 +239,7 @@ class teleop : NextFTCOpMode() {
   }
 
   override fun onStartButtonPressed() {
+    Flywheel.go().schedule()
     BotState.enabled = true
     val startingPose =
         when (BotState.alliance) {

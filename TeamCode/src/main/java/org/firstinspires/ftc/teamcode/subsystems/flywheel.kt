@@ -14,7 +14,7 @@ object Flywheel : Subsystem {
   private val upperShooterMotor = VoltageCompensatingMotor(MotorEx("leftShooter").brakeMode())
   private val lowerShooterMotor =
       VoltageCompensatingMotor(MotorEx("rightShooter").brakeMode().reversed())
-  private var shooterEncoder = MotorEx("backRight").zeroed()
+  private val shooterEncoder = MotorEx("backRight")
   val PID = controlSystem {
     velPid(0.01, 0.0, 0.0)
     basicFF(0.0004)
@@ -40,10 +40,10 @@ object Flywheel : Subsystem {
   }
 
   override fun periodic() {
-    if (this.braking) {
+    if (this.braking && !BotState.enabled) {
       upperShooterMotor.power = -0.5
       lowerShooterMotor.power = -0.5
-      if (this.speed > -300.0) {
+      if (this.speed < 300.0) {
         this.braking = false
         this.enabled = true
       }
@@ -107,5 +107,9 @@ object Flywheel : Subsystem {
   fun stop(instant: Boolean = false) =
       LambdaCommand("stopShooter")
           .setStart { this.braking = true }
-          .setIsDone { instant || this.speed > -300.0 }
+          .setIsDone { instant || this.speed < 300.0 }
+          .requires(this)
+
+  fun go() =
+      LambdaCommand("goShooter").setStart { this.braking = false }.setIsDone { true }.requires(this)
 }
