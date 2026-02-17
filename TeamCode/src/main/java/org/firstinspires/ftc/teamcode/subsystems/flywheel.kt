@@ -43,7 +43,7 @@ object Flywheel : Subsystem {
     if (this.braking) {
       upperShooterMotor.power = -0.5
       lowerShooterMotor.power = -0.5
-      if (this.speed < 300.0) {
+      if (this.speed > -300.0) {
         this.braking = false
         this.enabled = true
       }
@@ -107,5 +107,5 @@ object Flywheel : Subsystem {
   fun stop(instant: Boolean = false) =
       LambdaCommand("stopShooter")
           .setStart { this.braking = true }
-          .setIsDone { instant || this.speed < 300.0 }
+          .setIsDone { instant || this.speed > -300.0 }
 }
