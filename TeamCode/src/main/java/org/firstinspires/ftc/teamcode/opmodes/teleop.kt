@@ -22,6 +22,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.BotConstants
+import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -57,6 +58,7 @@ class teleop : NextFTCOpMode() {
         PedroComponent(Constants::createFollower),
         SubsystemComponent(Tube, Shooter, Flywheel, Hood, Turret),
     )
+    telemetry = TelemetryImplUpstreamSubmission(this)
   }
 
   var rotatedForward = 0.0
