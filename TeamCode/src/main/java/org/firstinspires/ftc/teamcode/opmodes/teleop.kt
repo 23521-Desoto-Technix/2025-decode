@@ -17,6 +17,12 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
@@ -35,12 +41,6 @@ import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import java.util.Locale
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
 
 data class ShootingConfig(
     val minDistance: Double,
@@ -426,6 +426,7 @@ class teleop : NextFTCOpMode() {
     telemetry.addData("Shooting Mode", shootingModeDisplay)
     telemetry.addData("Angle to (144, 144)", relativeAngleToTarget.inDeg)
     telemetry.addData("Flywheel Target Speed", flywheelTargetSpeed)
+    telemetry.addData("Flywheel Actual Speed", Flywheel.speed)
     telemetry.addData("Hood position", Hood.position)
     /* HTML telemetry reference
     telemetry.addLine("<b>Bold text</b>")
