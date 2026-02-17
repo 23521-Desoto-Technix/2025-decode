@@ -15,6 +15,7 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -24,7 +25,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Far 15", group = "Far", preselectTeleOp = "teleop")
 class far15 : NextFTCOpMode() {
@@ -127,6 +127,8 @@ class far15 : NextFTCOpMode() {
 
   override fun onUpdate() {
     BotState.pose = PedroComponent.follower.pose
+    telemetry.addData("x", PedroComponent.follower.pose.x)
+    telemetry.addData("y", PedroComponent.follower.pose.y)
     telemetry.update()
   }
 
