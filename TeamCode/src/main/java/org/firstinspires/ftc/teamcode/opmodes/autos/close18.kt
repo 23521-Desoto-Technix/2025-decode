@@ -15,9 +15,8 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -25,6 +24,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Close 18", group = "Close", preselectTeleOp = "teleop")
 class close18 : NextFTCOpMode() {
@@ -35,6 +36,7 @@ class close18 : NextFTCOpMode() {
         BindingsComponent,
         PedroComponent(Constants::createFollower),
     )
+    telemetry = TelemetryImplUpstreamSubmission(this)
   }
 
   lateinit var routine: Command

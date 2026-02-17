@@ -16,6 +16,7 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -34,6 +35,7 @@ class far15 : NextFTCOpMode() {
         BindingsComponent,
         PedroComponent(Constants::createFollower),
     )
+    telemetry = TelemetryImplUpstreamSubmission(this)
   }
 
   lateinit var routine: Command
