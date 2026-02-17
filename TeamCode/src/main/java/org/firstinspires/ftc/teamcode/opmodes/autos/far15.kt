@@ -82,7 +82,9 @@ class far15 : NextFTCOpMode() {
         Delay(700.milliseconds),
         Tube.shootAll(0.7),
         Delay(500.milliseconds),
+        Flywheel.stop(true),
         FollowPath(paths.getValue("shootFarToParkFar")),
+        Flywheel.stop(),
     )
   }
 

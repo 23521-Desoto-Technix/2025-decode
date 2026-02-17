@@ -94,7 +94,9 @@ class close18Coordinated : NextFTCOpMode() {
         Delay(150.milliseconds),
         Tube.shootAll(),
         Delay(400.milliseconds),
+        Flywheel.stop(true),
         FollowPath(paths.getValue("shootToFastPark")),
+        Flywheel.stop(),
     )
   }
 

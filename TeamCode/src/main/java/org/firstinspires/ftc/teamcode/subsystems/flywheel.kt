@@ -6,21 +6,23 @@ import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.VoltageCompensatingMotor
-import kotlin.math.abs
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.math.abs
 
 object Flywheel : Subsystem {
 
     private val upperShooterMotor = VoltageCompensatingMotor(MotorEx("leftShooter").brakeMode())
     private val lowerShooterMotor =
         VoltageCompensatingMotor(MotorEx("rightShooter").brakeMode().reversed())
-    private val shooterEncoder = MotorEx("backRight")
+    private val shooterEncoder = MotorEx("backRight").zeroed()
     val PID = controlSystem {
         velPid(0.01, 0.0, 0.0)
         basicFF(0.0004)
     }
 
     var power = 0.0
+
+    var braking = false
 
     var speed = 0.0
     var targetSpeed = 0.0
@@ -38,6 +40,16 @@ object Flywheel : Subsystem {
     }
 
     override fun periodic() {
+        this.speed = -shooterEncoder.velocity
+        if (this.braking) {
+            upperShooterMotor.power = -0.5
+            lowerShooterMotor.power = -0.5
+            if (this.speed < 300.0) {
+                this.braking = false
+                this.enabled = false
+            }
+            return
+        }
         val hardwareEnabled = enabled && BotState.enabled
         if (!hardwareEnabled) {
             upperShooterMotor.power = 0.0
@@ -45,8 +57,6 @@ object Flywheel : Subsystem {
             return
         }
 
-
-        this.speed = -shooterEncoder.velocity
         if (this.usingPID) {
             PID.goal = KineticState(Double.POSITIVE_INFINITY, this.targetSpeed, 0.0)
             val pidOutput =
@@ -89,14 +99,13 @@ object Flywheel : Subsystem {
             .requires(this)
 
     fun enable() =
-        LambdaCommand("enableShooter")
-            .setStart { enabled = true }
-            .setIsDone { true }
-            .requires(this)
+        LambdaCommand("enableShooter").setStart { enabled = true }.setIsDone { true }.requires(this)
 
     fun disable() =
-        LambdaCommand("disableShooter")
-            .setStart { enabled = false }
-            .setIsDone { true }
-            .requires(this)
+        LambdaCommand("disableShooter").setStart { enabled = false }.setIsDone { true }.requires(this)
+
+    fun stop(instant: Boolean = false) =
+        LambdaCommand("stopShooter")
+            .setStart { this.braking = true }
+            .setIsDone { instant || this.speed < 300.0 }
 }
