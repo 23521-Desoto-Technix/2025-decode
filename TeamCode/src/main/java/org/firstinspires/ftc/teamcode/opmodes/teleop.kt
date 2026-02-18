@@ -140,9 +140,6 @@ class teleop : NextFTCOpMode() {
   private lateinit var frontRight: com.qualcomm.robotcore.hardware.DcMotor
   private lateinit var pto: Servo
 
-  lateinit var aprilTag: AprilTagProcessor
-  lateinit var portal: VisionPortal
-
   val redReference = Pose(110.0, 131.3, 90.0.deg.inRad)
   val blueReference = mirrorPose(redReference)
 
@@ -420,18 +417,6 @@ class teleop : NextFTCOpMode() {
       tatag = BotConstants.RED_ALLIANCE_APRILTAG_ID
     } else if (BotState.alliance == Alliance.BLUE) {
       tatag = BotConstants.BLUE_ALLIANCE_APRILTAG_ID
-    }
-
-    var targetTagBearing: Double? = null
-    for (detection in aprilTag.detections) {
-      if (detection.id == tatag) {
-        targetTagBearing = detection.ftcPose.bearing
-        break
-      }
-    }
-
-    if (targetTagBearing != null) {
-      telemetry.addData("Target AprilTag Yaw", targetTagBearing)
     }
 
     if (abs(gamepad2.left_stick_y) > 0.1) {
