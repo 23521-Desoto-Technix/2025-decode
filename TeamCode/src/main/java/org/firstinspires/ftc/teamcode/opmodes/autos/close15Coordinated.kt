@@ -44,7 +44,7 @@ class close15Coordinated : NextFTCOpMode() {
     val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
     Turret.setTargetAngle((-92.5).deg)
     telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
-    telemetry.msTransmissionInterval = 25
+    telemetry.msTransmissionInterval = 100
   }
 
   private fun buildRoutine(paths: Map<String, PathChain>): Command {

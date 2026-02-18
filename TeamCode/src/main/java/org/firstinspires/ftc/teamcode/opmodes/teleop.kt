@@ -165,7 +165,7 @@ class teleop : NextFTCOpMode() {
     frontRight = hardwareMap.dcMotor["frontRight"]
     pto = hardwareMap.servo["pto"]
     telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
-    telemetry.msTransmissionInterval = 25
+    telemetry.msTransmissionInterval = 100
   }
 
   override fun onWaitForStart() {
