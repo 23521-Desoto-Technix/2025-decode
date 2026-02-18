@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
-import android.util.Size
 import com.pedropathing.geometry.Pose
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.Servo
@@ -17,16 +16,7 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import java.util.Locale
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -39,8 +29,13 @@ import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
 import org.firstinspires.ftc.vision.VisionPortal
-import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
+import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 data class ShootingConfig(
     val minDistance: Double,
@@ -174,32 +169,6 @@ class teleop : NextFTCOpMode() {
     pto = hardwareMap.servo["pto"]
     telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
     telemetry.msTransmissionInterval = 25
-
-    aprilTag =
-        AprilTagProcessor.Builder()
-            .setDrawAxes(true)
-            .setDrawCubeProjection(true)
-            .setDrawTagOutline(true)
-            .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-            .setLensIntrinsics(
-                BotConstants.CAMERA_LENS_FX,
-                BotConstants.CAMERA_LENS_FY,
-                BotConstants.CAMERA_LENS_CX,
-                BotConstants.CAMERA_LENS_CY,
-            )
-            .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
-            // ... these parameters are fx, fy, cx, cy.
-            .build()
-
-    portal =
-        VisionPortal.Builder()
-            .setCamera(hardwareMap.get<WebcamName?>(WebcamName::class.java, "turretCamera"))
-            .setCameraResolution(
-                Size(BotConstants.CAMERA_RESOLUTION_WIDTH, BotConstants.CAMERA_RESOLUTION_HEIGHT)
-            )
-            .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-            .addProcessor(aprilTag)
-            .build()
   }
 
   override fun onWaitForStart() {
