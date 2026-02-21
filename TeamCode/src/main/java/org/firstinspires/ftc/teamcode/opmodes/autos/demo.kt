@@ -16,6 +16,7 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -25,14 +26,12 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
-import kotlin.time.Duration.Companion.milliseconds
 
-@Autonomous(name = "Close 15 Coordinated", group = "Close", preselectTeleOp = "teleop")
-class close15Coordinated : NextFTCOpMode() {
+@Autonomous(name = "Empty", preselectTeleOp = "teleop")
+class demo : NextFTCOpMode() {
     init {
         addComponents(
             SubsystemComponent(Flywheel, Hood, Turret, Tube),
-            //BulkReadComponent,
             BindingsComponent,
             PedroComponent(Constants::createFollower),
         )
@@ -48,66 +47,32 @@ class close15Coordinated : NextFTCOpMode() {
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
 
         val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
-        Turret.setTargetAngle((-92.5).deg)
+        Turret.setTargetAngle(90.0.deg)
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
         //telemetry.msTransmissionInterval = 100
-        val selectRed =
-            button { gamepad1.circle }.whenBecomesTrue { BotState.alliance = Alliance.RED }
-        val selectBlue =
-            button { gamepad1.cross }.whenBecomesTrue { BotState.alliance = Alliance.BLUE }
     }
 
     private fun buildRoutine(paths: Map<String, PathChain>): Command {
         val turretAngle =
             when (BotState.alliance) {
-                Alliance.RED -> AutoConstants.Angles["closeTurretRed"]
-                Alliance.BLUE -> AutoConstants.Angles["closeTurretBlue"]
+                Alliance.RED -> AutoConstants.Angles["farTurretRed"]
+                Alliance.BLUE -> AutoConstants.Angles["farTurretBlue"]
                 else -> 0.0.deg
             }
-        val gateIntake =
-            SequentialGroup(
-                Tube.intakeAll,
-                FollowPath(paths.getValue("shootToGateIntake")),
-                Tube.waitForAll(1800.milliseconds),
-                FollowPath(paths.getValue("gateIntakeToShoot")),
-            )
+
         return SequentialGroup(
-            Flywheel.setSpeed(1_500.0),
-            InstantCommand { Hood.position = 0.55 },
-            InstantCommand { Turret.setTargetAngle(turretAngle) },
-            FollowPath(paths.getValue("startToShoot")),
-            Delay(150.milliseconds),
-            Tube.shootAll(),
-            Delay(500.milliseconds),
-            Tube.intakeAll,
-            FollowPath(paths.getValue("shootToSpike2")),
-            FollowPath(paths.getValue("spike2ToGate"), true, 0.6),
-            Delay(250.milliseconds),
-            FollowPath(paths.getValue("spike2ToShoot")),
-            Delay(150.milliseconds),
-            Tube.shootAll(),
-            Delay(500.milliseconds),
-            gateIntake,
-            Delay(150.milliseconds),
-            Tube.shootAll(),
-            Delay(500.milliseconds),
-            gateIntake,
-            Delay(150.milliseconds),
-            Tube.shootAll(),
-            Delay(500.milliseconds),
-            Tube.intakeAll,
-            FollowPath(paths.getValue("shootToSpike1")),
-            FollowPath(paths.getValue("spike1ToShoot")),
-            Delay(150.milliseconds),
-            Tube.shootAll(),
-            Delay(500.milliseconds),
-            Flywheel.stop(true),
-            FollowPath(paths.getValue("shootToPark")),
+            Flywheel.setSpeed(2_000.0),
+            InstantCommand { Hood.position = 0.935 },
             Flywheel.stop(),
         )
     }
 
     override fun onWaitForStart() {
+
+        val selectRed =
+            button { gamepad1.circle }.whenBecomesTrue { BotState.alliance = Alliance.RED }
+        val selectBlue =
+            button { gamepad1.cross }.whenBecomesTrue { BotState.alliance = Alliance.BLUE }
         val allianceDisplay =
             when (BotState.alliance) {
                 Alliance.RED ->
@@ -139,12 +104,14 @@ class close15Coordinated : NextFTCOpMode() {
         val paths = AutoConstants.Paths.forAlliance(BotState.alliance)
         routine = buildRoutine(paths)
 
-        PedroComponent.follower.pose = poses.getValue("start")
+        PedroComponent.follower.pose = poses.getValue("startFar")
         routine.schedule()
     }
 
     override fun onUpdate() {
         BotState.pose = PedroComponent.follower.pose
+        telemetry.addData("x", PedroComponent.follower.pose.x)
+        telemetry.addData("y", PedroComponent.follower.pose.y)
         telemetry.update()
         for (hub in allHubs) {
             hub!!.clearBulkCache()

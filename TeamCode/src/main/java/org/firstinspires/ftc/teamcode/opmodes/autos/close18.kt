@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.autos
 
 import com.pedropathing.paths.PathChain
+import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
@@ -29,125 +30,136 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Close 18", group = "Close", preselectTeleOp = "teleop")
 class close18 : NextFTCOpMode() {
-  init {
-    addComponents(
-        SubsystemComponent(Flywheel, Hood, Turret, Tube),
-        BulkReadComponent,
-        BindingsComponent,
-        PedroComponent(Constants::createFollower),
-    )
-    telemetry = TelemetryImplUpstreamSubmission(this)
-  }
-
-  lateinit var routine: Command
-
-  override fun onInit() {
-    val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
-    Turret.setTargetAngle((-92.5).deg)
-    telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
-    telemetry.msTransmissionInterval = 100
-  }
-
-  private fun buildRoutine(paths: Map<String, PathChain>): Command {
-    val turretAngle =
-        when (BotState.alliance) {
-          Alliance.RED -> AutoConstants.Angles["closeTurretRed"]
-          Alliance.BLUE -> AutoConstants.Angles["closeTurretBlue"]
-          else -> 0.0.deg
-        }
-    val gateIntake: (Duration) -> Command = { delay ->
-      SequentialGroup(
-          Tube.intakeAll,
-          FollowPath(paths.getValue("shootToGateIntake")),
-          // WaitUntil { Tube.isFull() }.endAfter(1.5.seconds),
-          Tube.waitForAll(delay),
-          FollowPath(paths.getValue("gateIntakeToShoot")),
-      )
+    init {
+        addComponents(
+            SubsystemComponent(Flywheel, Hood, Turret, Tube),
+            //BulkReadComponent,
+            BindingsComponent,
+            PedroComponent(Constants::createFollower),
+        )
+        telemetry = TelemetryImplUpstreamSubmission(this)
     }
-    return SequentialGroup(
-        Flywheel.setSpeed(1_500.0),
-        InstantCommand { Hood.position = 0.55 },
-        InstantCommand { Turret.setTargetAngle(turretAngle) },
-        FollowPath(paths.getValue("startToShoot")),
-        Delay(150.milliseconds),
-        Tube.shootAll(),
-        Delay(500.milliseconds),
-        Tube.intakeAll,
-        FollowPath(paths.getValue("shootToSpike2")),
-        FollowPath(paths.getValue("spike2ToShoot")),
-        Delay(150.milliseconds),
-        Tube.shootAll(),
-        Delay(500.milliseconds),
-        gateIntake(1200.milliseconds),
-        Delay(150.milliseconds),
-        Tube.shootAll(),
-        Delay(500.milliseconds),
-        gateIntake(1200.milliseconds),
-        Delay(150.milliseconds),
-        Tube.shootAll(),
-        Delay(500.milliseconds),
-        Tube.intakeAll,
-        FollowPath(paths.getValue("shootToSpike1")),
-        FollowPath(paths.getValue("spike1ToShoot")),
-        Delay(150.milliseconds),
-        Tube.shootAll(),
-        Delay(500.milliseconds),
-        Tube.intakeAll,
-        FollowPath(paths.getValue("shootToSpike3")),
-        FollowPath(paths.getValue("spike3ToShoot")),
-        Delay(150.milliseconds),
-        Tube.shootAll(),
-        Delay(500.milliseconds),
-        Flywheel.stop(true),
-        FollowPath(paths.getValue("shootToPark")),
-        Flywheel.stop(),
-    )
-  }
 
-  override fun onWaitForStart() {
+    lateinit var routine: Command
 
-    val selectRed = button { gamepad1.circle }.whenBecomesTrue { BotState.alliance = Alliance.RED }
-    val selectBlue = button { gamepad1.cross }.whenBecomesTrue { BotState.alliance = Alliance.BLUE }
-    val allianceDisplay =
-        when (BotState.alliance) {
-          Alliance.RED ->
-              "<span style=\"background-color: #FF0000; color: white;\">&nbsp;&nbsp;RED&nbsp;&nbsp;</span>"
-          Alliance.BLUE ->
-              "<span style=\"background-color: #0000FF; color: white;\">&nbsp;&nbsp;BLUE&nbsp;&nbsp;</span>"
-          Alliance.UNKNOWN -> {
+    private lateinit var allHubs: MutableList<LynxModule?>
 
-            if (((System.currentTimeMillis() / 500) % 2).toInt() == 0) {
-              "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
-            } else {
-              "&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;"
+
+    override fun onInit() {
+        allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
+
+        val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
+        Turret.setTargetAngle((-92.5).deg)
+        telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
+        //telemetry.msTransmissionInterval = 100
+        val selectRed =
+            button { gamepad1.circle }.whenBecomesTrue { BotState.alliance = Alliance.RED }
+        val selectBlue =
+            button { gamepad1.cross }.whenBecomesTrue { BotState.alliance = Alliance.BLUE }
+    }
+
+    private fun buildRoutine(paths: Map<String, PathChain>): Command {
+        val turretAngle =
+            when (BotState.alliance) {
+                Alliance.RED -> AutoConstants.Angles["closeTurretRed"]
+                Alliance.BLUE -> AutoConstants.Angles["closeTurretBlue"]
+                else -> 0.0.deg
             }
-          }
+        val gateIntake: (Duration) -> Command = { delay ->
+            SequentialGroup(
+                Tube.intakeAll,
+                FollowPath(paths.getValue("shootToGateIntake")),
+                // WaitUntil { Tube.isFull() }.endAfter(1.5.seconds),
+                Tube.waitForAll(delay),
+                FollowPath(paths.getValue("gateIntakeToShoot")),
+            )
         }
+        return SequentialGroup(
+            Flywheel.setSpeed(1_500.0),
+            InstantCommand { Hood.position = 0.55 },
+            InstantCommand { Turret.setTargetAngle(turretAngle) },
+            FollowPath(paths.getValue("startToShoot")),
+            Delay(150.milliseconds),
+            Tube.shootAll(),
+            Delay(500.milliseconds),
+            Tube.intakeAll,
+            FollowPath(paths.getValue("shootToSpike2")),
+            FollowPath(paths.getValue("spike2ToShoot")),
+            Delay(150.milliseconds),
+            Tube.shootAll(),
+            Delay(500.milliseconds),
+            gateIntake(1200.milliseconds),
+            Delay(150.milliseconds),
+            Tube.shootAll(),
+            Delay(500.milliseconds),
+            gateIntake(1200.milliseconds),
+            Delay(150.milliseconds),
+            Tube.shootAll(),
+            Delay(500.milliseconds),
+            Tube.intakeAll,
+            FollowPath(paths.getValue("shootToSpike1")),
+            FollowPath(paths.getValue("spike1ToShoot")),
+            Delay(150.milliseconds),
+            Tube.shootAll(),
+            Delay(500.milliseconds),
+            Tube.intakeAll,
+            FollowPath(paths.getValue("shootToSpike3")),
+            FollowPath(paths.getValue("spike3ToShoot")),
+            Delay(150.milliseconds),
+            Tube.shootAll(),
+            Delay(500.milliseconds),
+            Flywheel.stop(true),
+            FollowPath(paths.getValue("shootToPark")),
+            Flywheel.stop(),
+        )
+    }
 
-    telemetry.addLine(allianceDisplay)
-    telemetry.addLine("RED: Circle ●")
-    telemetry.addLine("BLUE: Cross ✕")
+    override fun onWaitForStart() {
+        val allianceDisplay =
+            when (BotState.alliance) {
+                Alliance.RED ->
+                    "<span style=\"background-color: #FF0000; color: white;\">&nbsp;&nbsp;RED&nbsp;&nbsp;</span>"
 
-    BindingManager.update()
-    telemetry.update()
-  }
+                Alliance.BLUE ->
+                    "<span style=\"background-color: #0000FF; color: white;\">&nbsp;&nbsp;BLUE&nbsp;&nbsp;</span>"
 
-  override fun onStartButtonPressed() {
-    val poses = AutoConstants.Poses.forAlliance(BotState.alliance)
-    val paths = AutoConstants.Paths.forAlliance(BotState.alliance)
-    routine = buildRoutine(paths)
+                Alliance.UNKNOWN -> {
 
-    PedroComponent.follower.pose = poses.getValue("start")
-    routine.schedule()
-  }
+                    if (((System.currentTimeMillis() / 500) % 2).toInt() == 0) {
+                        "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
+                    } else {
+                        "&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;"
+                    }
+                }
+            }
 
-  override fun onUpdate() {
-    BotState.pose = PedroComponent.follower.pose
-    telemetry.update()
-  }
+        telemetry.addLine(allianceDisplay)
+        telemetry.addLine("RED: Circle ●")
+        telemetry.addLine("BLUE: Cross ✕")
 
-  override fun onStop() {
-    BotState.enabled = false
-    Flywheel.setSpeed(0.0).schedule()
-  }
+        BindingManager.update()
+        telemetry.update()
+    }
+
+    override fun onStartButtonPressed() {
+        val poses = AutoConstants.Poses.forAlliance(BotState.alliance)
+        val paths = AutoConstants.Paths.forAlliance(BotState.alliance)
+        routine = buildRoutine(paths)
+
+        PedroComponent.follower.pose = poses.getValue("start")
+        routine.schedule()
+    }
+
+    override fun onUpdate() {
+        BotState.pose = PedroComponent.follower.pose
+        telemetry.update()
+        for (hub in allHubs) {
+            hub!!.clearBulkCache()
+        }
+    }
+
+    override fun onStop() {
+        BotState.enabled = false
+        Flywheel.setSpeed(0.0).schedule()
+    }
 }
