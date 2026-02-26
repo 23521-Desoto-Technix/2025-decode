@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
-import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -15,8 +14,6 @@ import dev.nextftc.core.units.deg
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -42,14 +39,17 @@ class demo : NextFTCOpMode() {
 
     private lateinit var allHubs: MutableList<LynxModule?>
 
-
     override fun onInit() {
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
 
         val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
         Turret.setTargetAngle(90.0.deg)
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
-        //telemetry.msTransmissionInterval = 100
+        // telemetry.msTransmissionInterval = 100
+        val selectRed =
+            button { gamepad1.circle }.whenBecomesTrue { BotState.alliance = Alliance.RED }
+        val selectBlue =
+            button { gamepad1.cross }.whenBecomesTrue { BotState.alliance = Alliance.BLUE }
     }
 
     private fun buildRoutine(paths: Map<String, PathChain>): Command {
@@ -63,16 +63,12 @@ class demo : NextFTCOpMode() {
         return SequentialGroup(
             Flywheel.setSpeed(2_000.0),
             InstantCommand { Hood.position = 0.935 },
+            FollowPath(paths.getValue("startFarToCenter")),
             Flywheel.stop(),
         )
     }
 
     override fun onWaitForStart() {
-
-        val selectRed =
-            button { gamepad1.circle }.whenBecomesTrue { BotState.alliance = Alliance.RED }
-        val selectBlue =
-            button { gamepad1.cross }.whenBecomesTrue { BotState.alliance = Alliance.BLUE }
         val allianceDisplay =
             when (BotState.alliance) {
                 Alliance.RED ->

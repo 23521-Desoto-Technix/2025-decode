@@ -34,6 +34,7 @@ object AutoConstants {
           pose("humanAlt", Pose(132.0, 12.0, 0.0.deg.inRad))
           pose("randomIntake", Pose(132.0, 35.0, 0.0.deg.inRad))
           pose("parkFar", Pose(100.0, 30.0, 0.0.deg.inRad))
+          pose("center", Pose(72.0, 72.0, 0.0.deg.inRad))
         }
 
     val red: Map<String, Pose>
@@ -283,6 +284,32 @@ object AutoConstants {
                   )
               )
               .setConstantHeadingInterpolation(p("parkFar").heading)
+              .build(),
+      )
+      path(
+          "startToCenter",
+          follower
+              .pathBuilder()
+              .addPath(
+                  BezierLine(
+                      p("start"),
+                      p("center"),
+                  )
+              )
+              .setConstantHeadingInterpolation(p("center").heading)
+              .build(),
+      )
+      path(
+          "startFarToCenter",
+          follower
+              .pathBuilder()
+              .addPath(
+                  BezierLine(
+                      p("startFar"),
+                      p("center"),
+                  )
+              )
+              .setConstantHeadingInterpolation(p("center").heading)
               .build(),
       )
     }
