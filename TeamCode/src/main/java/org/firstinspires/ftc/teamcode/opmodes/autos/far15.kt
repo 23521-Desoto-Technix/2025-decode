@@ -71,6 +71,15 @@ class far15 : NextFTCOpMode() {
                 Tube.shootAll(0.7),
                 Delay(500.milliseconds),
             )
+        val triangleIntake =
+            SequentialGroup(
+                Tube.intakeAll,
+                FollowPath(paths.getValue("farShootToHumanAlt")),
+                FollowPath(paths.getValue("humanAltToFarShoot")),
+                Delay(700.milliseconds),
+                Tube.shootAll(0.7),
+                Delay(500.milliseconds),
+            )
 
         return SequentialGroup(
             Flywheel.setSpeed(2_000.0),
@@ -83,13 +92,8 @@ class far15 : NextFTCOpMode() {
             Delay(500.milliseconds),
             hpIntake,
             hpIntake,
-            Tube.intakeAll,
-            FollowPath(paths.getValue("farShootToHumanAlt")),
-            FollowPath(paths.getValue("humanAltToFarShoot")),
-            Delay(700.milliseconds),
-            Tube.shootAll(0.7),
-            Delay(500.milliseconds),
-            hpIntake,
+            triangleIntake,
+            triangleIntake,
             hpIntake,
             Flywheel.stop(true),
             FollowPath(paths.getValue("shootFarToParkFar")),
