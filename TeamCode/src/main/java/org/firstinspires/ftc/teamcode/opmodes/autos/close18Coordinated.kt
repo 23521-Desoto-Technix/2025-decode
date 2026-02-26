@@ -15,7 +15,6 @@ import dev.nextftc.core.units.deg
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -32,7 +31,7 @@ class close18Coordinated : NextFTCOpMode() {
     init {
         addComponents(
             SubsystemComponent(Flywheel, Hood, Turret, Tube),
-            //BulkReadComponent,
+            // BulkReadComponent,
             BindingsComponent,
             PedroComponent(Constants::createFollower),
         )
@@ -43,14 +42,13 @@ class close18Coordinated : NextFTCOpMode() {
 
     private lateinit var allHubs: MutableList<LynxModule?>
 
-
     override fun onInit() {
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
 
         val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
         Turret.setTargetAngle((-92.5).deg)
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
-        //telemetry.msTransmissionInterval = 100
+        // telemetry.msTransmissionInterval = 100
         val selectRed =
             button { gamepad1.circle }.whenBecomesTrue { BotState.alliance = Alliance.RED }
         val selectBlue =
@@ -80,8 +78,9 @@ class close18Coordinated : NextFTCOpMode() {
             Tube.shootAll(),
             Delay(400.milliseconds),
             Tube.intakeAll,
-            FollowPath(paths.getValue("shootToSpike2")),
-            FollowPath(paths.getValue("spike2ToGate"), true, 0.8),
+            // FollowPath(paths.getValue("shootToSpike2")),
+            // FollowPath(paths.getValue("spike2ToGate"), true, 0.8),
+            FollowPath(paths.getValue("spike2Progressive"), true),
             FollowPath(paths.getValue("spike2ToShoot")),
             Delay(150.milliseconds),
             Tube.shootAll(),
