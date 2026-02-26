@@ -63,7 +63,7 @@ class demo : NextFTCOpMode() {
             }
 
         return SequentialGroup(
-            FollowPath(paths.getValue("startFarToCenter"), true),
+            FollowPath(paths.getValue("startToCenter"), true),
             Delay(30.seconds),
         )
     }
@@ -100,7 +100,7 @@ class demo : NextFTCOpMode() {
         val paths = AutoConstants.Paths.forAlliance(BotState.alliance)
         routine = buildRoutine(paths)
 
-        PedroComponent.follower.pose = poses.getValue("startFar")
+        PedroComponent.follower.pose = poses.getValue("start")
         routine.schedule()
     }
 
