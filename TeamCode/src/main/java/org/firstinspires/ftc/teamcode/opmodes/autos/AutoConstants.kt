@@ -34,6 +34,7 @@ object AutoConstants {
                 pose("shootFar", Pose(85.0, 15.0, 0.0.deg.inRad))
                 pose("human", Pose(132.0, 8.7, 0.0.deg.inRad))
                 pose("humanAlt", Pose(132.0, 12.0, 0.0.deg.inRad))
+                pose("humanAltCtrl", Pose(135.0, 50.0, 0.0.deg.inRad))
                 pose("randomIntake", Pose(132.0, 35.0, 0.0.deg.inRad))
                 pose("parkFar", Pose(100.0, 30.0, 0.0.deg.inRad))
                 pose("center", Pose(72.0, 72.0, 0.0.deg.inRad))
@@ -223,7 +224,7 @@ object AutoConstants {
                 "farShootToHumanAlt",
                 follower
                     .pathBuilder()
-                    .addPath(BezierLine(p("shootFar"), p("humanAlt")))
+                    .addPath(BezierCurve(p("shootFar"), p("humanAltCtrl"), p("humanAlt")))
                     .setConstantHeadingInterpolation(p("humanAlt").heading)
                     .build(),
             )
