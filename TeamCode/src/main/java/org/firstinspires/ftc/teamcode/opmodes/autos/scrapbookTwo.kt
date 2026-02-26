@@ -8,7 +8,6 @@ import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.SequentialGroup
-import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
@@ -26,8 +25,8 @@ import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import kotlin.time.Duration.Companion.seconds
 
-@Autonomous(name = "Empty", preselectTeleOp = "teleop")
-class demo : NextFTCOpMode() {
+@Autonomous(name = "Scrapbook 2", preselectTeleOp = "teleop")
+class scrapbookTwo : NextFTCOpMode() {
     init {
         addComponents(
             SubsystemComponent(Flywheel, Hood, Turret, Tube),
@@ -63,7 +62,7 @@ class demo : NextFTCOpMode() {
             }
 
         return SequentialGroup(
-            FollowPath(paths.getValue("startToCenter"), true),
+            FollowPath(paths.getValue("startToSpike3"), true),
             Delay(30.seconds),
         )
     }
