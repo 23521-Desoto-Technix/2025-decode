@@ -109,7 +109,7 @@ class close18 : NextFTCOpMode() {
             Tube.shootAll(),
             Delay(500.milliseconds),
             Flywheel.stop(true),
-            FollowPath(paths.getValue("shootToPark")),
+            FollowPath(paths.getValue("shootToFastPark")),
             Flywheel.stop(),
         )
     }
