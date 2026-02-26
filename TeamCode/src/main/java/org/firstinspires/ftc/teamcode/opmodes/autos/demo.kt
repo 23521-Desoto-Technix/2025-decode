@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
+import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -23,6 +24,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.time.Duration.Companion.seconds
 
 @Autonomous(name = "Empty", preselectTeleOp = "teleop")
 class demo : NextFTCOpMode() {
@@ -61,10 +63,8 @@ class demo : NextFTCOpMode() {
             }
 
         return SequentialGroup(
-            Flywheel.setSpeed(2_000.0),
-            InstantCommand { Hood.position = 0.935 },
-            FollowPath(paths.getValue("startFarToCenter")),
-            Flywheel.stop(),
+            FollowPath(paths.getValue("startFarToCenter"), true),
+            Delay(30.seconds),
         )
     }
 
