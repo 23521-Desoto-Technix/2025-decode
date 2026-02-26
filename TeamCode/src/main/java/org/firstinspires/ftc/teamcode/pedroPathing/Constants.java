@@ -26,7 +26,7 @@ public class Constants {
             .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.3, 0, 0.02, 0.03))
             .useSecondaryTranslationalPIDF(true)
             .headingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.1, 0))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.005, 0, 0.0002, 0.6, 0));
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.007, 0, 0.0003, 0.6, 0));
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .leftFrontMotorName("frontLeft")
@@ -53,8 +53,8 @@ public class Constants {
     public static PathConstraints pathConstraints = new PathConstraints(
             0.995,
             100,
-            5,
-            1.3
+            3,
+            1
     );
 
     public static Follower createFollower(HardwareMap hardwareMap) {
