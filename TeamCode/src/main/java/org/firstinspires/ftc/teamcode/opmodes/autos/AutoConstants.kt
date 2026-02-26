@@ -20,7 +20,7 @@ object AutoConstants {
                 pose("spike1", Pose(125.0, 85.0, 0.0.deg.inRad))
                 pose("spike2", Pose(123.0, 60.0, 0.0.deg.inRad))
                 pose("gate", Pose(125.0, 70.0, 0.0.deg.inRad))
-                pose("gateProgressive", Pose(125.0, 63.0, 0.0.deg.inRad))
+                pose("gateProgressive", Pose(125.0, 64.5, 0.0.deg.inRad))
                 pose("gateMid", Pose(110.0, 65.0, 0.0.deg.inRad))
                 pose("gateBonk", Pose(130.0, 61.0, 25.deg.inRad))
                 pose("gateIntake", Pose(128.0, 52.0, 32.deg.inRad))
