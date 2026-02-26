@@ -15,8 +15,6 @@ import dev.nextftc.core.units.deg
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -26,13 +24,14 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Far 15", group = "Far", preselectTeleOp = "teleop")
 class far15 : NextFTCOpMode() {
     init {
         addComponents(
             SubsystemComponent(Flywheel, Hood, Turret, Tube),
-            //BulkReadComponent,
+            // BulkReadComponent,
             BindingsComponent,
             PedroComponent(Constants::createFollower),
         )
@@ -43,14 +42,13 @@ class far15 : NextFTCOpMode() {
 
     private lateinit var allHubs: MutableList<LynxModule?>
 
-
     override fun onInit() {
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
 
         val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
         Turret.setTargetAngle(90.0.deg)
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
-        //telemetry.msTransmissionInterval = 100
+        // telemetry.msTransmissionInterval = 100
         val selectRed =
             button { gamepad1.circle }.whenBecomesTrue { BotState.alliance = Alliance.RED }
         val selectBlue =
@@ -64,6 +62,15 @@ class far15 : NextFTCOpMode() {
                 Alliance.BLUE -> AutoConstants.Angles["farTurretBlue"]
                 else -> 0.0.deg
             }
+        val hpIntake =
+            SequentialGroup(
+                Tube.intakeAll,
+                FollowPath(paths.getValue("farShootToHuman")),
+                FollowPath(paths.getValue("humanToFarShoot")),
+                Delay(700.milliseconds),
+                Tube.shootAll(0.7),
+                Delay(500.milliseconds),
+            )
 
         return SequentialGroup(
             Flywheel.setSpeed(2_000.0),
@@ -74,30 +81,16 @@ class far15 : NextFTCOpMode() {
             Delay(700.milliseconds),
             Tube.shootAll(0.7),
             Delay(500.milliseconds),
-            Tube.intakeAll,
-            FollowPath(paths.getValue("farShootToHuman")),
-            FollowPath(paths.getValue("humanToFarShoot")),
-            Delay(700.milliseconds),
-            Tube.shootAll(0.7),
-            Delay(500.milliseconds),
+            hpIntake,
             Tube.intakeAll,
             FollowPath(paths.getValue("farShootToHumanAlt")),
             FollowPath(paths.getValue("humanAltToFarShoot")),
             Delay(700.milliseconds),
             Tube.shootAll(0.7),
             Delay(500.milliseconds),
-            Tube.intakeAll,
-            FollowPath(paths.getValue("farShootToHuman")),
-            FollowPath(paths.getValue("humanToFarShoot")),
-            Delay(700.milliseconds),
-            Tube.shootAll(0.7),
-            Delay(500.milliseconds),
-            Tube.intakeAll,
-            FollowPath(paths.getValue("farShootToHuman")),
-            FollowPath(paths.getValue("humanToFarShoot")),
-            Delay(700.milliseconds),
-            Tube.shootAll(0.7),
-            Delay(500.milliseconds),
+            hpIntake,
+            hpIntake,
+            hpIntake,
             Flywheel.stop(true),
             FollowPath(paths.getValue("shootFarToParkFar")),
             Flywheel.stop(),
