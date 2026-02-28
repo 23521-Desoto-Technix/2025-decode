@@ -33,7 +33,7 @@ object AutoConstants {
                 pose("startFar", Pose(88.9, 7.8, 90.0.deg.inRad))
                 pose("shootFar", Pose(85.0, 15.0, 0.0.deg.inRad))
                 pose("human", Pose(132.0, 8.7, 0.0.deg.inRad))
-                pose("humanAlt", Pose(132.0, 16.0, -65.0.deg.inRad))
+                pose("humanAlt", Pose(132.0, 16.0, 0.0.deg.inRad))
                 pose("humanAltCtrl", Pose(139.0, 72.0, 0.0.deg.inRad))
                 pose("randomIntake", Pose(132.0, 35.0, 0.0.deg.inRad))
                 pose("parkFar", Pose(100.0, 30.0, 0.0.deg.inRad))
