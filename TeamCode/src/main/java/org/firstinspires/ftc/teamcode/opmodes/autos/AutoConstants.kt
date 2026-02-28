@@ -4,6 +4,7 @@ import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
+import com.pedropathing.paths.HeadingInterpolator
 import com.pedropathing.paths.PathChain
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
@@ -33,8 +34,8 @@ object AutoConstants {
                 pose("startFar", Pose(88.9, 7.8, 90.0.deg.inRad))
                 pose("shootFar", Pose(85.0, 15.0, 0.0.deg.inRad))
                 pose("human", Pose(132.0, 8.7, 0.0.deg.inRad))
-                pose("humanAlt", Pose(132.0, 16.0, 0.0.deg.inRad))
-                pose("humanAltCtrl", Pose(139.0, 72.0, 0.0.deg.inRad))
+                pose("humanAlt", Pose(131.0, 16.0, -65.0.deg.inRad))
+                pose("humanAltCtrl", Pose(138.0, 72.0, 0.0.deg.inRad))
                 pose("randomIntake", Pose(132.0, 35.0, 0.0.deg.inRad))
                 pose("parkFar", Pose(100.0, 30.0, 0.0.deg.inRad))
                 pose("center", Pose(72.0, 72.0, 0.0.deg.inRad))
@@ -225,7 +226,20 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierCurve(p("shootFar"), p("humanAltCtrl"), p("humanAlt")))
-                    .setConstantHeadingInterpolation(p("humanAlt").heading)
+                    .setHeadingInterpolation(
+                        HeadingInterpolator.piecewise(
+                            HeadingInterpolator.PiecewiseNode(
+                                0.0,
+                                0.6,
+                                HeadingInterpolator.constant(p("shootFar").heading),
+                            ),
+                            HeadingInterpolator.PiecewiseNode(
+                                0.6,
+                                1.0,
+                                HeadingInterpolator.constant(p("humanAlt").heading),
+                            ),
+                        )
+                    )
                     .build(),
             )
             path(
