@@ -226,20 +226,7 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierCurve(p("shootFar"), p("humanAltCtrl"), p("humanAlt")))
-                    .setHeadingInterpolation(
-                        HeadingInterpolator.piecewise(
-                            HeadingInterpolator.PiecewiseNode(
-                                0.0,
-                                0.6,
-                                HeadingInterpolator.constant(p("shootFar").heading),
-                            ),
-                            HeadingInterpolator.PiecewiseNode(
-                                0.6,
-                                1.0,
-                                HeadingInterpolator.constant(p("humanAlt").heading),
-                            ),
-                        )
-                    )
+                    .setConstantHeadingInterpolation(p("shootFar").heading)
                     .build(),
             )
             path(
