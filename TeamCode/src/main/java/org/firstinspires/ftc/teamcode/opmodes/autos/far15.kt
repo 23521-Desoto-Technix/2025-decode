@@ -7,6 +7,7 @@ import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
+import dev.nextftc.core.commands.groups.ParallelRaceGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -65,7 +66,10 @@ class far15 : NextFTCOpMode() {
         val hpIntake =
             SequentialGroup(
                 Tube.intakeAll,
-                FollowPath(paths.getValue("farShootToHuman")),
+                ParallelRaceGroup(
+                    FollowPath(paths.getValue("farShootToHuman")),
+                    Delay(1500.milliseconds),
+                ),
                 FollowPath(paths.getValue("humanToFarShoot")),
                 Delay(700.milliseconds),
                 Tube.shootAll(0.7),
@@ -74,7 +78,10 @@ class far15 : NextFTCOpMode() {
         val triangleIntake =
             SequentialGroup(
                 Tube.intakeAll,
-                FollowPath(paths.getValue("farShootToHumanAlt")),
+                ParallelRaceGroup(
+                    FollowPath(paths.getValue("farShootToHumanAlt")),
+                    Delay(2500.milliseconds),
+                ),
                 FollowPath(paths.getValue("humanAltToFarShoot")),
                 Delay(700.milliseconds),
                 Tube.shootAll(0.7),

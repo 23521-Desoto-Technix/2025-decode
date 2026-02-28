@@ -4,7 +4,6 @@ import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
-import com.pedropathing.paths.HeadingInterpolator
 import com.pedropathing.paths.PathChain
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
@@ -209,7 +208,9 @@ object AutoConstants {
                 "farShootToHuman",
                 follower
                     .pathBuilder()
-                    .addPath(BezierLine(p("shootFar"), p("human")))
+                    .addPath(
+                        BezierCurve(p("shootFar"), Pose(p("shootfar").x, p("human").y), p("human"))
+                    )
                     .setConstantHeadingInterpolation(p("human").heading)
                     .build(),
             )
