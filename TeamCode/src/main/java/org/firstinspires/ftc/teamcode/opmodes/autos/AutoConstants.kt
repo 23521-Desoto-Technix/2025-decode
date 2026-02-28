@@ -209,7 +209,7 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(
-                        BezierCurve(p("shootFar"), Pose(p("shootfar").x, p("human").y), p("human"))
+                        BezierCurve(p("shootFar"), Pose(p("shootFar").x, p("human").y), p("human"))
                     )
                     .setConstantHeadingInterpolation(p("human").heading)
                     .build(),
