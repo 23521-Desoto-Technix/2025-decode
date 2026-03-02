@@ -83,7 +83,7 @@ class far15 : NextFTCOpMode() {
                     Delay(2500.milliseconds),
                 ),
                 FollowPath(paths.getValue("humanAltToFarShoot")),
-                Delay(700.milliseconds),
+                Delay(500.milliseconds),
                 Tube.shootAll(0.7),
                 Delay(500.milliseconds),
             )
