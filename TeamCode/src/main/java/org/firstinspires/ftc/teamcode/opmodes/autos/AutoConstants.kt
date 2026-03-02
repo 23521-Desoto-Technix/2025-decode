@@ -31,6 +31,7 @@ object AutoConstants {
                 pose("s2Ctrl", Pose(100.0, 55.0, 0.0))
                 pose("s2Ctrl2", Pose(125.0, 59.0, 0.0))
                 pose("s3Ctrl", Pose(85.0, 30.0, 0.0))
+                pose("s3CtrlFar", Pose(100.0, 40.0, 0.0))
                 pose("startFar", Pose(88.9, 7.8, 90.0.deg.inRad))
                 pose("shootFar", Pose(85.0, 15.0, 0.0.deg.inRad))
                 pose("human", Pose(132.0, 8.7, 0.0.deg.inRad))
@@ -236,7 +237,7 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierCurve(p("shootFar"), p("humanAltCtrl"), p("humanAlt")))
-                    .setConstantHeadingInterpolation(p("shootFar").heading)
+                    .setConstantHeadingInterpolation(p("humanAlt").heading)
                     .build(),
             )
             path(
@@ -276,7 +277,7 @@ object AutoConstants {
                     .addPath(
                         BezierCurve(
                             p("shootFar"),
-                            Pose(p("shootFar").x, p("spike3").y),
+                            p("s3CtrlFar"),
                             p("spike3"),
                         )
                     )

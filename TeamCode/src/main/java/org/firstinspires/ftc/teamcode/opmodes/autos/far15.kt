@@ -87,6 +87,18 @@ class far15 : NextFTCOpMode() {
                 Tube.shootAll(0.7),
                 Delay(500.milliseconds),
             )
+        val s3Intake =
+            SequentialGroup(
+                Tube.intakeAll,
+                ParallelRaceGroup(
+                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    Delay(2500.milliseconds),
+                ),
+                FollowPath(paths.getValue("spike3ToShootFar")),
+                Delay(500.milliseconds),
+                Tube.shootAll(0.7),
+                Delay(500.milliseconds),
+            )
 
         return SequentialGroup(
             Flywheel.setSpeed(2_000.0),
@@ -98,7 +110,7 @@ class far15 : NextFTCOpMode() {
             Tube.shootAll(0.7),
             Delay(500.milliseconds),
             hpIntake,
-            triangleIntake,
+            s3Intake,
             hpIntake,
             triangleIntake,
             hpIntake,
