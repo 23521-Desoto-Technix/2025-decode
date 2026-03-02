@@ -16,6 +16,7 @@ object AutoConstants {
         private val redPoses =
             linkedMapOf<String, Pose>().apply {
                 pose("start", Pose(127.6, 120.8, -143.8.deg.inRad))
+                pose("shove", Pose(110.0, 130.0, -90.0.deg.inRad))
                 pose("shoot", Pose(85.0, 85.0, -45.0.deg.inRad))
                 pose("spike1", Pose(125.0, 85.0, 0.0.deg.inRad))
                 pose("spike2", Pose(123.0, 60.0, 0.0.deg.inRad))
@@ -96,6 +97,14 @@ object AutoConstants {
                     .pathBuilder()
                     .addPath(BezierLine(p("start"), p("shoot")))
                     .setLinearHeadingInterpolation(p("start").heading, p("shoot").heading)
+                    .build(),
+            )
+            path(
+                "startToShove",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("start"), p("shove")))
+                    .setLinearHeadingInterpolation(p("start").heading, p("shove").heading)
                     .build(),
             )
             path(
