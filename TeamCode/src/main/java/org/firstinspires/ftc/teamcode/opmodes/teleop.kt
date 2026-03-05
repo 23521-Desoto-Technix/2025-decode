@@ -489,7 +489,7 @@ class teleop : NextFTCOpMode() {
             offset = -offset
         }
         if (!ignorePinpoint && !lockTurret) {
-            Turret.setTargetAngle(-relativeAngleToTarget)
+            Turret.setTargetAngle(-relativeAngleToTarget + offset)
         } else {
             Turret.setTargetAngle(0.0.deg)
         }
