@@ -33,8 +33,6 @@ import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.math.sqrt
-
 
 data class ShootingConfig(
     val minDistance: Double,
@@ -47,7 +45,7 @@ data class ShootingConfig(
 class teleop : NextFTCOpMode() {
     init {
         addComponents(
-            //BulkReadComponent,
+            // BulkReadComponent,
             BindingsComponent,
             PedroComponent(Constants::createFollower),
             SubsystemComponent(Tube, Shooter, Flywheel, Hood, Turret),
@@ -71,42 +69,12 @@ class teleop : NextFTCOpMode() {
 
     val shootingConfigs =
         listOf(
-            ShootingConfig(
-                60.0,
-                75.0,
-                1_400.0,
-                0.45,
-            ),
-            ShootingConfig(
-                75.0,
-                85.0,
-                1_500.0,
-                0.55,
-            ),
-            ShootingConfig(
-                85.0,
-                93.0,
-                1_500.0,
-                0.55,
-            ),
-            ShootingConfig(
-                93.0,
-                98.0,
-                1_600.0,
-                0.7,
-            ),
-            ShootingConfig(
-                98.0,
-                104.0,
-                1_600.0,
-                0.65,
-            ),
-            ShootingConfig(
-                104.0,
-                110.0,
-                1_700.0,
-                0.65,
-            ),
+            ShootingConfig(60.0, 75.0, 1_400.0, 0.45),
+            ShootingConfig(75.0, 85.0, 1_500.0, 0.55),
+            ShootingConfig(85.0, 93.0, 1_500.0, 0.55),
+            ShootingConfig(93.0, 98.0, 1_600.0, 0.7),
+            ShootingConfig(98.0, 104.0, 1_600.0, 0.65),
+            ShootingConfig(104.0, 110.0, 1_700.0, 0.65),
             ShootingConfig(
                 110.0,
                 150.0,
@@ -142,7 +110,6 @@ class teleop : NextFTCOpMode() {
 
     private lateinit var allHubs: MutableList<LynxModule?>
 
-
     fun rotateJoystickInput(
         forward: Double,
         strafe: Double,
@@ -155,7 +122,9 @@ class teleop : NextFTCOpMode() {
     }
 
     fun getShootingConfigForDistance(distance: Double): ShootingConfig? {
-        return shootingConfigs.firstOrNull { distance >= it.minDistance && distance < it.maxDistance }
+        return shootingConfigs.firstOrNull {
+            distance >= it.minDistance && distance < it.maxDistance
+        }
     }
 
     override fun onInit() {
@@ -165,9 +134,8 @@ class teleop : NextFTCOpMode() {
         frontRight = hardwareMap.dcMotor["frontRight"]
         pto = hardwareMap.servo["pto"]
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
-        //telemetry.msTransmissionInterval = 100
+        // telemetry.msTransmissionInterval = 100
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
-
 
         val selectRed =
             button { gamepad2.circle }
@@ -330,8 +298,8 @@ class teleop : NextFTCOpMode() {
                 .whenTrue { headingLocked = true }
                 .whenFalse { headingLocked = false }
         /*val slow =
-            button { gamepad1.left_bumper }.whenTrue { slowMode = true }
-                .whenFalse { slowMode = false }*/
+        button { gamepad1.left_bumper }.whenTrue { slowMode = true }
+            .whenFalse { slowMode = false }*/
         val autoAimToggle =
             button { gamepad2.ps }.whenBecomesTrue { autoRangingEnabled = !autoRangingEnabled }
         val lockTurretToggle =
@@ -365,7 +333,7 @@ class teleop : NextFTCOpMode() {
         val currentY = PedroComponent.follower.pose.y
         val deltaX = targetPose.x - currentX
         val deltaY = targetPose.y - currentY
-        //Math.hypot()
+        // Math.hypot()
         val distanceToTarget = Math.hypot(deltaX, deltaY)
         val absoluteAngleToTarget = atan2(deltaY, deltaX).rad
         val relativeAngleToTarget =
@@ -388,7 +356,9 @@ class teleop : NextFTCOpMode() {
                     "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;IGNORING PINPOINT&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
                 )
             } else {
-                telemetry.addLine("&nbsp;&nbsp;!!&nbsp;&nbsp;IGNORING PINPOINT&nbsp;&nbsp;!!&nbsp;&nbsp;")
+                telemetry.addLine(
+                    "&nbsp;&nbsp;!!&nbsp;&nbsp;IGNORING PINPOINT&nbsp;&nbsp;!!&nbsp;&nbsp;"
+                )
             }
         }
 
@@ -462,7 +432,7 @@ class teleop : NextFTCOpMode() {
         }
         telemetry.addData(
             "Current angle",
-            PedroComponent.follower.pose.heading.rad.normalized.inDeg
+            PedroComponent.follower.pose.heading.rad.normalized.inDeg,
         )
         val rotated =
             rotateJoystickInput(
@@ -511,6 +481,13 @@ class teleop : NextFTCOpMode() {
         } else {
           Turret.setTargetAngle(Turret.currentAngle - targetTagBearing.deg)
         }*/
+        var offset = 5.deg // TODO nathan edit this
+
+        if (PedroComponent.follower.pose.y > 48) {
+            offset = 0.deg
+        } else if (BotState.alliance == Alliance.BLUE) {
+            offset = -offset
+        }
         if (!ignorePinpoint && !lockTurret) {
             Turret.setTargetAngle(-relativeAngleToTarget)
         } else {
