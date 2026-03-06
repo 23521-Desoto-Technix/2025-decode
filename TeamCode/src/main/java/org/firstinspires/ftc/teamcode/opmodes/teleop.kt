@@ -187,6 +187,14 @@ class teleop : NextFTCOpMode() {
             }
         if (BotState.pose != null) {
             PedroComponent.follower.pose = BotState.pose!!
+            if (BotState.alliance == Alliance.BLUE) {
+                PedroComponent.follower.pose ==
+                    Pose(
+                        PedroComponent.follower.pose.x,
+                        PedroComponent.follower.pose.y - 3,
+                        PedroComponent.follower.pose.heading,
+                    )
+            }
         } else {
             PedroComponent.follower.pose = startingPose
         }
@@ -481,15 +489,9 @@ class teleop : NextFTCOpMode() {
         } else {
           Turret.setTargetAngle(Turret.currentAngle - targetTagBearing.deg)
         }*/
-        var offset = 5.deg // TODO nathan edit this
 
-        if (PedroComponent.follower.pose.y > 48) {
-            offset = 0.deg
-        } else if (BotState.alliance == Alliance.BLUE) {
-            offset = -offset
-        }
         if (!ignorePinpoint && !lockTurret) {
-            Turret.setTargetAngle(-relativeAngleToTarget + offset)
+            Turret.setTargetAngle(-relativeAngleToTarget)
         } else {
             Turret.setTargetAngle(0.0.deg)
         }
