@@ -72,9 +72,9 @@ object AutoConstants {
     object Angles {
         private val angles =
             linkedMapOf<String, Angle>().apply {
-                angle("closeTurretRed", (-90.0).deg)
-                angle("closeTurretBlue", 90.0.deg)
-                angle("farTurretRed", (-118.0).deg)
+                angle("closeTurretRed", (-85.0).deg)
+                angle("closeTurretBlue", 92.0.deg)
+                angle("farTurretRed", (-113.0).deg)
                 angle("farTurretBlue", 116.0.deg)
             }
 

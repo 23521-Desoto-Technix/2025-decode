@@ -78,7 +78,7 @@ class teleop : NextFTCOpMode() {
             ShootingConfig(
                 110.0,
                 150.0,
-                1_000.0,
+                900.0,
                 0.6,
                 // ),
                 // ShootingConfig(
