@@ -191,7 +191,7 @@ class teleop : NextFTCOpMode() {
                 PedroComponent.follower.pose ==
                     Pose(
                         PedroComponent.follower.pose.x,
-                        PedroComponent.follower.pose.y - 3,
+                        PedroComponent.follower.pose.y - 5,
                         PedroComponent.follower.pose.heading,
                     )
             }
