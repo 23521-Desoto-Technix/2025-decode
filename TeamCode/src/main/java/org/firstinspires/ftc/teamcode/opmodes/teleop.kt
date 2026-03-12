@@ -16,6 +16,12 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
+import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
@@ -28,11 +34,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
-import java.util.Locale
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 
 data class ShootingConfig(
     val minDistance: Double,
@@ -333,16 +334,25 @@ class teleop : NextFTCOpMode() {
         val loopMs = if (lastUpdateNs == 0L) 0.0 else (nowNs - lastUpdateNs) / 1_000_000.0
         lastUpdateNs = nowNs
 
-        var targetPose = Pose(144.0, 144.0, 0.0)
-        if (BotState.alliance == Alliance.BLUE) {
-            targetPose = Pose(0.0, 144.0, 0.0)
-        }
+        val targetPose =
+            if (PedroComponent.follower.pose.y < 48.0) {
+                if (BotState.alliance == Alliance.BLUE) {
+                    Pose(12.0, 137.0, 0.0)
+                } else {
+                    Pose(132.0, 137.0, 0.0)
+                }
+            } else {
+                if (BotState.alliance == Alliance.BLUE) {
+                    Pose(0.0, 144.0, 0.0)
+                } else {
+                    Pose(144.0, 144.0, 0.0)
+                }
+            }
         val currentX = PedroComponent.follower.pose.x
         val currentY = PedroComponent.follower.pose.y
         val deltaX = targetPose.x - currentX
         val deltaY = targetPose.y - currentY
-        // Math.hypot()
-        val distanceToTarget = Math.hypot(deltaX, deltaY)
+        val distanceToTarget = hypot(deltaX, deltaY)
         val absoluteAngleToTarget = atan2(deltaY, deltaX).rad
         val relativeAngleToTarget =
             (PedroComponent.follower.pose.heading.rad - absoluteAngleToTarget + 180.deg).normalized
