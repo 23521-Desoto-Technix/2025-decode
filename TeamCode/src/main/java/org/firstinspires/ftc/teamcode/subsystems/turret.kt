@@ -49,7 +49,7 @@ object Turret : Subsystem {
     }
 
     fun setRawPosition(position: Double) {
-        left.position = position
-        right.position = position
+        left.position = position + 0.02
+        right.position = position - 0.02
     }
 }
