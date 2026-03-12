@@ -39,9 +39,6 @@ object Turret : Subsystem {
         val velocityDegPerSec = velocityVoltsPerSec * scale
 
         currentAngle = positionDeg.deg
-
-        ActiveOpMode.telemetry.addData("Turret Current Position (V)", currentVoltage)
-        ActiveOpMode.telemetry.addData("Turret Current Position (deg)", positionDeg)
     }
 
     fun setTargetAngle(angle: Angle) {

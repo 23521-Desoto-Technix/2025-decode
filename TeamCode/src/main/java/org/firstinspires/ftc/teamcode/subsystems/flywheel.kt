@@ -16,7 +16,7 @@ object Flywheel : Subsystem {
       VoltageCompensatingMotor(MotorEx("rightShooter").brakeMode().reversed())
   private val shooterEncoder = MotorEx("backRight").zeroed()
   val PID = controlSystem {
-    velPid(0.01, 0.0, 0.0)
+    velPid(0.02, 0.0, 0.0)
     basicFF(0.0004)
   }
 

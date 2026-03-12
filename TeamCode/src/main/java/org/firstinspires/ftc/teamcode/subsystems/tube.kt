@@ -66,10 +66,6 @@ object Tube : Subsystem {
       return
     }
     advanceStateMachine()
-    ActiveOpMode.telemetry.addData("TubeState", state)
-    ActiveOpMode.telemetry.addData("Top", top.state)
-    ActiveOpMode.telemetry.addData("Middle", middle.state)
-    ActiveOpMode.telemetry.addData("Bottom", bottom.state)
   }
 
   val intakeAll = InstantCommand {

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
+import com.bylazar.telemetry.JoinedTelemetry
+import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.geometry.Pose
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
@@ -68,6 +70,8 @@ class teleop : NextFTCOpMode() {
 
     private var lastUpdateNs = 0L
 
+    val t = JoinedTelemetry(PanelsTelemetry.ftcTelemetry, telemetry)
+
     val shootingConfigs =
         listOf(
             ShootingConfig(60.0, 75.0, 1_400.0, 0.45),
@@ -134,8 +138,8 @@ class teleop : NextFTCOpMode() {
         backLeft = hardwareMap.dcMotor["backLeft"]
         frontRight = hardwareMap.dcMotor["frontRight"]
         pto = hardwareMap.servo["pto"]
-        telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
-        // telemetry.msTransmissionInterval = 100
+        t.setDisplayFormat(Telemetry.DisplayFormat.HTML)
+        // t.msTransmissionInterval = 100
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
 
         val selectRed =
@@ -168,13 +172,13 @@ class teleop : NextFTCOpMode() {
                 }
             }
 
-        telemetry.addLine(allianceDisplay)
-        telemetry.addLine("Controller 2")
-        telemetry.addLine("RED: Circle ●")
-        telemetry.addLine("BLUE: Cross ✕")
+        t.addLine(allianceDisplay)
+        t.addLine("Controller 2")
+        t.addLine("RED: Circle ●")
+        t.addLine("BLUE: Cross ✕")
 
         BindingManager.update()
-        telemetry.update()
+        t.update()
     }
 
     override fun onStartButtonPressed() {
@@ -223,7 +227,6 @@ class teleop : NextFTCOpMode() {
             button { gamepad1.dpad_up || gamepad2.dpad_up }
                 .whenBecomesTrue {
                     if (!autoRangingEnabled) {
-                        flywheelTargetSpeed = 1_950.0
                         Hood.position = 0.935
                         Flywheel.enable().then(Flywheel.setSpeed(2_050.0)).schedule()
                     }
@@ -232,16 +235,14 @@ class teleop : NextFTCOpMode() {
             button { gamepad1.dpad_down || gamepad2.dpad_down }
                 .whenBecomesTrue {
                     if (!autoRangingEnabled) {
-                        flywheelTargetSpeed = 1_600.0
                         Hood.position = 0.45
                         Flywheel.enable().then(Flywheel.setSpeed(1_600.0)).schedule()
                     }
                 }
         val flywheelTesting =
-            button { gamepad1.dpad_left || gamepad1.dpad_left }
+            button { gamepad1.dpad_left || gamepad2.dpad_left }
                 .whenBecomesTrue {
                     if (!autoRangingEnabled) {
-                        flywheelTargetSpeed = 500.0
                         Flywheel.enable().then(Flywheel.setSpeed(500.0)).schedule()
                     }
                 }
@@ -256,16 +257,14 @@ class teleop : NextFTCOpMode() {
             button { gamepad2.left_trigger > 0.5 }
                 .whenBecomesTrue {
                     if (!autoRangingEnabled) {
-                        flywheelTargetSpeed += 100.0
-                        Flywheel.enable().then(Flywheel.setSpeed(flywheelTargetSpeed)).schedule()
+                        Flywheel.enable().then(Flywheel.setSpeed(Flywheel.targetSpeed + 100.0)).schedule()
                     }
                 }
         val flywheelSpeedDown =
             button { gamepad2.right_trigger > 0.5 }
                 .whenBecomesTrue {
                     if (!autoRangingEnabled) {
-                        flywheelTargetSpeed = maxOf(0.0, flywheelTargetSpeed - 100.0)
-                        Flywheel.enable().then(Flywheel.setSpeed(flywheelTargetSpeed)).schedule()
+                        Flywheel.enable().then(Flywheel.setSpeed(maxOf(0.0, Flywheel.targetSpeed - 100.0))).schedule()
                     }
                 }
         val hoodUp =
@@ -359,8 +358,7 @@ class teleop : NextFTCOpMode() {
 
         val config = getShootingConfigForDistance(distanceToTarget)
         if (config != null && autoRangingEnabled) {
-            if (flywheelTargetSpeed != config.flywheelSpeed) {
-                flywheelTargetSpeed = config.flywheelSpeed
+            if (Flywheel.targetSpeed != config.flywheelSpeed) {
                 Flywheel.enable().then(Flywheel.setSpeed(config.flywheelSpeed)).schedule()
             }
             if (Hood.position != config.hoodPosition) {
@@ -370,46 +368,46 @@ class teleop : NextFTCOpMode() {
 
         if (ignorePinpoint) {
             if (((System.currentTimeMillis() / 500) % 2).toInt() == 0) {
-                telemetry.addLine(
+                t.addLine(
                     "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;IGNORING PINPOINT&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
                 )
             } else {
-                telemetry.addLine(
+                t.addLine(
                     "&nbsp;&nbsp;!!&nbsp;&nbsp;IGNORING PINPOINT&nbsp;&nbsp;!!&nbsp;&nbsp;"
                 )
             }
         }
 
-        telemetry.addData("X", PedroComponent.follower.pose.x)
-        telemetry.addData("Y", PedroComponent.follower.pose.y)
-        telemetry.addData("Heading", PedroComponent.follower.pose.heading)
-        telemetry.addData("Distance to Target", distanceToTarget)
-        telemetry.addData("Loop Time (ms)", String.format(Locale.US, "%.1f", loopMs))
+        t.addData("X", PedroComponent.follower.pose.x)
+        t.addData("Y", PedroComponent.follower.pose.y)
+        t.addData("Heading", PedroComponent.follower.pose.heading)
+        t.addData("Distance to Target", distanceToTarget)
+        t.addData("Loop Time (ms)", String.format(Locale.US, "%.1f", loopMs))
         val shootingModeDisplay =
             if (autoRangingEnabled) {
                 "<span style=\"background-color: #00FF00; color: black;\">&nbsp;&nbsp;AUTO&nbsp;&nbsp;</span>"
             } else {
                 "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;MANUAL&nbsp;&nbsp;</span>"
             }
-        telemetry.addData("Shooting Mode", shootingModeDisplay)
-        telemetry.addData("Angle to (144, 144)", relativeAngleToTarget.inDeg)
-        telemetry.addData("Flywheel Target Speed", flywheelTargetSpeed)
-        telemetry.addData("Flywheel Actual Speed", Flywheel.speed)
-        telemetry.addData("Hood position", Hood.position)
+        t.addData("Shooting Mode", shootingModeDisplay)
+        t.addData("Angle to (144, 144)", relativeAngleToTarget.inDeg)
+        t.addData("Flywheel Target Speed", Flywheel.targetSpeed)
+        t.addData("Flywheel Actual Speed", Flywheel.speed)
+        t.addData("Hood position", Hood.position)
         /* HTML telemetry reference
-        telemetry.addLine("<b>Bold text</b>")
-        telemetry.addLine("<i>Italic text</i>")
-        telemetry.addLine("<u>Underlined text</u>")
-        telemetry.addLine("<font color=\"#FF0000\">Red text</font>")
-        telemetry.addLine("<font color=\"#00FF00\">Green text</font>")
-        telemetry.addLine("<b><i>Bold and italic</i></b>")
-        telemetry.addLine(
+        t.addLine("<b>Bold text</b>")
+        t.addLine("<i>Italic text</i>")
+        t.addLine("<u>Underlined text</u>")
+        t.addLine("<font color=\"#FF0000\">Red text</font>")
+        t.addLine("<font color=\"#00FF00\">Green text</font>")
+        t.addLine("<b><i>Bold and italic</i></b>")
+        t.addLine(
             "<span style=\"background-color: yellow; color: black;\">Yellow background</span>"
         )
-        telemetry.addLine(
+        t.addLine(
             "<span style=\"background-color: #FF0000; color: white;\">Red background</span>"
         )
-        telemetry.addLine(
+        t.addLine(
             "<span style=\"background-color: #0000FF; color: white;\">Blue background</span>"
         )*/
 
@@ -440,7 +438,7 @@ class teleop : NextFTCOpMode() {
             frontLeft.power = 0.0
         }
         BindingManager.update()
-        telemetry.update()
+        t.update()
         var rotateBy = -PedroComponent.follower.pose.heading.rad
         if (BotState.alliance == Alliance.BLUE) {
             rotateBy = (rotateBy + 180.deg).normalized
@@ -448,10 +446,6 @@ class teleop : NextFTCOpMode() {
         if (ignorePinpoint) {
             rotateBy = 0.0.deg
         }
-        telemetry.addData(
-            "Current angle",
-            PedroComponent.follower.pose.heading.rad.normalized.inDeg,
-        )
         val rotated =
             rotateJoystickInput(
                 -gamepad1.left_stick_y.toDouble(),
@@ -483,7 +477,6 @@ class teleop : NextFTCOpMode() {
         } else {
             rotatedTurn = -gamepad1.right_stick_x.toDouble()
         }
-        telemetry.addData("turn thingy", rotatedTurn)
         if (!BotState.enabled) {
             rotatedForward = 0.0
             rotatedStrafe = 0.0
