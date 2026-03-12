@@ -15,6 +15,8 @@ object Turret : Subsystem {
     private var lastVoltage: Double = 0.0
     private var lastTimeNs: Long = 0L
 
+    const val OFFSET = 0.015
+
     var currentAngle: Angle = 0.0.deg
         private set
 
@@ -44,12 +46,12 @@ object Turret : Subsystem {
     fun setTargetAngle(angle: Angle) {
         val normalizedAngle = angle.normalized.inDeg
         val targetPosition = 0.5 - normalizedAngle * 0.0031666667
-        left.position = targetPosition
-        right.position = targetPosition
+        left.position = targetPosition + OFFSET
+        right.position = targetPosition - OFFSET
     }
 
     fun setRawPosition(position: Double) {
-        left.position = position + 0.02
-        right.position = position - 0.02
+        left.position = position + OFFSET
+        right.position = position - OFFSET
     }
 }
