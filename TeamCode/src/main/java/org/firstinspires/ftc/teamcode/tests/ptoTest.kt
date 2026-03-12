@@ -1,0 +1,35 @@
+package org.firstinspires.ftc.teamcode.tests
+
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+
+@TeleOp(name = "PTO Test")
+@Disabled
+class ptoTest : LinearOpMode() {
+  override fun runOpMode() {
+    val backRight = hardwareMap.dcMotor["backRight"]
+    val frontLeft = hardwareMap.dcMotor["frontLeft"]
+    val backLeft = hardwareMap.dcMotor["backLeft"]
+    val frontRight = hardwareMap.dcMotor["frontRight"]
+    val pto = hardwareMap.servo["pto"]
+    waitForStart()
+    while (opModeIsActive()) {
+
+      val stickValue = gamepad2.left_stick_y.toDouble()
+      telemetry.addData("Power", stickValue)
+      telemetry.update()
+      backRight.power = stickValue
+      frontLeft.power = 0.0 // stickValue
+      backLeft.power = -stickValue
+      frontRight.power = 0.0 // -stickValue
+
+      if (gamepad1.a
+        ) {
+        pto.position = 0.0
+      } else if (gamepad1.b) {
+        pto.position = .95
+      }
+    }
+  }
+}

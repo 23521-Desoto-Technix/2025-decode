@@ -1,162 +1,66 @@
 package org.firstinspires.ftc.teamcode.subsystems
 
-import dev.nextftc.control.KineticState
-import dev.nextftc.control.builder.controlSystem
-import dev.nextftc.core.commands.utility.LambdaCommand
+import com.qualcomm.robotcore.hardware.AnalogInput
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
-import dev.nextftc.hardware.impl.MotorEx
-import kotlin.math.abs
+import dev.nextftc.ftc.ActiveOpMode
+import dev.nextftc.hardware.impl.ServoEx
 
 object Turret : Subsystem {
-  val motor = MotorEx("turret").zeroed().brakeMode()
-  val encoder = MotorEx("frontLeft").zeroed()
-  var angle = 0.0
-  var power = 0.0
-  val PID = controlSystem { posPid(0.0002, 0.0, 0.000002) }
-  var usingPID = false
-  var usingIMU = false
-  var targetAngle = 0.0
-  var IMUDegrees = 0.0
-  var goal = KineticState(0.0, 0.0)
-  var baseAngle = 0.0
-  var previousError = 0.0
-  var lastTime = System.currentTimeMillis()
-  var imuOffset = -(90.0).deg
-  var enabled = true
+    val left = ServoEx("turretLeft")
+    val right = ServoEx("turretRight")
+    lateinit var encoder: AnalogInput
+    val DEADZONE = 60.deg
+    val MAGIC_NUMBER = 1.04
+    const val RIGHT_OFFSET = 0.028
+    const val DESYNC = 0.03
 
-  private fun normalizeAngle(angleDeg: Double): Double {
-    var normalized = angleDeg
-    while (normalized > 180) {
-      normalized -= 360
-    }
-    while (normalized < -180) {
-      normalized += 360
-    }
-    return normalized
-  }
+    private var lastVoltage: Double = 0.0
+    private var lastTimeNs: Long = 0L
 
-  private fun applyTickLimits(ticks: Double): Double {
-    return ticks.coerceIn(-19_000.0, 19_000.0)
-  }
+    var currentAngle: Angle = 0.0.deg
+        private set
 
-  private fun degreesToTicks(degrees: Double): Double {
-    return degrees * (145.0 / 24.0) * 8192 / 360
-  }
-
-  private fun ticksToDegrees(ticks: Double): Double {
-    return ticks / 8192 * 360 * (24 / 145.0)
-  }
-
-  private fun setGoalSafe(angleDeg: Double, updateBase: Boolean = true) {
-    val normalized = normalizeAngle(angleDeg)
-    val ticks = degreesToTicks(normalized)
-    val limited = applyTickLimits(ticks)
-    PID.goal = KineticState(limited, 0.0)
-    goal = KineticState(limited, 0.0)
-    targetAngle = normalized
-    if (updateBase) {
-      baseAngle = normalized
-    }
-  }
-
-  override fun periodic() {
-    if (!enabled) {
-      motor.power = 0.0
-      return
+    override fun initialize() {
+        encoder = ActiveOpMode.hardwareMap.analogInput["turretEncoder"]
+        lastVoltage = encoder.voltage
+        lastTimeNs = System.nanoTime()
     }
 
-    if (usingIMU) {
-      val adjustedAngle = baseAngle + IMUDegrees + imuOffset.inDeg
-      setGoalSafe(adjustedAngle, false)
+    override fun periodic() {
+        val now = System.nanoTime()
+        val currentVoltage = encoder.voltage
+        val dtSeconds = (now - lastTimeNs) / 1e9
+        val velocityVoltsPerSec =
+            if (dtSeconds > 0.0) (currentVoltage - lastVoltage) / dtSeconds else 0.0
+
+        lastVoltage = currentVoltage
+        lastTimeNs = now
+
+        val scale = 360.0 / 3.3
+        val positionDeg = currentVoltage * scale - 180.0
+        val velocityDegPerSec = velocityVoltsPerSec * scale
+
+        currentAngle = positionDeg.deg
+
+        ActiveOpMode.telemetry.addData("Turret Current Position (V)", currentVoltage)
+        ActiveOpMode.telemetry.addData("Turret Current Position (deg)", positionDeg)
     }
-    if (usingPID) {
-      motor.power =
-          PID.calculate(KineticState(encoder.currentPosition.toDouble(), encoder.velocity))
-    } else {
-      motor.power = power
+
+    fun setTargetAngle(angle: Angle) {
+        val normalizedAngle =
+            angle.normalized.inDeg.coerceIn(
+                ((-180).deg + DEADZONE).inDeg,
+                (180.deg - DEADZONE).inDeg,
+            )
+        val targetPosition = -normalizedAngle * (.558 / 180.0) + 0.5
+        left.position = targetPosition
+        right.position = targetPosition + RIGHT_OFFSET
     }
-    angle = ticksToDegrees(encoder.currentPosition.toDouble())
-  }
 
-  fun setImuOffset(angle: Angle) = LambdaCommand().setStart { imuOffset = angle }
-
-  fun setTicks(targetTicks: Double): LambdaCommand {
-    var limitedTicks = 0.0
-    return LambdaCommand("setTurretAngle")
-        .setStart {
-          limitedTicks = applyTickLimits(targetTicks)
-          PID.goal = KineticState(limitedTicks, 0.0)
-          goal = KineticState(limitedTicks, 0.0)
-          usingPID = true
-        }
-        .setIsDone { abs(encoder.currentPosition.toDouble() - limitedTicks) < 50 }
-        .requires(this)
-  }
-
-  fun setAngle(angle: Angle, useIMU: Boolean = false) =
-      LambdaCommand("setTurretAngle")
-          .setStart {
-            usingIMU = useIMU
-            setGoalSafe(angle.inDeg)
-            usingPID = true
-          }
-          .setIsDone { true }
-          .requires(this)
-
-  fun setPower(power: Double) =
-      LambdaCommand("setTurretPower")
-          .setStart {
-            usingPID = false
-            val currentTicks = encoder.currentPosition.toDouble()
-            if (currentTicks >= 19_000) {
-              this.power = 0.2
-            } else if (currentTicks <= -19_000) {
-              this.power = -0.2
-            } else {
-              this.power = power
-            }
-          }
-          .setIsDone { true }
-          .requires(this)
-
-  fun cameraTrackPower(cameraError: Double, gamepadComp: Double = 0.0) =
-      LambdaCommand("turretCameraTrackPower")
-          .setStart {
-            usingPID = false
-
-            var kP = 0.0015
-            val kD = 0.00001
-            val error = cameraError + (gamepadComp * 150.0)
-            val currentTime = System.currentTimeMillis()
-            val dt = (currentTime - lastTime) / 1000.0
-            val errorRate = if (dt > 0) (error - previousError) / dt else 0.0
-
-            val currentTicks = encoder.currentPosition.toDouble()
-            if (currentTicks >= 19_000) {
-              this.power = 0.2
-            } else if (currentTicks <= -19_000) {
-              this.power = -0.2
-            } else {
-              this.power = ((error * kP) + (errorRate * kD)).coerceIn(-1.0, 1.0)
-            }
-
-            previousError = error
-            lastTime = currentTime
-          }
-          .setIsDone { true }
-          .requires(this)
-
-  fun enable() =
-      LambdaCommand("enableTurret")
-          .setStart { enabled = true }
-          .setIsDone { true }
-          .requires(this)
-
-  fun disable() =
-      LambdaCommand("disableTurret")
-          .setStart { enabled = false }
-          .setIsDone { true }
-          .requires(this)
+    fun setRawPosition(position: Double) {
+        left.position = position - DESYNC
+        right.position = position + RIGHT_OFFSET + DESYNC
+    }
 }

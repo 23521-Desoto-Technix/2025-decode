@@ -1,16 +1,34 @@
 package org.firstinspires.ftc.teamcode.subsystems
 
-import dev.nextftc.core.commands.utility.LambdaCommand
+import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.ServoEx
+import org.firstinspires.ftc.teamcode.utils.BotState
 
 object Hood : Subsystem {
   val servo = ServoEx("hood")
-  var position = 0.0
+  var position = 0.5
+  private const val BUMP_AMOUNT = 0.05
 
-  override fun periodic() {
+  override fun initialize() {
+    if (!BotState.enabled) {
+      return
+    }
     servo.position = position
   }
 
-  fun setPosition(pos: Double) = LambdaCommand("setHoodPosition").setStart { position = pos }
+  override fun periodic() {
+      if (!BotState.enabled) {
+          return
+      }
+      servo.position = position
+  }
+
+  fun bumpUp() = InstantCommand {
+    position = (position + BUMP_AMOUNT).coerceIn(0.0, 1.0)
+  }
+
+  fun bumpDown() = InstantCommand {
+    position = (position - BUMP_AMOUNT).coerceIn(0.0, 1.0)
+  }
 }
