@@ -337,9 +337,9 @@ class teleop : NextFTCOpMode() {
         val targetPose =
             if (PedroComponent.follower.pose.y < 48.0) {
                 if (BotState.alliance == Alliance.BLUE) {
-                    Pose(12.0, 137.0, 0.0)
+                    Pose(4.0, 140.0, 0.0)
                 } else {
-                    Pose(132.0, 137.0, 0.0)
+                    Pose(140.0, 140.0, 0.0)
                 }
             } else {
                 if (BotState.alliance == Alliance.BLUE) {
