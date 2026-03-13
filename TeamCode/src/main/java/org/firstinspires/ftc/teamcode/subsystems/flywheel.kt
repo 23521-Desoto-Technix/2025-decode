@@ -67,8 +67,8 @@ object Flywheel : Subsystem {
                   shooterEncoder.state.acceleration,
               )
           )
-      upperShooterMotor.power = pidOutput.coerceIn(0.0, 1.0)
-      lowerShooterMotor.power = pidOutput.coerceIn(0.0, 1.0)
+      upperShooterMotor.power = pidOutput
+      lowerShooterMotor.power = pidOutput
     } else {
       upperShooterMotor.power = power
       lowerShooterMotor.power = power
