@@ -18,6 +18,12 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
+import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
@@ -30,18 +36,17 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
-import java.util.Locale
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.hypot
-import kotlin.math.sin
 
 data class ShootingConfig(
     val minDistance: Double,
     val maxDistance: Double,
     val flywheelSpeed: Double,
     val hoodPosition: Double,
+)
+
+data class TargetMetrics(
+    val distanceToTarget: Double,
+    val relativeAngleToTarget: dev.nextftc.core.units.Angle,
 )
 
 @TeleOp
@@ -129,6 +134,51 @@ class teleop : NextFTCOpMode() {
         return shootingConfigs.firstOrNull {
             distance >= it.minDistance && distance < it.maxDistance
         }
+    }
+
+    fun applyRobotSpaceOffset(pose: Pose, localX: Double, localY: Double): Pose {
+        val heading = pose.heading
+        val fieldX = pose.x + localX * cos(heading) - localY * sin(heading)
+        val fieldY = pose.y + localX * sin(heading) + localY * cos(heading)
+        return Pose(fieldX, fieldY, pose.heading)
+    }
+
+    fun calculateTargetMetrics(currentPose: Pose): TargetMetrics {
+        val targetPose =
+            if (currentPose.y < 48.0) {
+                if (BotState.alliance == Alliance.BLUE) {
+                    Pose(4.0, 140.0, 0.0)
+                } else {
+                    Pose(140.0, 140.0, 0.0)
+                }
+            } else {
+                if (BotState.alliance == Alliance.BLUE) {
+                    Pose(0.0, 144.0, 0.0)
+                } else {
+                    Pose(144.0, 144.0, 0.0)
+                }
+            }
+
+        val currentX = currentPose.x
+        val currentY = currentPose.y
+        val deltaX = targetPose.x - currentX
+        val deltaY = targetPose.y - currentY
+        val distanceToTarget = hypot(deltaX, deltaY)
+
+        val redAnglePoseA = Pose(144.0, 125.0, 0.0)
+        val redAnglePoseB = Pose(125.0, 144.0, 0.0)
+        val anglePoseA =
+            if (BotState.alliance == Alliance.BLUE) mirrorPose(redAnglePoseA) else redAnglePoseA
+        val anglePoseB =
+            if (BotState.alliance == Alliance.BLUE) mirrorPose(redAnglePoseB) else redAnglePoseB
+        val angleToPoseA = atan2(anglePoseA.y - currentY, anglePoseA.x - currentX)
+        val angleToPoseB = atan2(anglePoseB.y - currentY, anglePoseB.x - currentX)
+        val absoluteAngleToTarget =
+            atan2(sin(angleToPoseA) + sin(angleToPoseB), cos(angleToPoseA) + cos(angleToPoseB)).rad
+        val relativeAngleToTarget =
+            (currentPose.heading.rad - absoluteAngleToTarget + 180.deg).normalized
+
+        return TargetMetrics(distanceToTarget, relativeAngleToTarget)
     }
 
     override fun onInit() {
@@ -336,39 +386,10 @@ class teleop : NextFTCOpMode() {
         val loopMs = if (lastUpdateNs == 0L) 0.0 else (nowNs - lastUpdateNs) / 1_000_000.0
         lastUpdateNs = nowNs
 
-        val targetPose =
-            if (PedroComponent.follower.pose.y < 48.0) {
-                if (BotState.alliance == Alliance.BLUE) {
-                    Pose(4.0, 140.0, 0.0)
-                } else {
-                    Pose(140.0, 140.0, 0.0)
-                }
-            } else {
-                if (BotState.alliance == Alliance.BLUE) {
-                    Pose(0.0, 144.0, 0.0)
-                } else {
-                    Pose(144.0, 144.0, 0.0)
-                }
-            }
-        val currentX = PedroComponent.follower.pose.x
-        val currentY = PedroComponent.follower.pose.y
-        val deltaX = targetPose.x - currentX
-        val deltaY = targetPose.y - currentY
-        val distanceToTarget = hypot(deltaX, deltaY)
-
-        val redAnglePoseA = Pose(144.0, 125.0, 0.0)
-        val redAnglePoseB = Pose(125.0, 144.0, 0.0)
-        val anglePoseA =
-            if (BotState.alliance == Alliance.BLUE) mirrorPose(redAnglePoseA) else redAnglePoseA
-        val anglePoseB =
-            if (BotState.alliance == Alliance.BLUE) mirrorPose(redAnglePoseB) else redAnglePoseB
-        val angleToPoseA = atan2(anglePoseA.y - currentY, anglePoseA.x - currentX)
-        val angleToPoseB = atan2(anglePoseB.y - currentY, anglePoseB.x - currentX)
-        // val absoluteAngleToTarget = atan2(deltaY, deltaX).rad
-        val absoluteAngleToTarget =
-            atan2(sin(angleToPoseA) + sin(angleToPoseB), cos(angleToPoseA) + cos(angleToPoseB)).rad
-        val relativeAngleToTarget =
-            (PedroComponent.follower.pose.heading.rad - absoluteAngleToTarget + 180.deg).normalized
+        val targetMetrics =
+            calculateTargetMetrics(applyRobotSpaceOffset(PedroComponent.follower.pose, -1.633, 0.0))
+        val distanceToTarget = targetMetrics.distanceToTarget
+        val relativeAngleToTarget = targetMetrics.relativeAngleToTarget
 
         val config = getShootingConfigForDistance(distanceToTarget)
         if (config != null && autoRangingEnabled) {
