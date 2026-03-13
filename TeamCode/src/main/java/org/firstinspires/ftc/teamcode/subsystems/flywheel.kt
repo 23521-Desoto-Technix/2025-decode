@@ -71,8 +71,8 @@ object Flywheel : Subsystem {
             upperShooterMotor.power = pidOutput.coerceAtLeast(0.0)
             lowerShooterMotor.power = pidOutput.coerceAtLeast(0.0)
         } else {
-            upperShooterMotor.power = pidOutput.coerceAtLeast(-0.4)
-            lowerShooterMotor.power = pidOutput.coerceAtLeast(-0.4)
+            upperShooterMotor.power = pidOutput.coerceAtLeast(-0.2)
+            lowerShooterMotor.power = pidOutput.coerceAtLeast(-0.2)
         }
     } else {
       upperShooterMotor.power = power
