@@ -78,25 +78,25 @@ class teleop : NextFTCOpMode() {
             ShootingConfig(93.0, 98.0, 1_600.0, 0.7),
             ShootingConfig(98.0, 104.0, 1_600.0, 0.65),
             ShootingConfig(104.0, 110.0, 1_700.0, 0.65),
-            ShootingConfig(
-                110.0,
-                120.0,
-                900.0,
-                0.6,
-                 ),
+//            ShootingConfig(
+//                110.0,
+//                120.0,
+//                900.0,
+//                0.6,
+                 //),
             //far zone
-                 ShootingConfig(
-                 120.0,
-                 135.0,
-                 1_950.0,
-                 0.9,
-                  ),
-                 ShootingConfig(
-                 135.0,
-                 160.0,
-                 2_050.0,
-                  0.95,
-            ),
+//                 ShootingConfig(
+//                 120.0,
+//                 135.0,
+//                 1_950.0,
+//                 0.9,
+//                  ),
+//                 ShootingConfig(
+//                 135.0,
+//                 160.0,
+//                 2_050.0,
+//                  0.95,
+//            ),
         )
 
     val headingPID = controlSystem { posPid(0.0085, 0.0, 0.0) }
