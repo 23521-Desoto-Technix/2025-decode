@@ -18,12 +18,6 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
-import java.util.Locale
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.hypot
-import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
@@ -36,6 +30,12 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
+import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.sin
 
 data class ShootingConfig(
     val minDistance: Double,
@@ -78,25 +78,25 @@ class teleop : NextFTCOpMode() {
             ShootingConfig(93.0, 98.0, 1_600.0, 0.7),
             ShootingConfig(98.0, 104.0, 1_600.0, 0.65),
             ShootingConfig(104.0, 110.0, 1_700.0, 0.65),
-//            ShootingConfig(
-//                110.0,
-//                120.0,
-//                900.0,
-//                0.6,
-                 //),
-            //far zone
-//                 ShootingConfig(
-//                 120.0,
-//                 135.0,
-//                 1_950.0,
-//                 0.9,
-//                  ),
-//                 ShootingConfig(
-//                 135.0,
-//                 160.0,
-//                 2_050.0,
-//                  0.95,
-//            ),
+            //            ShootingConfig(
+            //                110.0,
+            //                120.0,
+            //                900.0,
+            //                0.6,
+            // ),
+            // far zone
+            //                 ShootingConfig(
+            //                 120.0,
+            //                 135.0,
+            //                 1_950.0,
+            //                 0.9,
+            //                  ),
+            //                 ShootingConfig(
+            //                 135.0,
+            //                 160.0,
+            //                 2_050.0,
+            //                  0.95,
+            //            ),
         )
 
     val headingPID = controlSystem { posPid(0.0085, 0.0, 0.0) }
@@ -256,14 +256,18 @@ class teleop : NextFTCOpMode() {
             button { gamepad2.left_trigger > 0.5 }
                 .whenBecomesTrue {
                     if (!autoRangingEnabled) {
-                        Flywheel.enable().then(Flywheel.setSpeed(Flywheel.targetSpeed + 100.0)).schedule()
+                        Flywheel.enable()
+                            .then(Flywheel.setSpeed(Flywheel.targetSpeed + 100.0))
+                            .schedule()
                     }
                 }
         val flywheelSpeedDown =
             button { gamepad2.right_trigger > 0.5 }
                 .whenBecomesTrue {
                     if (!autoRangingEnabled) {
-                        Flywheel.enable().then(Flywheel.setSpeed(maxOf(0.0, Flywheel.targetSpeed - 100.0))).schedule()
+                        Flywheel.enable()
+                            .then(Flywheel.setSpeed(maxOf(0.0, Flywheel.targetSpeed - 100.0)))
+                            .schedule()
                     }
                 }
         val hoodUp =
@@ -351,7 +355,18 @@ class teleop : NextFTCOpMode() {
         val deltaX = targetPose.x - currentX
         val deltaY = targetPose.y - currentY
         val distanceToTarget = hypot(deltaX, deltaY)
-        val absoluteAngleToTarget = atan2(deltaY, deltaX).rad
+
+        val redAnglePoseA = Pose(144.0, 120.0, 0.0)
+        val redAnglePoseB = Pose(120.0, 144.0, 0.0)
+        val anglePoseA =
+            if (BotState.alliance == Alliance.BLUE) mirrorPose(redAnglePoseA) else redAnglePoseA
+        val anglePoseB =
+            if (BotState.alliance == Alliance.BLUE) mirrorPose(redAnglePoseB) else redAnglePoseB
+        val angleToPoseA = atan2(anglePoseA.y - currentY, anglePoseA.x - currentX)
+        val angleToPoseB = atan2(anglePoseB.y - currentY, anglePoseB.x - currentX)
+        // val absoluteAngleToTarget = atan2(deltaY, deltaX).rad
+        val absoluteAngleToTarget =
+            atan2(sin(angleToPoseA) + sin(angleToPoseB), cos(angleToPoseA) + cos(angleToPoseB)).rad
         val relativeAngleToTarget =
             (PedroComponent.follower.pose.heading.rad - absoluteAngleToTarget + 180.deg).normalized
 
@@ -371,9 +386,7 @@ class teleop : NextFTCOpMode() {
                     "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;IGNORING PINPOINT&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
                 )
             } else {
-                t.addLine(
-                    "&nbsp;&nbsp;!!&nbsp;&nbsp;IGNORING PINPOINT&nbsp;&nbsp;!!&nbsp;&nbsp;"
-                )
+                t.addLine("&nbsp;&nbsp;!!&nbsp;&nbsp;IGNORING PINPOINT&nbsp;&nbsp;!!&nbsp;&nbsp;")
             }
         }
 
