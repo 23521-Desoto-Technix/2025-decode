@@ -6,8 +6,8 @@ import dev.nextftc.core.commands.utility.LambdaCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.impl.VoltageCompensatingMotor
-import kotlin.math.abs
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.math.abs
 
 object Flywheel : Subsystem {
 
@@ -67,8 +67,13 @@ object Flywheel : Subsystem {
                   shooterEncoder.state.acceleration,
               )
           )
-      upperShooterMotor.power = pidOutput
-      lowerShooterMotor.power = pidOutput
+        if (abs(this.targetSpeed - this.speed) < 50) {
+            upperShooterMotor.power = pidOutput.coerceAtLeast(0.0)
+            lowerShooterMotor.power = pidOutput.coerceAtLeast(0.0)
+        } else {
+            upperShooterMotor.power = pidOutput
+            lowerShooterMotor.power = pidOutput
+        }
     } else {
       upperShooterMotor.power = power
       lowerShooterMotor.power = power

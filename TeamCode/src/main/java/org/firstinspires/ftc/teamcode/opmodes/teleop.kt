@@ -62,8 +62,6 @@ class teleop : NextFTCOpMode() {
 
     var ignorePinpoint = false
 
-    var flywheelTargetSpeed = 0.0
-
     var headingLocked = false
 
     var autoRangingEnabled = true
