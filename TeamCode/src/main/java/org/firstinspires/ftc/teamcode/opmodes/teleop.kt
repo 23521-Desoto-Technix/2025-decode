@@ -18,12 +18,6 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
-import java.util.Locale
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.hypot
-import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
@@ -36,6 +30,12 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
+import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.sin
 
 data class ShootingConfig(
     val minDistance: Double,
@@ -235,20 +235,12 @@ class teleop : NextFTCOpMode() {
         val red = Pose(127.6, 120.8, -143.8.deg.inRad)
         val startingPose =
             when (BotState.alliance) {
-                Alliance.RED -> red
-                Alliance.BLUE -> mirrorPose(red)
+                Alliance.RED -> Pose(72.0, 72.0, 90.0.deg.inRad)
+                Alliance.BLUE -> Pose(72.0, 72.0, 90.0.deg.inRad)
                 Alliance.UNKNOWN -> Pose(72.0, 72.0, 90.0.deg.inRad)
             }
         if (BotState.pose != null) {
-            PedroComponent.follower.pose = BotState.pose!!
-            if (BotState.alliance == Alliance.BLUE) {
-                PedroComponent.follower.pose ==
-                    Pose(
-                        PedroComponent.follower.pose.x,
-                        PedroComponent.follower.pose.y - 5,
-                        PedroComponent.follower.pose.heading,
-                    )
-            }
+            //PedroComponent.follower.pose = BotState.pose!!
         } else {
             PedroComponent.follower.pose = startingPose
         }
