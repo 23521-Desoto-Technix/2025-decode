@@ -240,7 +240,7 @@ class teleop : NextFTCOpMode() {
                 Alliance.UNKNOWN -> Pose(72.0, 72.0, 90.0.deg.inRad)
             }
         if (BotState.pose != null) {
-            //PedroComponent.follower.pose = BotState.pose!!
+            PedroComponent.follower.pose = BotState.pose!!
         } else {
             PedroComponent.follower.pose = startingPose
         }
