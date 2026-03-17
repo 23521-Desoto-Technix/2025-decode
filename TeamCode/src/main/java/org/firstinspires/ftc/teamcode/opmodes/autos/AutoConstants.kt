@@ -17,8 +17,9 @@ object AutoConstants {
             linkedMapOf<String, Pose>().apply {
                 pose("startNear", Pose(113.27, 134.27, -90.0.deg.inRad))
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
-                pose("sideSpike1Approach", Pose(115.5, 98.0, -90.0.deg.inRad))
-                pose("sideSpike1Eat", Pose(115.5, 88.0, -90.0.deg.inRad))
+                pose("sideSpike1", Pose(115.5, 88.0, -90.0.deg.inRad))
+                pose("sideSpike1Ctrl", Pose(118.0, 100.0, -90.0.deg.inRad))
+
             }
 
         val red: Map<String, Pose>
@@ -83,11 +84,9 @@ object AutoConstants {
                 "shootNearSideSpike1",
                 follower
                     .pathBuilder()
-                    .addPath(BezierLine(p("shootNear"), p("sideSpike1Approach")))
+                    .addPath(BezierCurve(p("shootNear"), p("sideSpike1Ctrl"), p("sideSpike1")))
                     .setConstantHeadingInterpolation(p("startNear").heading)
-                    .addPath(BezierLine(p("sideSpike1Approach"), p("sideSpike1Eat")))
-                    .setConstantHeadingInterpolation(p("startNear").heading)
-                    .addPath(BezierLine(p("sideSpike1Eat"), p("shootNear")))
+                    .addPath(BezierLine(p("sideSpike1"), p("shootNear")))
                     .setConstantHeadingInterpolation(p("startNear").heading)
                     .build(),
             )
