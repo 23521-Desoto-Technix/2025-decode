@@ -3,10 +3,12 @@ package org.firstinspires.ftc.teamcode.opmodes.autos
 import com.pedropathing.paths.PathChain
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
+import dev.nextftc.core.commands.groups.ParallelRaceGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -15,8 +17,6 @@ import dev.nextftc.core.units.deg
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import dev.nextftc.ftc.components.BulkReadComponent
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -26,13 +26,15 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.time.Duration.Companion.milliseconds
 
-@Autonomous(name = "Close 12", group = "Close", preselectTeleOp = "teleop")
-class close12 : NextFTCOpMode() {
+@Autonomous(name = "Far 18", group = "Far", preselectTeleOp = "teleop")
+@Disabled
+class far18 : NextFTCOpMode() {
     init {
         addComponents(
             SubsystemComponent(Flywheel, Hood, Turret, Tube),
-            //BulkReadComponent,
+            // BulkReadComponent,
             BindingsComponent,
             PedroComponent(Constants::createFollower),
         )
@@ -45,10 +47,11 @@ class close12 : NextFTCOpMode() {
 
     override fun onInit() {
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
+
         val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
-        Turret.setTargetAngle((-92.5).deg)
+        Turret.setTargetAngle(90.0.deg)
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
-        //telemetry.msTransmissionInterval = 100
+        // telemetry.msTransmissionInterval = 100
         val selectRed =
             button { gamepad1.circle }.whenBecomesTrue { BotState.alliance = Alliance.RED }
         val selectBlue =
@@ -58,40 +61,63 @@ class close12 : NextFTCOpMode() {
     private fun buildRoutine(paths: Map<String, PathChain>): Command {
         val turretAngle =
             when (BotState.alliance) {
-                Alliance.RED -> AutoConstants.Angles["closeTurretRed"]
-                Alliance.BLUE -> AutoConstants.Angles["closeTurretBlue"]
+                Alliance.RED -> AutoConstants.Angles["farTurretRed"]
+                Alliance.BLUE -> AutoConstants.Angles["farTurretBlue"]
                 else -> 0.0.deg
             }
+        val hpIntake =
+            SequentialGroup(
+                Tube.intakeAll,
+                ParallelRaceGroup(
+                    FollowPath(paths.getValue("farShootToHuman")),
+                    Delay(1500.milliseconds),
+                ),
+                FollowPath(paths.getValue("humanToFarShoot")),
+                Delay(700.milliseconds),
+                Tube.shootAll(0.7),
+                Delay(500.milliseconds),
+            )
+        val triangleIntake =
+            SequentialGroup(
+                Tube.intakeAll,
+                ParallelRaceGroup(
+                    FollowPath(paths.getValue("farShootToHumanAlt")),
+                    Delay(2500.milliseconds),
+                ),
+                FollowPath(paths.getValue("humanAltToFarShoot")),
+                Delay(500.milliseconds),
+                Tube.shootAll(0.7),
+                Delay(500.milliseconds),
+            )
+        val s3Intake =
+            SequentialGroup(
+                Tube.intakeAll,
+                ParallelRaceGroup(
+                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    Delay(2500.milliseconds),
+                ),
+                FollowPath(paths.getValue("spike3ToShootFar")),
+                Delay(500.milliseconds),
+                Tube.shootAll(0.7),
+                Delay(500.milliseconds),
+            )
+
         return SequentialGroup(
-            Flywheel.setSpeed(1_500.0),
-            InstantCommand { Hood.position = 0.55 },
+            Flywheel.setSpeed(2_000.0),
+            InstantCommand { Hood.position = 0.935 },
+            FollowPath(paths.getValue("farStartToShoot")),
             InstantCommand { Turret.setTargetAngle(turretAngle) },
-            FollowPath(paths.getValue("startToShoot")),
+            Flywheel.waitForSpeed(),
+            Delay(700.milliseconds),
+            Tube.shootAll(0.7),
             Delay(500.milliseconds),
-            Tube.shootAll(),
-            Delay(750.milliseconds),
-            Tube.intakeAll,
-            FollowPath(paths.getValue("shootToSpike2")),
-            FollowPath(paths.getValue("spike2ToGate")),
-            Delay(200.milliseconds),
-            FollowPath(paths.getValue("spike2ToShoot")),
-            Delay(500.milliseconds),
-            Tube.shootAll(),
-            Delay(750.milliseconds),
-            Tube.intakeAll,
-            FollowPath(paths.getValue("shootToSpike1")),
-            FollowPath(paths.getValue("spike1ToShoot")),
-            Delay(500.milliseconds),
-            Tube.shootAll(),
-            Delay(750.milliseconds),
-            Tube.intakeAll,
-            FollowPath(paths.getValue("shootToSpike3")),
-            FollowPath(paths.getValue("spike3ToShoot")),
-            Delay(750.milliseconds),
-            Tube.shootAll(),
-            Delay(500.milliseconds),
+            hpIntake,
+            s3Intake,
+            hpIntake,
+            triangleIntake,
+            hpIntake,
             Flywheel.stop(true),
-            FollowPath(paths.getValue("shootToPark")),
+            FollowPath(paths.getValue("shootFarToParkFar")),
             Flywheel.stop(),
         )
     }
@@ -128,12 +154,15 @@ class close12 : NextFTCOpMode() {
         val paths = AutoConstants.Paths.forAlliance(BotState.alliance)
         routine = buildRoutine(paths)
 
-        PedroComponent.follower.pose = poses.getValue("start")
+        PedroComponent.follower.pose = poses.getValue("startFar")
         routine.schedule()
     }
 
     override fun onUpdate() {
         BotState.pose = PedroComponent.follower.pose
+        telemetry.addData("x", PedroComponent.follower.pose.x)
+        telemetry.addData("y", PedroComponent.follower.pose.y)
+        telemetry.update()
         for (hub in allHubs) {
             hub!!.clearBulkCache()
         }

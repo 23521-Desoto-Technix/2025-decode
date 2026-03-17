@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.autos
 import com.pedropathing.paths.PathChain
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
@@ -29,6 +30,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Close 18", group = "Close", preselectTeleOp = "teleop")
+@Disabled
 class close18 : NextFTCOpMode() {
     init {
         addComponents(

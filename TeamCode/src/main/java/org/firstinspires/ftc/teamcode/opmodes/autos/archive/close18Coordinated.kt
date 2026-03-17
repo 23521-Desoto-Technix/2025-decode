@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.autos
 import com.pedropathing.paths.PathChain
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
@@ -15,7 +16,6 @@ import dev.nextftc.core.units.deg
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -27,12 +27,13 @@ import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import kotlin.time.Duration.Companion.milliseconds
 
-@Autonomous(name = "Close 15 Coordinated", group = "Close", preselectTeleOp = "teleop")
-class close15Coordinated : NextFTCOpMode() {
+@Autonomous(name = "Close 18 Coordinated", group = "Close", preselectTeleOp = "teleop")
+@Disabled
+class close18Coordinated : NextFTCOpMode() {
     init {
         addComponents(
             SubsystemComponent(Flywheel, Hood, Turret, Tube),
-            //BulkReadComponent,
+            // BulkReadComponent,
             BindingsComponent,
             PedroComponent(Constants::createFollower),
         )
@@ -43,14 +44,13 @@ class close15Coordinated : NextFTCOpMode() {
 
     private lateinit var allHubs: MutableList<LynxModule?>
 
-
     override fun onInit() {
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
 
         val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
         Turret.setTargetAngle((-92.5).deg)
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
-        //telemetry.msTransmissionInterval = 100
+        // telemetry.msTransmissionInterval = 100
         val selectRed =
             button { gamepad1.circle }.whenBecomesTrue { BotState.alliance = Alliance.RED }
         val selectBlue =
@@ -68,7 +68,7 @@ class close15Coordinated : NextFTCOpMode() {
             SequentialGroup(
                 Tube.intakeAll,
                 FollowPath(paths.getValue("shootToGateIntake")),
-                Tube.waitForAll(1800.milliseconds),
+                Tube.waitForAll(1200.milliseconds),
                 FollowPath(paths.getValue("gateIntakeToShoot")),
             )
         return SequentialGroup(
@@ -76,31 +76,34 @@ class close15Coordinated : NextFTCOpMode() {
             InstantCommand { Hood.position = 0.55 },
             InstantCommand { Turret.setTargetAngle(turretAngle) },
             FollowPath(paths.getValue("startToShoot")),
-            Delay(300.milliseconds),
+            Delay(150.milliseconds),
             Tube.shootAll(),
-            Delay(500.milliseconds),
+            Delay(400.milliseconds),
             Tube.intakeAll,
             FollowPath(paths.getValue("shootToSpike2")),
-            FollowPath(paths.getValue("spike2ToGate"), true, 0.6),
-            Delay(250.milliseconds),
+            FollowPath(paths.getValue("spike2ToGate"), true, 0.8),
             FollowPath(paths.getValue("spike2ToShoot")),
-            Delay(300.milliseconds),
+            Delay(150.milliseconds),
             Tube.shootAll(),
-            Delay(500.milliseconds),
+            Delay(400.milliseconds),
             gateIntake,
-            Delay(300.milliseconds),
+            Delay(150.milliseconds),
             Tube.shootAll(),
-            Delay(500.milliseconds),
+            Delay(400.milliseconds),
             gateIntake,
-            Delay(300.milliseconds),
+            Delay(150.milliseconds),
             Tube.shootAll(),
-            Delay(500.milliseconds),
+            Delay(400.milliseconds),
+            gateIntake,
+            Delay(150.milliseconds),
+            Tube.shootAll(),
+            Delay(400.milliseconds),
             Tube.intakeAll,
             FollowPath(paths.getValue("shootToSpike1")),
             FollowPath(paths.getValue("spike1ToShoot")),
-            Delay(300.milliseconds),
+            Delay(150.milliseconds),
             Tube.shootAll(),
-            Delay(500.milliseconds),
+            Delay(400.milliseconds),
             Flywheel.stop(true),
             FollowPath(paths.getValue("shootToFastPark")),
             Flywheel.stop(),
