@@ -19,7 +19,7 @@ public class Constants {
             .mass(13.6)
             .forwardZeroPowerAcceleration(-29.89)
             .lateralZeroPowerAcceleration(-60.074)
-            .centripetalScaling(0.0)
+            .centripetalScaling(0.0005)
             .headingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.1, 0))
             .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.25, 0.0491149757, 0.002134455));
 
