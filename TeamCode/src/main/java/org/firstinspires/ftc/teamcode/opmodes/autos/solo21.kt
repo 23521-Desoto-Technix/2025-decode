@@ -66,8 +66,8 @@ class solo21 : NextFTCOpMode() {
             else -> 0.0.deg
         }
         return SequentialGroup(
-            Flywheel.setSpeed(1_400.0),
-            InstantCommand { Hood.position = 0.45 },
+            Flywheel.setSpeed(1_350.0),
+            InstantCommand { Hood.position = 0.42 },
             InstantCommand { Turret.setTargetAngle(turretAngle) },
             FollowPath(paths.getValue("startNearToShootNear")),
             Flywheel.waitForSpeed(),
