@@ -70,12 +70,13 @@ class solo21 : NextFTCOpMode() {
             InstantCommand { Hood.position = 0.45 },
             InstantCommand { Turret.setTargetAngle(turretAngle) },
             FollowPath(paths.getValue("startNearToShootNear")),
+            Flywheel.waitForSpeed(),
             Tube.shootAll(),
-            Delay(200.milliseconds),
+            Delay(500.milliseconds),
             Tube.intakeAll,
             FollowPath(paths.getValue("shootNearSideSpike1")),
             Tube.shootAll(),
-            Delay(200.milliseconds),
+            Delay(500.milliseconds),
             Flywheel.stop(),
         )
     }

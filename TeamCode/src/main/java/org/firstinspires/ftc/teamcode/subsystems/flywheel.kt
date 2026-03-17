@@ -30,7 +30,7 @@ object Flywheel : Subsystem {
     var usingPID = false
     var enabled = true
 
-    private const val SPEED_TOLERANCE = 30
+    private const val SPEED_TOLERANCE = 50
 
     override fun initialize() {
         if (!BotState.enabled) {

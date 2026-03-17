@@ -84,7 +84,9 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierLine(p("shootNear"), p("sideSpike1Approach")))
+                    .setConstantHeadingInterpolation(p("startNear").heading)
                     .addPath(BezierLine(p("sideSpike1Approach"), p("sideSpike1Eat")))
+                    .setConstantHeadingInterpolation(p("startNear").heading)
                     .addPath(BezierLine(p("sideSpike1Eat"), p("shootNear")))
                     .setConstantHeadingInterpolation(p("startNear").heading)
                     .build(),
