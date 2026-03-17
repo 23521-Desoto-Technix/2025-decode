@@ -111,7 +111,7 @@ class solo21 : NextFTCOpMode() {
         val paths = AutoConstants.Paths.forAlliance(BotState.alliance)
         routine = buildRoutine(paths)
 
-        PedroComponent.follower.pose = poses.getValue("start")
+        PedroComponent.follower.pose = poses.getValue("startNear")
         routine.schedule()
     }
 
