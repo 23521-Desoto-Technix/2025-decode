@@ -13,6 +13,7 @@ import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
+import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
@@ -118,6 +119,9 @@ class solo21 : NextFTCOpMode() {
 
     override fun onUpdate() {
         BotState.pose = PedroComponent.follower.pose
+        telemetry.addData("X", BotState.pose?.x)
+        telemetry.addData("Y", BotState.pose?.y)
+        telemetry.addData("Heading", BotState.pose?.heading?.rad?.inDeg)
         telemetry.update()
         for (hub in allHubs) {
             hub!!.clearBulkCache()
