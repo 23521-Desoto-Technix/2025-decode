@@ -91,7 +91,7 @@ class solo21 : NextFTCOpMode() {
             Delay(500.milliseconds),
             Tube.intakeAll,
             FollowPath(paths.getValue("shootMiddleGateIntake")),
-            Tube.waitForAll(800.milliseconds),
+            Tube.waitForAll(1100.milliseconds),
             FollowPath(paths.getValue("gateIntakeShootMiddle")),
             Delay(150.milliseconds),
             Tube.shootAll(),
