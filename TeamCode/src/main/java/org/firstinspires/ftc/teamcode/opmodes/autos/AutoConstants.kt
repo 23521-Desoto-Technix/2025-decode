@@ -19,7 +19,7 @@ object AutoConstants {
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
                 pose("sideSpike1", Pose(119.0, 88.0, -90.0.deg.inRad))
                 pose("sideSpike1Ctrl", Pose(120.0, 100.0, -90.0.deg.inRad))
-                pose("sideSpike2", Pose(119.0, 64.0, -90.0.deg.inRad))
+                pose("sideSpike2", Pose(120.0, 74.0, -90.0.deg.inRad))
                 pose("sideSpike2Ctrl", Pose(120.0, 93.0, -90.0.deg.inRad))
             }
 
