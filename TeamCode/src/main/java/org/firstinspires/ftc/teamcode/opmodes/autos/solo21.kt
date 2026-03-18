@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes.autos
 import com.pedropathing.paths.PathChain
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
@@ -17,7 +16,6 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -27,7 +25,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Solo 21", group = "Solo", preselectTeleOp = "teleop")
@@ -61,15 +58,20 @@ class solo21 : NextFTCOpMode() {
     }
 
     private fun buildRoutine(paths: Map<String, PathChain>): Command {
-        val turretAngle = when (BotState.alliance) {
+        val nearTurretAngle = when (BotState.alliance) {
             Alliance.RED -> AutoConstants.Angles["closeTurretRed"]
             Alliance.BLUE -> AutoConstants.Angles["closeTurretBlue"]
+            else -> 0.0.deg
+        }
+        val middleTurretAngle = when (BotState.alliance) {
+            Alliance.RED -> AutoConstants.Angles["middleTurretRed"]
+            Alliance.BLUE -> AutoConstants.Angles["middleTurretBlue"]
             else -> 0.0.deg
         }
         return SequentialGroup(
             Flywheel.setSpeed(1_350.0),
             InstantCommand { Hood.position = 0.42 },
-            InstantCommand { Turret.setTargetAngle(turretAngle) },
+            InstantCommand { Turret.setTargetAngle(nearTurretAngle) },
             FollowPath(paths.getValue("startNearToShootNear")),
             Flywheel.waitForSpeed(),
             Tube.shootAll(),
@@ -80,7 +82,17 @@ class solo21 : NextFTCOpMode() {
             Tube.shootAll(),
             Delay(500.milliseconds),
             Tube.intakeAll,
+            Flywheel.setSpeed(1_500.0),
+            InstantCommand { Hood.position = 0.55 },
+            InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             FollowPath(paths.getValue("shootNearSideSpike2")),
+            Delay(150.milliseconds),
+            Tube.shootAll(),
+            Delay(500.milliseconds),
+            Tube.intakeAll,
+            FollowPath(paths.getValue("shootMiddleGateIntake")),
+            Tube.waitForAll(800.milliseconds),
+            FollowPath(paths.getValue("gateIntakeShootMiddle")),
             Delay(150.milliseconds),
             Tube.shootAll(),
             Delay(500.milliseconds),

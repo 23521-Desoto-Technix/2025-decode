@@ -17,10 +17,12 @@ object AutoConstants {
             linkedMapOf<String, Pose>().apply {
                 pose("startNear", Pose(113.27, 134.27, -90.0.deg.inRad))
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
+                pose("shootMiddle", Pose(89.0, 80.0, 0.0.deg.inRad))
                 pose("sideSpike1", Pose(119.0, 88.0, -90.0.deg.inRad))
                 pose("sideSpike1Ctrl", Pose(120.0, 100.0, -90.0.deg.inRad))
                 pose("sideSpike2", Pose(121.0, 74.0, -90.0.deg.inRad))
                 pose("sideSpike2Ctrl", Pose(121.0, 93.0, -90.0.deg.inRad))
+                pose("gateIntake", Pose(131.3, 60.7, 42.0.deg.inRad))
             }
 
         val red: Map<String, Pose>
@@ -55,6 +57,8 @@ object AutoConstants {
             linkedMapOf<String, Angle>().apply {
                 angle("closeTurretRed", (-35.0).deg)
                 angle("closeTurretBlue", 35.0.deg)
+                angle("middleTurretRed", (-90.0).deg)
+                angle("middleTurretBlue", 90.0.deg)
                 angle("farTurretRed", (-113.0).deg)
                 angle("farTurretBlue", 116.0.deg)
             }
@@ -97,9 +101,25 @@ object AutoConstants {
                     .pathBuilder()
                     .addPath(BezierCurve(p("shootNear"), p("sideSpike2Ctrl"), p("sideSpike2")))
                     .setConstantHeadingInterpolation(p("startNear").heading)
-                    .addPath(BezierLine(p("sideSpike2"), p("shootNear")))
-                    .setConstantHeadingInterpolation(p("startNear").heading)
+                    .addPath(BezierLine(p("sideSpike2"), p("shootMiddle")))
+                    .setConstantHeadingInterpolation(p("shootMiddle").heading)
                     .build(),
+            )
+            path(
+                "shootMiddleGateIntake",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("shootMiddle"), p("gateIntake")))
+                    .setLinearHeadingInterpolation(p("shootMiddle").heading, p("gateIntake").heading)
+                    .build()
+            )
+            path(
+                "gateIntakeShootMiddle",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("gateIntake"), p("shootMiddle")))
+                    .setLinearHeadingInterpolation(p("gateIntake").heading, p("shootMiddle").heading)
+                    .build()
             )
         }
     }
