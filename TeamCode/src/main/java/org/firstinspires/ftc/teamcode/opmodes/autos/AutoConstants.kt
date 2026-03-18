@@ -22,7 +22,7 @@ object AutoConstants {
                 pose("sideSpike1Ctrl", Pose(120.0, 100.0, -90.0.deg.inRad))
                 pose("sideSpike2", Pose(121.0, 74.0, -90.0.deg.inRad))
                 pose("sideSpike2Ctrl", Pose(121.0, 93.0, -90.0.deg.inRad))
-                pose("gateIntake", Pose(131.3, 60.7, 42.0.deg.inRad))
+                pose("gateIntake", Pose(130.0, 58.0, 35.0.deg.inRad))
             }
 
         val red: Map<String, Pose>
@@ -57,8 +57,8 @@ object AutoConstants {
             linkedMapOf<String, Angle>().apply {
                 angle("closeTurretRed", (-35.0).deg)
                 angle("closeTurretBlue", 35.0.deg)
-                angle("middleTurretRed", (-90.0).deg)
-                angle("middleTurretBlue", 90.0.deg)
+                angle("middleTurretRed", (-140.0).deg)
+                angle("middleTurretBlue", 140.0.deg)
                 angle("farTurretRed", (-113.0).deg)
                 angle("farTurretBlue", 116.0.deg)
             }
