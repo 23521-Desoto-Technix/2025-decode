@@ -79,6 +79,7 @@ class solo21 : NextFTCOpMode() {
             Delay(100.milliseconds),
             Tube.shootAll(),
             Delay(300.milliseconds),
+            Tube.intakeAll,
             FollowPath(paths.getValue("shootNearSideSpike2")),
             Tube.shootAll(),
             Delay(300.milliseconds),
