@@ -63,14 +63,16 @@ class near18 : NextFTCOpMode() {
                 Alliance.BLUE -> AutoConstants.Angles["middleTurretBlue"]
                 else -> 0.0.deg
             }
+        val intake: (Command) -> Command = { path ->
+            SequentialGroup(Tube.intakeAll, path, Tube.shootAll(), Delay(400.milliseconds))
+        }
         val gateIntake =
-            SequentialGroup(
-                Tube.intakeAll,
-                FollowPath(paths.getValue("shootMiddleGateIntake")),
-                Tube.waitForAll(1100.milliseconds),
-                FollowPath(paths.getValue("gateIntakeShootMiddle")),
-                Tube.shootAll(),
-                Delay(400.milliseconds),
+            intake(
+                SequentialGroup(
+                    FollowPath(paths.getValue("shootMiddleGateIntake")),
+                    Tube.waitForAll(1100.milliseconds),
+                    FollowPath(paths.getValue("gateIntakeShootMiddle")),
+                )
             )
         return SequentialGroup(
             Flywheel.setSpeed(1_500.0),
@@ -79,20 +81,11 @@ class near18 : NextFTCOpMode() {
             FollowPath(paths.getValue("startNearToShootMiddle")),
             Tube.shootAll(),
             Delay(400.milliseconds),
-            Tube.intakeAll,
-            FollowPath(paths.getValue("spike2Combined")),
-            Tube.shootAll(),
-            Delay(400.milliseconds),
+            intake(FollowPath(paths.getValue("spike2Combined"))),
             gateIntake,
             gateIntake,
-            Tube.intakeAll,
-            FollowPath(paths.getValue("spike3Combined")),
-            Tube.shootAll(),
-            Delay(400.milliseconds),
-            Tube.intakeAll,
-            FollowPath(paths.getValue("spike1Combined")),
-            Tube.shootAll(),
-            Delay(400.milliseconds),
+            intake(FollowPath(paths.getValue("spike3Combined"))),
+            intake(FollowPath(paths.getValue("spike1Combined"))),
             Flywheel.stop(),
         )
     }
