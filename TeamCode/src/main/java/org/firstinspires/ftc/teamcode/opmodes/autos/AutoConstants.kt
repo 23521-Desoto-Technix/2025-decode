@@ -19,7 +19,7 @@ object AutoConstants {
                 pose("startNear", Pose(113.27, 134.27, -90.0.deg.inRad))
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
                 pose("shootMiddle", Pose(89.0, 80.0, 0.0.deg.inRad))
-                pose("shootPark", Pose(89.0, 80.0, 0.0.deg.inRad))
+                pose("shootPark", Pose(85.0, 101.0, 0.0.deg.inRad))
                 pose("sideSpike1", Pose(119.0, 88.0, -90.0.deg.inRad))
                 pose("sideSpike1Ctrl", Pose(120.0, 100.0, -90.0.deg.inRad))
                 pose("sideSpike2", Pose(121.0, 74.0, -90.0.deg.inRad))
@@ -109,11 +109,11 @@ object AutoConstants {
                             ),
                             HeadingInterpolator.PiecewiseNode(
                                 0.1,
-                                0.75,
+                                0.5,
                                 HeadingInterpolator.tangent,
                             ),
                             HeadingInterpolator.PiecewiseNode(
-                                0.75,
+                                0.5,
                                 1.0,
                                 HeadingInterpolator.constant(p("shootMiddle").heading)
                             ),
@@ -159,6 +159,7 @@ object AutoConstants {
                     .setLinearHeadingInterpolation(p("spike3End").heading, p("shootMiddle").heading)
                     .addPath(BezierLine(p("spike3End"), p("shootPark")))
                     .setTangentHeadingInterpolation()
+                    .setReversed()
                     .build(),
             )
             path(

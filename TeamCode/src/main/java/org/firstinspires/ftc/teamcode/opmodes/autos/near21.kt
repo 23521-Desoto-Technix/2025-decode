@@ -16,7 +16,6 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -26,6 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Near 21", group = "Near", preselectTeleOp = "teleop")
 class near21 : NextFTCOpMode() {
@@ -82,7 +82,7 @@ class near21 : NextFTCOpMode() {
             )
         return SequentialGroup(
             Flywheel.setSpeed(1_600.0),
-            InstantCommand { Hood.position = 0.6 },
+            InstantCommand { Hood.position = 0.65 },
             InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             FollowPath(paths.getValue("startNearToShootMiddle")),
             Delay(200.milliseconds),
