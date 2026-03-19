@@ -4,6 +4,7 @@ import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
+import com.pedropathing.paths.HeadingInterpolator
 import com.pedropathing.paths.PathChain
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
@@ -96,7 +97,25 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierLine(p("startNear"), p("shootMiddle")))
-                    .setLinearHeadingInterpolation(p("startNear").heading, p("shootMiddle").heading)
+                    .setHeadingInterpolation(
+                        HeadingInterpolator.piecewise(
+                            HeadingInterpolator.PiecewiseNode(
+                                0.0,
+                                0.1,
+                                HeadingInterpolator.constant(p("startNear").heading),
+                            ),
+                            HeadingInterpolator.PiecewiseNode(
+                                0.1,
+                                0.75,
+                                HeadingInterpolator.tangent,
+                            ),
+                            HeadingInterpolator.PiecewiseNode(
+                                0.75,
+                                1.0,
+                                HeadingInterpolator.constant(p("shootMiddle").heading)
+                            ),
+                        )
+                    )
                     .build(),
             )
             path(
@@ -172,16 +191,22 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierLine(p("shootMiddle"), p("gateIntake")))
-                    .setLinearHeadingInterpolation(p("shootMiddle").heading, p("gateIntake").heading)
-                    .build()
+                    .setLinearHeadingInterpolation(
+                        p("shootMiddle").heading,
+                        p("gateIntake").heading,
+                    )
+                    .build(),
             )
             path(
                 "gateIntakeShootMiddle",
                 follower
                     .pathBuilder()
                     .addPath(BezierLine(p("gateIntake"), p("shootMiddle")))
-                    .setLinearHeadingInterpolation(p("gateIntake").heading, p("shootMiddle").heading)
-                    .build()
+                    .setLinearHeadingInterpolation(
+                        p("gateIntake").heading,
+                        p("shootMiddle").heading,
+                    )
+                    .build(),
             )
         }
     }
