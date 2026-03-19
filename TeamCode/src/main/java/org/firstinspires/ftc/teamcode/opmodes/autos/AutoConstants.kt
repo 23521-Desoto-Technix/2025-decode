@@ -24,6 +24,7 @@ object AutoConstants {
                 pose("sideSpike2Ctrl", Pose(121.0, 93.0, -90.0.deg.inRad))
                 pose("gateIntake", Pose(130.0, 58.0, 35.0.deg.inRad))
                 pose("spike1End", Pose(125.0, 85.0, 0.0.deg.inRad))
+                pose("spike2End", Pose(125.0, 60.0, 0.0.deg.inRad))
             }
 
         val red: Map<String, Pose>
@@ -58,8 +59,8 @@ object AutoConstants {
             linkedMapOf<String, Angle>().apply {
                 angle("closeTurretRed", (-35.0).deg)
                 angle("closeTurretBlue", 35.0.deg)
-                angle("middleTurretRed", (-140.0).deg)
-                angle("middleTurretBlue", 140.0.deg)
+                angle("middleTurretRed", (-135.0).deg)
+                angle("middleTurretBlue", 135.0.deg)
                 angle("farTurretRed", (-113.0).deg)
                 angle("farTurretBlue", 116.0.deg)
             }
@@ -100,6 +101,16 @@ object AutoConstants {
                     .pathBuilder()
                     .addPath(BezierLine(p("shootMiddle"), p("spike1End")))
                     .setLinearHeadingInterpolation(p("shootMiddle").heading, p("spike1End").heading)
+                    .build(),
+            )
+            path(
+                "spike1Combined",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("shootMiddle"), p("spike1End")))
+                    .setLinearHeadingInterpolation(p("shootMiddle").heading, p("spike1End").heading)
+                    .addPath(BezierLine(p("spike1End"), p("shootMiddle")))
+                    .setLinearHeadingInterpolation(p("spike1End").heading, p("shootMiddle").heading)
                     .build(),
             )
             path(

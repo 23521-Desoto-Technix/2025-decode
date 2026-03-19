@@ -73,8 +73,10 @@ class near18 : NextFTCOpMode() {
             Tube.shootAll(),
             Delay(500.milliseconds),
             Tube.intakeAll,
+            /*
             ParallelRaceGroup(FollowPath(paths.getValue("shootMiddleToSpike1")), Tube.waitForAll()),
-            FollowPath(paths.getValue("spike1ToShootMiddle")),
+            FollowPath(paths.getValue("spike1ToShootMiddle")),*/
+            FollowPath(paths.getValue("spike1Combined")),
             Delay(150.milliseconds),
             Tube.shootAll(),
             Delay(500.milliseconds),
