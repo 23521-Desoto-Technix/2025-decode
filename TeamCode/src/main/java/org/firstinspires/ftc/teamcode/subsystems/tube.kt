@@ -91,9 +91,9 @@ object Tube : Subsystem {
           .setStart { waitForAllStartedAt = now() }
           .setIsDone {
             if (d == null) {
-              this.state == TubeState.IDLE
+              this.state == TubeState.INTAKE_DELAY_AFTER_BOTTOM
             } else {
-              this.state == TubeState.IDLE || elapsedSinceWaitStart() >= d
+              this.state == TubeState.INTAKE_DELAY_AFTER_BOTTOM || elapsedSinceWaitStart() >= d
             }
           }
 
