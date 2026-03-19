@@ -16,6 +16,7 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -25,10 +26,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
-import kotlin.time.Duration.Companion.milliseconds
 
-@Autonomous(name = "Near 18", group = "Near", preselectTeleOp = "teleop")
-class near18 : NextFTCOpMode() {
+@Autonomous(name = "Near 21", group = "Near", preselectTeleOp = "teleop")
+class near21 : NextFTCOpMode() {
     init {
         addComponents(
             SubsystemComponent(Flywheel, Hood, Turret, Tube),
@@ -63,6 +63,12 @@ class near18 : NextFTCOpMode() {
                 Alliance.BLUE -> AutoConstants.Angles["middleTurretBlue"]
                 else -> 0.0.deg
             }
+        val parkTurretAngle =
+            when (BotState.alliance) {
+                Alliance.RED -> AutoConstants.Angles["parkTurretRed"]
+                Alliance.BLUE -> AutoConstants.Angles["parkTurretBlue"]
+                else -> 0.0.deg
+            }
         val intake: (Command) -> Command = { path ->
             SequentialGroup(Tube.intakeAll, path, Tube.shootAll(), Delay(400.milliseconds))
         }
@@ -79,14 +85,16 @@ class near18 : NextFTCOpMode() {
             InstantCommand { Hood.position = 0.6 },
             InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             FollowPath(paths.getValue("startNearToShootMiddle")),
+            Delay(200.milliseconds),
             Tube.shootAll(),
             Delay(400.milliseconds),
             intake(FollowPath(paths.getValue("spike2Combined"))),
             gateIntake,
             gateIntake,
-            gateIntake,
-            intake(FollowPath(paths.getValue("spike3Combined"))),
             intake(FollowPath(paths.getValue("spike1Combined"))),
+            gateIntake,
+            InstantCommand { Turret.setTargetAngle(parkTurretAngle) },
+            intake(FollowPath(paths.getValue("spike3Combined"))),
             Flywheel.stop(),
         )
     }

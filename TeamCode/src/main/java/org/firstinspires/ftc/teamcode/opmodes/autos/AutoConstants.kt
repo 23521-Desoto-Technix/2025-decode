@@ -19,6 +19,7 @@ object AutoConstants {
                 pose("startNear", Pose(113.27, 134.27, -90.0.deg.inRad))
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
                 pose("shootMiddle", Pose(89.0, 80.0, 0.0.deg.inRad))
+                pose("shootPark", Pose(89.0, 80.0, 0.0.deg.inRad))
                 pose("sideSpike1", Pose(119.0, 88.0, -90.0.deg.inRad))
                 pose("sideSpike1Ctrl", Pose(120.0, 100.0, -90.0.deg.inRad))
                 pose("sideSpike2", Pose(121.0, 74.0, -90.0.deg.inRad))
@@ -66,6 +67,8 @@ object AutoConstants {
                 angle("closeTurretBlue", 35.0.deg)
                 angle("middleTurretRed", (-135.0).deg)
                 angle("middleTurretBlue", 135.0.deg)
+                angle("parkTurretRed", 100.0.deg)
+                angle("parkTurretBlue", (-100.0).deg)
                 angle("farTurretRed", (-113.0).deg)
                 angle("farTurretBlue", 116.0.deg)
             }
@@ -154,8 +157,8 @@ object AutoConstants {
                     .setLinearHeadingInterpolation(p("shootMiddle").heading, p("spike3End").heading)
                     .addPath(BezierLine(p("spike3Start"), p("spike3End")))
                     .setLinearHeadingInterpolation(p("spike3End").heading, p("shootMiddle").heading)
-                    .addPath(BezierLine(p("spike3End"), p("shootMiddle")))
-                    .setLinearHeadingInterpolation(p("spike3End").heading, p("shootMiddle").heading)
+                    .addPath(BezierLine(p("spike3End"), p("shootPark")))
+                    .setTangentHeadingInterpolation()
                     .build(),
             )
             path(
