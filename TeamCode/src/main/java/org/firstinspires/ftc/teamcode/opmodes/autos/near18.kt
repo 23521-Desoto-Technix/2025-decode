@@ -7,7 +7,6 @@ import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
-import dev.nextftc.core.commands.groups.ParallelRaceGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -17,7 +16,6 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -27,6 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Near 18", group = "Near", preselectTeleOp = "teleop")
 class near18 : NextFTCOpMode() {
@@ -64,6 +63,15 @@ class near18 : NextFTCOpMode() {
                 Alliance.BLUE -> AutoConstants.Angles["middleTurretBlue"]
                 else -> 0.0.deg
             }
+        val gateIntake =
+            SequentialGroup(
+                Tube.intakeAll,
+                FollowPath(paths.getValue("shootMiddleGateIntake")),
+                Tube.waitForAll(1100.milliseconds),
+                FollowPath(paths.getValue("gateIntakeShootMiddle")),
+                Tube.shootAll(),
+                Delay(400.milliseconds),
+            )
         return SequentialGroup(
             Flywheel.setSpeed(1_500.0),
             InstantCommand { Hood.position = 0.55 },
@@ -75,12 +83,14 @@ class near18 : NextFTCOpMode() {
             FollowPath(paths.getValue("spike2Combined")),
             Tube.shootAll(),
             Delay(400.milliseconds),
+            gateIntake,
+            gateIntake,
             Tube.intakeAll,
-            FollowPath(paths.getValue("spike1Combined")),
+            FollowPath(paths.getValue("spike3Combined")),
             Tube.shootAll(),
             Delay(400.milliseconds),
             Tube.intakeAll,
-            FollowPath(paths.getValue("spike3Combined")),
+            FollowPath(paths.getValue("spike1Combined")),
             Tube.shootAll(),
             Delay(400.milliseconds),
             Flywheel.stop(),
