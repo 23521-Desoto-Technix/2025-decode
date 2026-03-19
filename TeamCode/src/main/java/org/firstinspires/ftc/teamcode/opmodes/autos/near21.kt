@@ -97,6 +97,7 @@ class near21 : NextFTCOpMode() {
             InstantCommand { Hood.position = 0.45 },
             InstantCommand { Turret.setTargetAngle(parkTurretAngle) },
             intake(FollowPath(paths.getValue("spike3Combined"))),
+            Delay(500.milliseconds),
             Flywheel.stop(),
         )
     }

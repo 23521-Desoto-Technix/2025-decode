@@ -24,7 +24,7 @@ object AutoConstants {
                 pose("sideSpike1Ctrl", Pose(120.0, 100.0, -90.0.deg.inRad))
                 pose("sideSpike2", Pose(121.0, 74.0, -90.0.deg.inRad))
                 pose("sideSpike2Ctrl", Pose(121.0, 93.0, -90.0.deg.inRad))
-                pose("gateIntake", Pose(131.0, 59.0, 30.0.deg.inRad))
+                pose("gateIntake", Pose(130.2, 59.0, 30.0.deg.inRad))
                 pose("spike1End", Pose(113.0, 85.0, 0.0.deg.inRad))
                 pose("spike2End", Pose(113.0, 60.0, 0.0.deg.inRad))
                 pose("spike2Ctrl", Pose(95.0, 58.0, 0.0.deg.inRad))
@@ -65,10 +65,10 @@ object AutoConstants {
             linkedMapOf<String, Angle>().apply {
                 angle("closeTurretRed", (-35.0).deg)
                 angle("closeTurretBlue", 35.0.deg)
-                angle("middleTurretRed", (-135.0).deg)
-                angle("middleTurretBlue", 135.0.deg)
-                angle("parkTurretRed", (-95.0).deg)
-                angle("parkTurretBlue", 95.0.deg)
+                angle("middleTurretRed", (-132.0).deg)
+                angle("middleTurretBlue", 132.0.deg)
+                angle("parkTurretRed", (-90.0).deg)
+                angle("parkTurretBlue", 90.0.deg)
                 angle("farTurretRed", (-113.0).deg)
                 angle("farTurretBlue", 116.0.deg)
             }
