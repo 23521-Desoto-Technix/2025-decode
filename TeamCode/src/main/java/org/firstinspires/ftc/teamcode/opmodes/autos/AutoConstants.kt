@@ -19,11 +19,15 @@ object AutoConstants {
                 pose("startNear", Pose(113.27, 134.27, -90.0.deg.inRad))
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
                 pose("shootMiddle", Pose(89.0, 80.0, 0.0.deg.inRad))
+                pose("shootFar", Pose(89.0, 20.0, 0.0.deg.inRad))
                 pose("shootPark", Pose(85.0, 105.0, 0.0.deg.inRad))
                 pose("sideSpike1", Pose(119.0, 88.0, -90.0.deg.inRad))
                 pose("sideSpike1Ctrl", Pose(120.0, 100.0, -90.0.deg.inRad))
                 pose("sideSpike2", Pose(121.0, 74.0, -90.0.deg.inRad))
                 pose("sideSpike2Ctrl", Pose(121.0, 93.0, -90.0.deg.inRad))
+                pose("sideSpike3", Pose(121.0, 74.0, -90.0.deg.inRad))
+                pose("sideSpike3TransitionalCtrl", Pose(121.0, 93.0, -90.0.deg.inRad))
+                pose("gateHit", Pose(129.0, 69.5, 0.0.deg.inRad))
                 pose("gateIntake", Pose(130.5, 59.5, 40.0.deg.inRad))
                 pose("gateIntakeCtrl", Pose(105.0, 58.0, 40.0.deg.inRad))
                 pose("spike1End", Pose(113.0, 85.0, 0.0.deg.inRad))
@@ -211,6 +215,24 @@ object AutoConstants {
                         p("gateIntake").heading,
                         p("shootMiddle").heading,
                     )
+                    .build(),
+            )
+            path(
+                "shootMiddleToGateHit",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("shootMiddle"), p("gateHit")))
+                    .setConstantHeadingInterpolation(p("gateHit").heading)
+                    .build(),
+            )
+            path(
+                "gateHitSideSpike3",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierCurve(p("gateIntake"), p("sideSpike3TransitionalCtrl"), p("sideSpike3")))
+                    .setConstantHeadingInterpolation(p("gateHit").heading)
+                    .addPath(BezierLine(p("sideSpike3"), p("shootFar")))
+                    .setLinearHeadingInterpolation(p("sideSpike3").heading, p("shootFar").heading)
                     .build(),
             )
         }

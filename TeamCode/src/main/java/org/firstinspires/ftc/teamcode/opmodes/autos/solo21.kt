@@ -27,7 +27,7 @@ import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import kotlin.time.Duration.Companion.milliseconds
 
-@Autonomous(name = "Solo 21", group = "Solo", preselectTeleOp = "teleop")
+@Autonomous(name = "Solo Transitional 21 (sidespike)", group = "Solo", preselectTeleOp = "teleop")
 class solo21 : NextFTCOpMode() {
     init {
         addComponents(
@@ -68,6 +68,7 @@ class solo21 : NextFTCOpMode() {
             Alliance.BLUE -> AutoConstants.Angles["middleTurretBlue"]
             else -> 0.0.deg
         }
+
         return SequentialGroup(
             Flywheel.setSpeed(1_350.0),
             InstantCommand { Hood.position = 0.42 },
@@ -94,6 +95,12 @@ class solo21 : NextFTCOpMode() {
             Tube.waitForAll(1100.milliseconds),
             FollowPath(paths.getValue("gateIntakeShootMiddle")),
             Delay(150.milliseconds),
+            Tube.shootAll(),
+            Delay(500.milliseconds),
+            Tube.intakeAll,
+            FollowPath(paths.getValue("shootMiddleToGateHit")),
+            Delay(0.milliseconds),
+            FollowPath(paths.getValue("gateHitSideSpike3")),
             Tube.shootAll(),
             Delay(500.milliseconds),
             Flywheel.stop(),
