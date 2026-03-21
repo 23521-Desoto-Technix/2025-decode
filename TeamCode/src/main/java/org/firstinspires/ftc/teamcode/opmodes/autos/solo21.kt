@@ -69,8 +69,8 @@ class solo21 : NextFTCOpMode() {
             else -> 0.0.deg
         }
         val farTurretAngle = when (BotState.alliance) {
-            Alliance.RED -> AutoConstants.Angles["middleTurretRed"]
-            Alliance.BLUE -> AutoConstants.Angles["middleTurretBlue"]
+            Alliance.RED -> AutoConstants.Angles["farTurretRed"]
+            Alliance.BLUE -> AutoConstants.Angles["farTurretBlue"]
             else -> 0.0.deg
         }
 
