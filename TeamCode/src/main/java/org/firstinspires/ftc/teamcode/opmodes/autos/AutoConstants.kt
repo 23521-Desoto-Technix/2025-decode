@@ -27,6 +27,7 @@ object AutoConstants {
                 pose("sideSpike2Ctrl", Pose(121.0, 93.0, -90.0.deg.inRad))
                 pose("sideSpike3", Pose(121.0, 45.0, -90.0.deg.inRad))
                 pose("sideSpike3TransitionalCtrl", Pose(118.0, 45.0, -90.0.deg.inRad))
+                pose("sideSpike3TransitionalCtrl", Pose(121.0, 58.0, -90.0.deg.inRad))
                 pose("gateHit", Pose(129.0, 65.0, -90.0.deg.inRad))
                 pose("gateIntake", Pose(130.5, 59.5, 40.0.deg.inRad))
                 pose("gateIntakeCtrl", Pose(105.0, 58.0, 40.0.deg.inRad))
@@ -38,7 +39,7 @@ object AutoConstants {
                 pose("spike3Ctrl", Pose(90.0, 35.0, 0.0.deg.inRad))
                 pose("humanIntake", Pose(130.0, 10.0, 0.0.deg.inRad))
                 pose("humanIntakeCtrl", Pose(95.0, 10.0, 0.0.deg.inRad))
-                pose("parkFar", Pose(100.0, 20.0, 0.0.deg.inRad))
+                pose("parkFar", Pose(110.0, 20.0, 0.0.deg.inRad))
             }
 
         val red: Map<String, Pose>
@@ -246,6 +247,16 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierCurve(p("gateHit"), p("sideSpike3TransitionalCtrl"), p("sideSpike3")))
+                    .setConstantHeadingInterpolation(p("gateHit").heading)
+                    .addPath(BezierLine(p("sideSpike3"), p("shootFar")))
+                    .setLinearHeadingInterpolation(p("sideSpike3").heading, p("shootFar").heading)
+                    .build(),
+            )
+            path(
+                "shootMiddleSideSpike3",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierCurve(p("shootMiddle"), p("sideSpike3Ctrl"), p("sideSpike3")))
                     .setConstantHeadingInterpolation(p("gateHit").heading)
                     .addPath(BezierLine(p("sideSpike3"), p("shootFar")))
                     .setLinearHeadingInterpolation(p("sideSpike3").heading, p("shootFar").heading)

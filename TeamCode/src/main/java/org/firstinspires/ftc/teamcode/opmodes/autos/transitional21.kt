@@ -28,6 +28,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Autonomous(name = "Solo Transitional 21 (traditional)", group = "Solo", preselectTeleOp = "teleop")
 class transitional21 : NextFTCOpMode() {
@@ -108,6 +109,7 @@ class transitional21 : NextFTCOpMode() {
             intake(FollowPath(paths.getValue("shootFarHumanIntake"))),
             Flywheel.stop(true),
             FollowPath(paths.getValue("shootFarPark")),
+            Delay(30.seconds),
         )
     }
 
