@@ -82,15 +82,6 @@ class transitional21 : NextFTCOpMode() {
                     FollowPath(paths.getValue("gateIntakeShootMiddle")),
                 )
             )
-        val gateIntakeHold =
-            intake(
-                SequentialGroup(
-                    FollowPath(paths.getValue("shootMiddleGateIntake")),
-                    Tube.waitForAll(1100.milliseconds),
-                    TurnBy((-40).deg),
-                    Delay(500.milliseconds),
-                )
-            )
         val farTurretAngle =
             when (BotState.alliance) {
                 Alliance.RED -> AutoConstants.Angles["farTurretRed"]
@@ -108,15 +99,15 @@ class transitional21 : NextFTCOpMode() {
             intake(FollowPath(paths.getValue("spike2Combined"))),
             gateIntake,
             intake(FollowPath(paths.getValue("spike1Combined"))),
-            gateIntakeHold,
+            gateIntake,
             Tube.intakeAll,
             Flywheel.setSpeed(1_950.0),
             InstantCommand { Hood.position = 0.9 },
             InstantCommand { Turret.setTargetAngle(farTurretAngle) },
             intake(FollowPath(paths.getValue("gateHitSideSpike3"))),
             intake(FollowPath(paths.getValue("shootFarHumanIntake"))),
-            intake(FollowPath(paths.getValue("shootFarHumanIntake"))),
-            Flywheel.stop(),
+            Flywheel.stop(true),
+            FollowPath(paths.getValue("shootFarPark")),
         )
     }
 
