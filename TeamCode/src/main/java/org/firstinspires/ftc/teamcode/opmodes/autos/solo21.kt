@@ -68,6 +68,11 @@ class solo21 : NextFTCOpMode() {
             Alliance.BLUE -> AutoConstants.Angles["middleTurretBlue"]
             else -> 0.0.deg
         }
+        val farTurretAngle = when (BotState.alliance) {
+            Alliance.RED -> AutoConstants.Angles["middleTurretRed"]
+            Alliance.BLUE -> AutoConstants.Angles["middleTurretBlue"]
+            else -> 0.0.deg
+        }
 
         return SequentialGroup(
             Flywheel.setSpeed(1_350.0),
@@ -98,8 +103,11 @@ class solo21 : NextFTCOpMode() {
             Tube.shootAll(),
             Delay(500.milliseconds),
             Tube.intakeAll,
+            Flywheel.setSpeed(1_700.0),
+            InstantCommand { Hood.position = 0.65 },
+            InstantCommand { Turret.setTargetAngle(farTurretAngle) },
             FollowPath(paths.getValue("shootMiddleToGateHit")),
-            Delay(0.milliseconds),
+            Delay(500.milliseconds),
             FollowPath(paths.getValue("gateHitSideSpike3")),
             Tube.shootAll(),
             Delay(500.milliseconds),
