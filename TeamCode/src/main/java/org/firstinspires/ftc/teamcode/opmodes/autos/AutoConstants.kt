@@ -36,7 +36,7 @@ object AutoConstants {
                 pose("spike3Start", Pose(105.0, 36.0, 0.0.deg.inRad))
                 pose("spike3End", Pose(120.0, 36.0, 0.0.deg.inRad))
                 pose("spike3Ctrl", Pose(90.0, 35.0, 0.0.deg.inRad))
-                pose("humanIntake", Pose(135.0, 10.0, 0.0.deg.inRad))
+                pose("humanIntake", Pose(130.0, 10.0, 0.0.deg.inRad))
             }
 
         val red: Map<String, Pose>
