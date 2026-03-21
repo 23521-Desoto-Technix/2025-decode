@@ -172,6 +172,18 @@ object AutoConstants {
                     .build(),
             )
             path(
+                "spike3CombinedFar",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierCurve(p("shootMiddle"), p("spike3Ctrl"), p("spike3Start")))
+                    .setConstantHeadingInterpolation(p("shootMiddle").heading)
+                    .addPath(BezierLine(p("spike3Start"), p("spike3End")))
+                    .setConstantHeadingInterpolation(p("shootMiddle").heading)
+                    .addPath(BezierLine(p("spike3End"), p("shootFar")))
+                    .setConstantHeadingInterpolation(p("shootMiddle").heading)
+                    .build(),
+            )
+            path(
                 "spike1ToShootMiddle",
                 follower
                     .pathBuilder()
