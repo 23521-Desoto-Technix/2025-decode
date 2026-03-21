@@ -7,7 +7,6 @@ import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
-import dev.nextftc.core.commands.groups.ParallelRaceGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -33,7 +32,7 @@ class solo21 : NextFTCOpMode() {
     init {
         addComponents(
             SubsystemComponent(Flywheel, Hood, Turret, Tube),
-            //BulkReadComponent,
+            // BulkReadComponent,
             BindingsComponent,
             PedroComponent(Constants::createFollower),
         )
@@ -44,14 +43,13 @@ class solo21 : NextFTCOpMode() {
 
     private lateinit var allHubs: MutableList<LynxModule?>
 
-
     override fun onInit() {
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
 
         val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
         Turret.setTargetAngle(0.0.deg)
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
-        //telemetry.msTransmissionInterval = 100
+        // telemetry.msTransmissionInterval = 100
         val selectRed =
             button { gamepad1.circle }.whenBecomesTrue { BotState.alliance = Alliance.RED }
         val selectBlue =
@@ -59,21 +57,24 @@ class solo21 : NextFTCOpMode() {
     }
 
     private fun buildRoutine(paths: Map<String, PathChain>): Command {
-        val nearTurretAngle = when (BotState.alliance) {
-            Alliance.RED -> AutoConstants.Angles["closeTurretRed"]
-            Alliance.BLUE -> AutoConstants.Angles["closeTurretBlue"]
-            else -> 0.0.deg
-        }
-        val middleTurretAngle = when (BotState.alliance) {
-            Alliance.RED -> AutoConstants.Angles["middleTurretRed"]
-            Alliance.BLUE -> AutoConstants.Angles["middleTurretBlue"]
-            else -> 0.0.deg
-        }
-        val farTurretAngle = when (BotState.alliance) {
-            Alliance.RED -> AutoConstants.Angles["farTurretRed"]
-            Alliance.BLUE -> AutoConstants.Angles["farTurretBlue"]
-            else -> 0.0.deg
-        }
+        val nearTurretAngle =
+            when (BotState.alliance) {
+                Alliance.RED -> AutoConstants.Angles["closeTurretRed"]
+                Alliance.BLUE -> AutoConstants.Angles["closeTurretBlue"]
+                else -> 0.0.deg
+            }
+        val middleTurretAngle =
+            when (BotState.alliance) {
+                Alliance.RED -> AutoConstants.Angles["middleTurretRed"]
+                Alliance.BLUE -> AutoConstants.Angles["middleTurretBlue"]
+                else -> 0.0.deg
+            }
+        val farTurretAngle =
+            when (BotState.alliance) {
+                Alliance.RED -> AutoConstants.Angles["farTurretRed"]
+                Alliance.BLUE -> AutoConstants.Angles["farTurretBlue"]
+                else -> 0.0.deg
+            }
 
         return SequentialGroup(
             Flywheel.setSpeed(1_350.0),
@@ -113,19 +114,11 @@ class solo21 : NextFTCOpMode() {
             Tube.shootAll(),
             Delay(500.milliseconds),
             Tube.intakeAll,
-            ParallelRaceGroup(
-                FollowPath(paths.getValue("shootFarToHumanIntake")),
-                Tube.waitForAll()
-            ),
-            FollowPath(paths.getValue("humanIntakeToShootFar")),
+            FollowPath(paths.getValue("shootFarHumanIntake")),
             Tube.shootAll(),
             Delay(500.milliseconds),
             Tube.intakeAll,
-            ParallelRaceGroup(
-                FollowPath(paths.getValue("shootFarToHumanIntake")),
-                Tube.waitForAll()
-            ),
-            FollowPath(paths.getValue("humanIntakeToShootFar")),
+            FollowPath(paths.getValue("shootFarHumanIntake")),
             Tube.shootAll(),
             Delay(500.milliseconds),
             Flywheel.stop(),
@@ -134,21 +127,23 @@ class solo21 : NextFTCOpMode() {
 
     override fun onWaitForStart() {
 
+        val allianceDisplay =
+            when (BotState.alliance) {
+                Alliance.RED ->
+                    "<span style=\"background-color: #FF0000; color: white;\">&nbsp;&nbsp;RED&nbsp;&nbsp;</span>"
 
-        val allianceDisplay = when (BotState.alliance) {
-            Alliance.RED -> "<span style=\"background-color: #FF0000; color: white;\">&nbsp;&nbsp;RED&nbsp;&nbsp;</span>"
+                Alliance.BLUE ->
+                    "<span style=\"background-color: #0000FF; color: white;\">&nbsp;&nbsp;BLUE&nbsp;&nbsp;</span>"
 
-            Alliance.BLUE -> "<span style=\"background-color: #0000FF; color: white;\">&nbsp;&nbsp;BLUE&nbsp;&nbsp;</span>"
+                Alliance.UNKNOWN -> {
 
-            Alliance.UNKNOWN -> {
-
-                if (((System.currentTimeMillis() / 500) % 2).toInt() == 0) {
-                    "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
-                } else {
-                    "&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;"
+                    if (((System.currentTimeMillis() / 500) % 2).toInt() == 0) {
+                        "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
+                    } else {
+                        "&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;"
+                    }
                 }
             }
-        }
 
         telemetry.addLine(allianceDisplay)
         telemetry.addLine("RED: Circle ●")
