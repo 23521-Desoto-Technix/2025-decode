@@ -28,7 +28,7 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Solo Transitional 21 (sidespike)", group = "Solo", preselectTeleOp = "teleop")
-class solo21 : NextFTCOpMode() {
+class transitional21sidespike : NextFTCOpMode() {
     init {
         addComponents(
             SubsystemComponent(Flywheel, Hood, Turret, Tube),

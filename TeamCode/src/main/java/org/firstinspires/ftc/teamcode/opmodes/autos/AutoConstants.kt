@@ -254,7 +254,7 @@ object AutoConstants {
                 "shootFarHumanIntake",
                 follower
                     .pathBuilder()
-                    .addPath(BezierCurve(p("shootFar"), p("humanIntake"), p("humanIntakeCtrl")))
+                    .addPath(BezierCurve(p("shootFar"), p("humanIntakeCtrl"), p("humanIntake")))
                     .setConstantHeadingInterpolation(p("humanIntake").heading)
                     .addPath(BezierLine(p("humanIntake"), p("shootFar")))
                     .setConstantHeadingInterpolation(p("humanIntake").heading)
