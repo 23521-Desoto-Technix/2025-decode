@@ -7,6 +7,7 @@ import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
+import dev.nextftc.core.commands.groups.ParallelRaceGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -103,12 +104,26 @@ class solo21 : NextFTCOpMode() {
             Tube.shootAll(),
             Delay(500.milliseconds),
             Tube.intakeAll,
-            Flywheel.setSpeed(1_700.0),
+            Flywheel.setSpeed(1_800.0),
             InstantCommand { Hood.position = 0.65 },
             InstantCommand { Turret.setTargetAngle(farTurretAngle) },
             FollowPath(paths.getValue("shootMiddleToGateHit")),
             Delay(500.milliseconds),
             FollowPath(paths.getValue("gateHitSideSpike3")),
+            Tube.shootAll(),
+            Delay(500.milliseconds),
+            ParallelRaceGroup(
+                FollowPath(paths.getValue("shootFarToHumanIntake")),
+                Tube.waitForAll()
+            ),
+            FollowPath(paths.getValue("humanIntakeToShootFar")),
+            Tube.shootAll(),
+            Delay(500.milliseconds),
+            ParallelRaceGroup(
+                FollowPath(paths.getValue("shootFarToHumanIntake")),
+                Tube.waitForAll()
+            ),
+            FollowPath(paths.getValue("humanIntakeToShootFar")),
             Tube.shootAll(),
             Delay(500.milliseconds),
             Flywheel.stop(),
