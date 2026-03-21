@@ -15,6 +15,7 @@ import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
+import dev.nextftc.extensions.pedro.TurnTo
 import dev.nextftc.ftc.NextFTCOpMode
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
@@ -80,6 +81,12 @@ class transitional21 : NextFTCOpMode() {
                     FollowPath(paths.getValue("gateIntakeShootMiddle")),
                 )
             )
+        val farTurretAngle =
+            when (BotState.alliance) {
+                Alliance.RED -> AutoConstants.Angles["farTurretRed"]
+                Alliance.BLUE -> AutoConstants.Angles["farTurretBlue"]
+                else -> 0.0.deg
+            }
         return SequentialGroup(
             Flywheel.setSpeed(1_500.0),
             InstantCommand { Hood.position = 0.55 },
@@ -90,14 +97,17 @@ class transitional21 : NextFTCOpMode() {
             Delay(400.milliseconds),
             intake(FollowPath(paths.getValue("spike2Combined"))),
             gateIntake,
-            gateIntake,
             intake(FollowPath(paths.getValue("spike1Combined"))),
             gateIntake,
-            Flywheel.setSpeed(1_400.0),
-            InstantCommand { Hood.position = 0.45 },
-            InstantCommand { Turret.setTargetAngle(parkTurretAngle) },
-            intake(FollowPath(paths.getValue("spike3Combined"))),
+            Tube.intakeAll,
+            Flywheel.setSpeed(1_950.0),
+            InstantCommand { Hood.position = 0.9 },
+            InstantCommand { Turret.setTargetAngle(farTurretAngle) },
+            TurnTo(0.deg),
             Delay(500.milliseconds),
+            intake(FollowPath(paths.getValue("gateHitSideSpike3"))),
+            intake(FollowPath(paths.getValue("shootFarHumanIntake"))),
+            intake(FollowPath(paths.getValue("shootFarHumanIntake"))),
             Flywheel.stop(),
         )
     }

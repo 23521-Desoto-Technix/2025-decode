@@ -260,6 +260,14 @@ object AutoConstants {
                     .setConstantHeadingInterpolation(p("humanIntake").heading)
                     .build(),
             )
+            path(
+                "gateIntakeHit",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("shootMiddle"), p("gateHit")))
+                    .setConstantHeadingInterpolation(p("gateHit").heading)
+                    .build(),
+            )
         }
     }
 
