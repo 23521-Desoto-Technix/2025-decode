@@ -104,14 +104,15 @@ class solo21 : NextFTCOpMode() {
             Tube.shootAll(),
             Delay(500.milliseconds),
             Tube.intakeAll,
-            Flywheel.setSpeed(1_800.0),
-            InstantCommand { Hood.position = 0.65 },
+            Flywheel.setSpeed(1_950.0),
+            InstantCommand { Hood.position = 0.9 },
             InstantCommand { Turret.setTargetAngle(farTurretAngle) },
             FollowPath(paths.getValue("shootMiddleToGateHit")),
             Delay(500.milliseconds),
             FollowPath(paths.getValue("gateHitSideSpike3")),
             Tube.shootAll(),
             Delay(500.milliseconds),
+            Tube.intakeAll,
             ParallelRaceGroup(
                 FollowPath(paths.getValue("shootFarToHumanIntake")),
                 Tube.waitForAll()
@@ -119,6 +120,7 @@ class solo21 : NextFTCOpMode() {
             FollowPath(paths.getValue("humanIntakeToShootFar")),
             Tube.shootAll(),
             Delay(500.milliseconds),
+            Tube.intakeAll,
             ParallelRaceGroup(
                 FollowPath(paths.getValue("shootFarToHumanIntake")),
                 Tube.waitForAll()
