@@ -25,9 +25,9 @@ object AutoConstants {
                 pose("sideSpike1Ctrl", Pose(120.0, 100.0, -90.0.deg.inRad))
                 pose("sideSpike2", Pose(121.0, 74.0, -90.0.deg.inRad))
                 pose("sideSpike2Ctrl", Pose(121.0, 93.0, -90.0.deg.inRad))
-                pose("sideSpike3", Pose(121.0, 74.0, -90.0.deg.inRad))
+                pose("sideSpike3", Pose(121.0, 45.0, -90.0.deg.inRad))
                 pose("sideSpike3TransitionalCtrl", Pose(121.0, 93.0, -90.0.deg.inRad))
-                pose("gateHit", Pose(129.0, 69.5, 0.0.deg.inRad))
+                pose("gateHit", Pose(129.0, 69.5, -90.0.deg.inRad))
                 pose("gateIntake", Pose(130.5, 59.5, 40.0.deg.inRad))
                 pose("gateIntakeCtrl", Pose(105.0, 58.0, 40.0.deg.inRad))
                 pose("spike1End", Pose(113.0, 85.0, 0.0.deg.inRad))
@@ -229,7 +229,7 @@ object AutoConstants {
                 "gateHitSideSpike3",
                 follower
                     .pathBuilder()
-                    .addPath(BezierCurve(p("gateIntake"), p("sideSpike3TransitionalCtrl"), p("sideSpike3")))
+                    .addPath(BezierCurve(p("gateHit"), p("sideSpike3TransitionalCtrl"), p("sideSpike3")))
                     .setConstantHeadingInterpolation(p("gateHit").heading)
                     .addPath(BezierLine(p("sideSpike3"), p("shootFar")))
                     .setLinearHeadingInterpolation(p("sideSpike3").heading, p("shootFar").heading)
