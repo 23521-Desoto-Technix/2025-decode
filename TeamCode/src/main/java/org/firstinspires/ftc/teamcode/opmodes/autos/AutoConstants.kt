@@ -109,25 +109,7 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierLine(p("startNear"), p("shootMiddle")))
-                    .setHeadingInterpolation(
-                        HeadingInterpolator.piecewise(
-                            HeadingInterpolator.PiecewiseNode(
-                                0.0,
-                                0.1,
-                                HeadingInterpolator.constant(p("startNear").heading),
-                            ),
-                            HeadingInterpolator.PiecewiseNode(
-                                0.1,
-                                0.5,
-                                HeadingInterpolator.tangent,
-                            ),
-                            HeadingInterpolator.PiecewiseNode(
-                                0.5,
-                                1.0,
-                                HeadingInterpolator.constant(p("shootMiddle").heading)
-                            ),
-                        )
-                    )
+                    .setConstantHeadingInterpolation(p("shootMiddle").heading)
                     .build(),
             )
             path(
