@@ -16,7 +16,7 @@ object AutoConstants {
     object Poses {
         private val redPoses =
             linkedMapOf<String, Pose>().apply {
-                pose("startNear", Pose(113.27, 134.27, -90.0.deg.inRad))
+                pose("startNear", Pose(126.74, 111.15, 0.0.deg.inRad))
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
                 pose("shootMiddle", Pose(89.0, 80.0, 0.0.deg.inRad))
                 pose("shootFar", Pose(89.0, 20.0, 0.0.deg.inRad))
@@ -72,13 +72,13 @@ object AutoConstants {
     object Angles {
         private val angles =
             linkedMapOf<String, Angle>().apply {
-                angle("closeTurretRed", (-35.0).deg)
-                angle("closeTurretBlue", 35.0.deg)
+                angle("closeTurretRed", (-38.0).deg)
+                angle("closeTurretBlue", 38.0.deg)
                 angle("middleTurretRed", (-132.0).deg)
                 angle("middleTurretBlue", 132.0.deg)
                 angle("parkTurretRed", (-90.0).deg)
                 angle("parkTurretBlue", 90.0.deg)
-                angle("farTurretRed", (-113.0).deg)
+                angle("farTurretRed", (-116.0).deg)
                 angle("farTurretBlue", 116.0.deg)
             }
 
