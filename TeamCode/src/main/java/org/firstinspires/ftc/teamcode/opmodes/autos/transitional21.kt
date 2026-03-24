@@ -91,7 +91,7 @@ class transitional21 : NextFTCOpMode() {
             }
         return SequentialGroup(
             Flywheel.setSpeed(1_500.0),
-            InstantCommand { Hood.position = 0.55 },
+            InstantCommand { Hood.position = 0.6 },
             InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             FollowPath(paths.getValue("startNearToShootMiddle")),
             Delay(200.milliseconds),
@@ -103,7 +103,7 @@ class transitional21 : NextFTCOpMode() {
             gateIntake,
             Tube.intakeAll,
             Flywheel.setSpeed(1_950.0),
-            InstantCommand { Hood.position = 0.9 },
+            InstantCommand { Hood.position = 0.95 },
             InstantCommand { Turret.setTargetAngle(farTurretAngle) },
             intake(FollowPath(paths.getValue("spike3CombinedFar"))),
             intake(FollowPath(paths.getValue("shootFarHumanIntake"))),
