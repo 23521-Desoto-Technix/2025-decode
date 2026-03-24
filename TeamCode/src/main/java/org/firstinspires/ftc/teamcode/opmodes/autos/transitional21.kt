@@ -107,8 +107,8 @@ class transitional21 : NextFTCOpMode() {
             InstantCommand { Turret.setTargetAngle(farTurretAngle) },
             intake(FollowPath(paths.getValue("spike3CombinedFar"))),
             intake(FollowPath(paths.getValue("shootFarHumanIntake"))),
-            Flywheel.stop(true),
             FollowPath(paths.getValue("shootFarPark")),
+            Flywheel.stop(),
             Delay(30.seconds),
         )
     }

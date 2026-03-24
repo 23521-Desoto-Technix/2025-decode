@@ -37,8 +37,8 @@ object AutoConstants {
                 pose("spike3Start", Pose(105.0, 36.0, 0.0.deg.inRad))
                 pose("spike3End", Pose(120.0, 36.0, 0.0.deg.inRad))
                 pose("spike3Ctrl", Pose(90.0, 35.0, 0.0.deg.inRad))
-                pose("humanIntake", Pose(130.0, 10.0, 0.0.deg.inRad))
-                pose("humanIntakeCtrl", Pose(95.0, 10.0, 0.0.deg.inRad))
+                pose("humanIntake", Pose(130.0, 7.0, 0.0.deg.inRad))
+                pose("humanIntakeCtrl", Pose(89.0, 7.0, 0.0.deg.inRad))
                 pose("parkFar", Pose(110.0, 20.0, 0.0.deg.inRad))
             }
 
