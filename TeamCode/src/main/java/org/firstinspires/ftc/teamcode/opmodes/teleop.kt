@@ -25,6 +25,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
 import org.firstinspires.ftc.teamcode.subsystems.Shooter
+import org.firstinspires.ftc.teamcode.subsystems.Tilt
 import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
@@ -56,7 +57,7 @@ class teleop : NextFTCOpMode() {
             // BulkReadComponent,
             BindingsComponent,
             PedroComponent(Constants::createFollower),
-            SubsystemComponent(Tube, Shooter, Flywheel, Hood, Turret),
+            SubsystemComponent(Tube, Shooter, Flywheel, Hood, Turret, Tilt),
         )
         telemetry = TelemetryImplUpstreamSubmission(this)
     }
@@ -265,7 +266,7 @@ class teleop : NextFTCOpMode() {
             button { gamepad1.square }.whenBecomesTrue { Tube.shootAll(0.7).schedule() }
 
         val flywheelLong =
-            button { gamepad1.dpad_up || gamepad2.dpad_up }
+            button { gamepad2.dpad_up }
                 .whenBecomesTrue {
                     if (!autoRangingEnabled) {
                         Hood.position = 0.935
@@ -273,7 +274,7 @@ class teleop : NextFTCOpMode() {
                     }
                 }
         val flywheelShort =
-            button { gamepad1.dpad_down || gamepad2.dpad_down }
+            button { gamepad2.dpad_down }
                 .whenBecomesTrue {
                     if (!autoRangingEnabled) {
                         Hood.position = 0.45
@@ -281,14 +282,14 @@ class teleop : NextFTCOpMode() {
                     }
                 }
         val flywheelTesting =
-            button { gamepad1.dpad_left || gamepad2.dpad_left }
+            button { gamepad2.dpad_left }
                 .whenBecomesTrue {
                     if (!autoRangingEnabled) {
                         Flywheel.enable().then(Flywheel.setSpeed(500.0)).schedule()
                     }
                 }
         val flywheelOff =
-            button { gamepad1.dpad_right || gamepad2.dpad_right }
+            button { gamepad2.dpad_right }
                 .whenBecomesTrue {
                     if (!autoRangingEnabled) {
                         Flywheel.disable().schedule()
@@ -366,6 +367,8 @@ class teleop : NextFTCOpMode() {
                         PedroComponent.follower.pose = blueReference
                     }
                 }
+        val tiltDown = button {gamepad1.dpad_down}.whenBecomesTrue { Tilt.down() }
+        val tiltUp = button {gamepad1.dpad_up}.whenBecomesTrue { Tilt.up() }
     }
 
     override fun onUpdate() {
