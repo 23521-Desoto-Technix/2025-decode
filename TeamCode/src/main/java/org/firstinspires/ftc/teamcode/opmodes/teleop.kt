@@ -367,8 +367,8 @@ class teleop : NextFTCOpMode() {
                         PedroComponent.follower.pose = blueReference
                     }
                 }
-        val tiltDown = button {gamepad1.dpad_down}.whenBecomesTrue { Tilt.down() }
-        val tiltUp = button {gamepad1.dpad_up}.whenBecomesTrue { Tilt.up() }
+        val tiltDown = button {gamepad1.dpad_down}.whenBecomesTrue { Tilt.down().schedule() }
+        val tiltUp = button {gamepad1.dpad_up}.whenBecomesTrue { Tilt.up().schedule() }
     }
 
     override fun onUpdate() {
