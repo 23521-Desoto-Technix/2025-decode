@@ -365,7 +365,7 @@ class teleop : NextFTCOpMode() {
         val shootingZoneFar =
             button { gamepad2.dpad_right }
                 .whenBecomesTrue {
-                    if (!autoRangingEnabled) {
+                    if (autoRangingEnabled) {
                         activeShootingZone = ShootingZone.FAR
                     }
                 }
