@@ -107,7 +107,6 @@ class transitional21 : NextFTCOpMode() {
             InstantCommand { Hood.position = 0.6 },
             InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             FollowPath(paths.getValue("startNearToShootMiddle")),
-            Delay(200.milliseconds),
             Tube.shootAll(),
             Delay(400.milliseconds),
             intake(FollowPath(paths.getValue("spike2Combined")), 1.0),
