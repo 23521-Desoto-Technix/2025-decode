@@ -96,7 +96,7 @@ class teleop : NextFTCOpMode() {
     val farZoneConfigs =
         listOf(
             ShootingConfig(120.0, 135.0, 1_950.0, 0.9),
-            ShootingConfig(135.0, 160.0, 2_050.0, 0.95),
+            //ShootingConfig(135.0, 160.0, 2_050.0, 0.95),
         )
     val farZoneDefault = farZoneConfigs.first()
 
