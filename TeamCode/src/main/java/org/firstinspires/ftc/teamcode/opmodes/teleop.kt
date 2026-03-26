@@ -18,6 +18,12 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
+import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.sin
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
@@ -32,12 +38,6 @@ import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
-import java.util.Locale
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.hypot
-import kotlin.math.sin
 
 data class ShootingConfig(
     val minDistance: Double,
@@ -53,7 +53,7 @@ data class TargetMetrics(
 
 enum class ShootingZone {
     NEAR,
-    FAR
+    FAR,
 }
 
 @TeleOp
@@ -129,17 +129,19 @@ class teleop : NextFTCOpMode() {
     }
 
     fun getShootingConfigForDistance(distance: Double): ShootingConfig? {
-        val configs = when (activeShootingZone) {
-            ShootingZone.NEAR -> nearZoneConfigs
-            ShootingZone.FAR -> farZoneConfigs
-        }
+        val configs =
+            when (activeShootingZone) {
+                ShootingZone.NEAR -> nearZoneConfigs
+                ShootingZone.FAR -> farZoneConfigs
+            }
         val matchedConfig = configs.firstOrNull {
             distance >= it.minDistance && distance < it.maxDistance
         }
-        return matchedConfig ?: when (activeShootingZone) {
-            ShootingZone.NEAR -> nearZoneDefault
-            ShootingZone.FAR -> farZoneDefault
-        }
+        return matchedConfig
+            ?: when (activeShootingZone) {
+                ShootingZone.NEAR -> nearZoneDefault
+                ShootingZone.FAR -> farZoneDefault
+            }
     }
 
     fun applyRobotSpaceOffset(pose: Pose, localX: Double, localY: Double): Pose {
@@ -250,7 +252,13 @@ class teleop : NextFTCOpMode() {
         val stopIntake = button { gamepad1.cross }.whenBecomesTrue { Tube.stopAll.schedule() }
         val shootAll =
             button { gamepad1.triangle || gamepad1.left_trigger > 0.2 }
-                .whenBecomesTrue { Tube.shootAll().schedule() }
+                .whenBecomesTrue {
+                    if (activeShootingZone == ShootingZone.NEAR) {
+                        Tube.shootAll().schedule()
+                    } else {
+                        Tube.shootAll(0.7).schedule()
+                    }
+                }
         val shootAllSlow =
             button { gamepad1.square }.whenBecomesTrue { Tube.shootAll(0.7).schedule() }
 
@@ -349,10 +357,18 @@ class teleop : NextFTCOpMode() {
             button { gamepad2.triangle }.whenBecomesTrue { lockTurret = !lockTurret }
         val shootingZoneNear =
             button { gamepad2.dpad_left }
-                .whenBecomesTrue { if (autoRangingEnabled) {activeShootingZone = ShootingZone.NEAR} }
+                .whenBecomesTrue {
+                    if (autoRangingEnabled) {
+                        activeShootingZone = ShootingZone.NEAR
+                    }
+                }
         val shootingZoneFar =
-            button { gamepad2.dpad_right}
-                .whenBecomesTrue { if (!autoRangingEnabled) {activeShootingZone = ShootingZone.FAR} }
+            button { gamepad2.dpad_right }
+                .whenBecomesTrue {
+                    if (!autoRangingEnabled) {
+                        activeShootingZone = ShootingZone.FAR
+                    }
+                }
         val resetPose =
             button { gamepad1.ps }
                 .whenBecomesTrue {
@@ -397,7 +413,13 @@ class teleop : NextFTCOpMode() {
         }
 
         if (ignorePinpoint) {
-            t.addLine(HtmlTelemetryUtils.createFlashingBadge("!!  IGNORING PINPOINT  !!", "yellow", "black"))
+            t.addLine(
+                HtmlTelemetryUtils.createFlashingBadge(
+                    "!!  IGNORING PINPOINT  !!",
+                    "yellow",
+                    "black",
+                )
+            )
         }
 
         t.addData("X", PedroComponent.follower.pose.x)
@@ -414,7 +436,8 @@ class teleop : NextFTCOpMode() {
         t.addData("Shooting Mode", shootingModeDisplay)
         val shootingZoneDisplay =
             when (activeShootingZone) {
-                ShootingZone.NEAR -> HtmlTelemetryUtils.createColoredBadge("NEAR", "#FFA500", "black")
+                ShootingZone.NEAR ->
+                    HtmlTelemetryUtils.createColoredBadge("NEAR", "#FFA500", "black")
                 ShootingZone.FAR -> HtmlTelemetryUtils.createColoredBadge("FAR", "#9933FF", "white")
             }
         t.addData("Shooting Zone", shootingZoneDisplay)
