@@ -108,42 +108,42 @@ object Tube : Subsystem {
 
         when (state) {
             TubeState.INTAKE_PHASE0 -> {
-                if (isBottomContinuouslyTripped(1000.milliseconds)) {
+                if (isBottomContinuouslyTripped(1500.milliseconds)) {
                     transitionTo(TubeState.INTAKE_FINAL_PUSH)
                 } else if (!top.state) {
                     transitionTo(TubeState.INTAKE_DELAY_AFTER_TOP)
                 }
             }
             TubeState.INTAKE_DELAY_AFTER_TOP -> {
-                if (isBottomContinuouslyTripped(1000.milliseconds)) {
+                if (isBottomContinuouslyTripped(1500.milliseconds)) {
                     transitionTo(TubeState.INTAKE_FINAL_PUSH)
                 } else if (elapsedSinceStep() >= 300.milliseconds) {
                     transitionTo(TubeState.INTAKE_WAIT_MIDDLE)
                 }
             }
             TubeState.INTAKE_WAIT_MIDDLE -> {
-                if (isBottomContinuouslyTripped(1000.milliseconds)) {
+                if (isBottomContinuouslyTripped(1500.milliseconds)) {
                     transitionTo(TubeState.INTAKE_FINAL_PUSH)
                 } else if (!middle.state) {
                     transitionTo(TubeState.INTAKE_DELAY_AFTER_MIDDLE)
                 }
             }
             TubeState.INTAKE_DELAY_AFTER_MIDDLE -> {
-                if (isBottomContinuouslyTripped(1000.milliseconds)) {
+                if (isBottomContinuouslyTripped(1500.milliseconds)) {
                     transitionTo(TubeState.INTAKE_FINAL_PUSH)
                 } else if (elapsedSinceStep() >= 200.milliseconds) {
                     transitionTo(TubeState.INTAKE_WAIT_BOTTOM)
                 }
             }
             TubeState.INTAKE_WAIT_BOTTOM -> {
-                if (isBottomContinuouslyTripped(1000.milliseconds)) {
+                if (isBottomContinuouslyTripped(1500.milliseconds)) {
                     transitionTo(TubeState.INTAKE_FINAL_PUSH)
                 } else if (!bottom.state) {
                     transitionTo(TubeState.INTAKE_DELAY_AFTER_BOTTOM)
                 }
             }
             TubeState.INTAKE_DELAY_AFTER_BOTTOM -> {
-                if (isBottomContinuouslyTripped(1000.milliseconds)) {
+                if (isBottomContinuouslyTripped(1500.milliseconds)) {
                     transitionTo(TubeState.INTAKE_FINAL_PUSH)
                 } else if (elapsedSinceStep() >= 50.milliseconds) {
                     transitionTo(TubeState.INTAKE_FINAL_PUSH)
