@@ -224,6 +224,8 @@ class teleop : NextFTCOpMode() {
 
     override fun onStartButtonPressed() {
         BotState.enabled = true
+        pto.position = 0.0
+        Tube.jiggle()
         val red = Pose(127.6, 120.8, -143.8.deg.inRad)
         val startingPose =
             when (BotState.alliance) {
