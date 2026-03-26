@@ -79,6 +79,14 @@ class transitional21 : NextFTCOpMode() {
                 Delay(400.milliseconds),
             )
         }
+        val intakeFar: (Command, Double?) -> Command = { path, shootSpeed ->
+            SequentialGroup(
+                Tube.intakeAll,
+                path,
+                Tube.shootAll(shootSpeed ?: 1.0),
+                Delay(800.milliseconds),
+            )
+        }
         val gateIntake =
             intake(
                 SequentialGroup(
@@ -110,8 +118,8 @@ class transitional21 : NextFTCOpMode() {
             Flywheel.setSpeed(1_950.0),
             InstantCommand { Hood.position = 0.95 },
             InstantCommand { Turret.setTargetAngle(farTurretAngle) },
-            intake(FollowPath(paths.getValue("spike3CombinedFar")), 0.7),
-            intake(FollowPath(paths.getValue("shootFarHumanIntake")), 0.7),
+            intakeFar(FollowPath(paths.getValue("spike3CombinedFar")), 0.7),
+            intakeFar(FollowPath(paths.getValue("shootFarHumanIntake")), 0.7),
             FollowPath(paths.getValue("shootFarPark")),
             Flywheel.stop(),
             Delay(30.seconds),
