@@ -7,8 +7,8 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 
 object Tilt : Subsystem {
     val servo = ServoEx("tilt")
-    const val UP = 0.75
-    const val DOWN = 0.25
+    const val UP = 0.26
+    const val DOWN = 0.6
     var position = UP
 
     override fun initialize() {
