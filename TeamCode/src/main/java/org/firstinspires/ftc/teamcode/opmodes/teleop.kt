@@ -30,6 +30,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
 import java.util.Locale
 import kotlin.math.abs
@@ -49,6 +50,11 @@ data class TargetMetrics(
     val distanceToTarget: Double,
     val relativeAngleToTarget: dev.nextftc.core.units.Angle,
 )
+
+enum class ShootingZone {
+    NEAR,
+    FAR
+}
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -76,7 +82,7 @@ class teleop : NextFTCOpMode() {
 
     val t = JoinedTelemetry(PanelsTelemetry.ftcTelemetry, telemetry)
 
-    val shootingConfigs =
+    val nearZoneConfigs =
         listOf(
             ShootingConfig(60.0, 75.0, 1_400.0, 0.45),
             ShootingConfig(75.0, 85.0, 1_500.0, 0.55),
@@ -84,26 +90,17 @@ class teleop : NextFTCOpMode() {
             ShootingConfig(93.0, 98.0, 1_600.0, 0.7),
             ShootingConfig(98.0, 104.0, 1_600.0, 0.65),
             ShootingConfig(104.0, 110.0, 1_700.0, 0.65),
-            //            ShootingConfig(
-            //                110.0,
-            //                120.0,
-            //                900.0,
-            //                0.6,
-            // ),
-            // far zone
-            //                 ShootingConfig(
-            //                 120.0,
-            //                 135.0,
-            //                 1_950.0,
-            //                 0.9,
-            //                  ),
-            //                 ShootingConfig(
-            //                 135.0,
-            //                 160.0,
-            //                 2_050.0,
-            //                  0.95,
-            //            ),
         )
+    val nearZoneDefault = nearZoneConfigs.last()
+
+    val farZoneConfigs =
+        listOf(
+            ShootingConfig(120.0, 135.0, 1_950.0, 0.9),
+            ShootingConfig(135.0, 160.0, 2_050.0, 0.95),
+        )
+    val farZoneDefault = farZoneConfigs.first()
+
+    var activeShootingZone = ShootingZone.NEAR
 
     val headingPID = controlSystem { posPid(0.0085, 0.0, 0.0) }
 
@@ -132,8 +129,16 @@ class teleop : NextFTCOpMode() {
     }
 
     fun getShootingConfigForDistance(distance: Double): ShootingConfig? {
-        return shootingConfigs.firstOrNull {
+        val configs = when (activeShootingZone) {
+            ShootingZone.NEAR -> nearZoneConfigs
+            ShootingZone.FAR -> farZoneConfigs
+        }
+        val matchedConfig = configs.firstOrNull {
             distance >= it.minDistance && distance < it.maxDistance
+        }
+        return matchedConfig ?: when (activeShootingZone) {
+            ShootingZone.NEAR -> nearZoneDefault
+            ShootingZone.FAR -> farZoneDefault
         }
     }
 
@@ -204,23 +209,7 @@ class teleop : NextFTCOpMode() {
 
     override fun onWaitForStart() {
         BindingManager.layer = "init"
-        val allianceDisplay =
-            when (BotState.alliance) {
-                Alliance.RED ->
-                    "<span style=\"background-color: #FF0000; color: white;\">&nbsp;&nbsp;RED&nbsp;&nbsp;</span>"
-
-                Alliance.BLUE ->
-                    "<span style=\"background-color: #0000FF; color: white;\">&nbsp;&nbsp;BLUE&nbsp;&nbsp;</span>"
-
-                Alliance.UNKNOWN -> {
-
-                    if (((System.currentTimeMillis() / 500) % 2).toInt() == 0) {
-                        "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
-                    } else {
-                        "&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;"
-                    }
-                }
-            }
+        val allianceDisplay = HtmlTelemetryUtils.createAllianceBadge(BotState.alliance)
 
         t.addLine(allianceDisplay)
         t.addLine("Controller 2")
@@ -358,6 +347,12 @@ class teleop : NextFTCOpMode() {
             button { gamepad2.ps }.whenBecomesTrue { autoRangingEnabled = !autoRangingEnabled }
         val lockTurretToggle =
             button { gamepad2.triangle }.whenBecomesTrue { lockTurret = !lockTurret }
+        val shootingZoneNear =
+            button { gamepad2.dpad_left }
+                .whenBecomesTrue { if (autoRangingEnabled) {activeShootingZone = ShootingZone.NEAR} }
+        val shootingZoneFar =
+            button { gamepad2.dpad_right}
+                .whenBecomesTrue { if (!autoRangingEnabled) {activeShootingZone = ShootingZone.FAR} }
         val resetPose =
             button { gamepad1.ps }
                 .whenBecomesTrue {
@@ -367,8 +362,13 @@ class teleop : NextFTCOpMode() {
                         PedroComponent.follower.pose = blueReference
                     }
                 }
-        val tiltDown = button {gamepad1.dpad_down}.whenBecomesTrue { Tilt.down().schedule() }
-        val tiltUp = button {gamepad1.dpad_up}.whenBecomesTrue { Tilt.up().schedule() }
+        val tiltDown =
+            button { gamepad1.dpad_down }
+                .whenBecomesTrue {
+                    Tilt.down().schedule()
+                    pto.position = 0.95
+                }
+        val tiltUp = button { gamepad1.dpad_up }.whenBecomesTrue { Tilt.up().schedule() }
     }
 
     override fun onUpdate() {
@@ -397,13 +397,7 @@ class teleop : NextFTCOpMode() {
         }
 
         if (ignorePinpoint) {
-            if (((System.currentTimeMillis() / 500) % 2).toInt() == 0) {
-                t.addLine(
-                    "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;IGNORING PINPOINT&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
-                )
-            } else {
-                t.addLine("&nbsp;&nbsp;!!&nbsp;&nbsp;IGNORING PINPOINT&nbsp;&nbsp;!!&nbsp;&nbsp;")
-            }
+            t.addLine(HtmlTelemetryUtils.createFlashingBadge("!!  IGNORING PINPOINT  !!", "yellow", "black"))
         }
 
         t.addData("X", PedroComponent.follower.pose.x)
@@ -413,11 +407,17 @@ class teleop : NextFTCOpMode() {
         t.addData("Loop Time (ms)", String.format(Locale.US, "%.1f", loopMs))
         val shootingModeDisplay =
             if (autoRangingEnabled) {
-                "<span style=\"background-color: #00FF00; color: black;\">&nbsp;&nbsp;AUTO&nbsp;&nbsp;</span>"
+                HtmlTelemetryUtils.createColoredBadge("AUTO", "#00FF00", "black")
             } else {
-                "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;MANUAL&nbsp;&nbsp;</span>"
+                HtmlTelemetryUtils.createColoredBadge("MANUAL", "yellow", "black")
             }
         t.addData("Shooting Mode", shootingModeDisplay)
+        val shootingZoneDisplay =
+            when (activeShootingZone) {
+                ShootingZone.NEAR -> HtmlTelemetryUtils.createColoredBadge("NEAR", "#FFA500", "black")
+                ShootingZone.FAR -> HtmlTelemetryUtils.createColoredBadge("FAR", "#9933FF", "white")
+            }
+        t.addData("Shooting Zone", shootingZoneDisplay)
         t.addData("Angle to (144, 144)", relativeAngleToTarget.inDeg)
         t.addData("Flywheel Target Speed", Flywheel.targetSpeed)
         t.addData("Flywheel Actual Speed", Flywheel.speed)
@@ -450,9 +450,7 @@ class teleop : NextFTCOpMode() {
         if (abs(gamepad2.left_stick_y) > 0.1) {
             if (BotState.enabled) {
                 backRight.power = gamepad2.left_stick_y.toDouble()
-                //frontRight.power = -gamepad2.left_stick_y.toDouble() * 0.75
                 backLeft.power = gamepad2.left_stick_y.toDouble()
-               //frontLeft.power = -gamepad2.left_stick_y.toDouble() * 0.75
             } else {
                 backRight.power = 0.0
                 frontRight.power = 0.0

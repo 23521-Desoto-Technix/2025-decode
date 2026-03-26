@@ -27,6 +27,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -115,23 +116,7 @@ class transitional21 : NextFTCOpMode() {
 
     override fun onWaitForStart() {
 
-        val allianceDisplay =
-            when (BotState.alliance) {
-                Alliance.RED ->
-                    "<span style=\"background-color: #FF0000; color: white;\">&nbsp;&nbsp;RED&nbsp;&nbsp;</span>"
-
-                Alliance.BLUE ->
-                    "<span style=\"background-color: #0000FF; color: white;\">&nbsp;&nbsp;BLUE&nbsp;&nbsp;</span>"
-
-                Alliance.UNKNOWN -> {
-
-                    if (((System.currentTimeMillis() / 500) % 2).toInt() == 0) {
-                        "<span style=\"background-color: yellow; color: black;\">&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;</span>"
-                    } else {
-                        "&nbsp;&nbsp;!!&nbsp;&nbsp;UNKNOWN&nbsp;&nbsp;!!&nbsp;&nbsp;"
-                    }
-                }
-            }
+        val allianceDisplay = HtmlTelemetryUtils.createAllianceBadge(BotState.alliance)
 
         telemetry.addLine(allianceDisplay)
         telemetry.addLine("RED: Circle ●")
