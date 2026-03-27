@@ -71,19 +71,19 @@ class transitional21 : NextFTCOpMode() {
                 Alliance.BLUE -> AutoConstants.Angles["parkTurretBlue"]
                 else -> 0.0.deg
             }
-        val intake: (Command, Double?) -> Command = { path, shootSpeed ->
+        val intake: (Command, Double) -> Command = { path, shootSpeed ->
             SequentialGroup(
                 Tube.intakeAll,
                 path,
-                Tube.shootAll(shootSpeed ?: 1.0),
+                Tube.shootAll(shootSpeed),
                 Delay(400.milliseconds),
             )
         }
-        val intakeFar: (Command, Double?) -> Command = { path, shootSpeed ->
+        val intakeFar: (Command, Double) -> Command = { path, shootSpeed ->
             SequentialGroup(
                 Tube.intakeAll,
                 path,
-                Tube.shootAll(shootSpeed ?: 1.0),
+                Tube.shootAll(shootSpeed),
                 Delay(800.milliseconds),
             )
         }
@@ -91,7 +91,7 @@ class transitional21 : NextFTCOpMode() {
             intake(
                 SequentialGroup(
                     FollowPath(paths.getValue("shootMiddleGateIntake")),
-                    Tube.waitForAll(1100.milliseconds),
+                    Delay(1100.milliseconds),
                     FollowPath(paths.getValue("gateIntakeShootMiddle")),
                 ),
                 1.0,
