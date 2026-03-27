@@ -84,9 +84,9 @@ class teleop : NextFTCOpMode() {
 
     val nearZoneConfigs =
         listOf(
-            ShootingConfig(60.0, 75.0, 1_400.0, 0.45),
-            ShootingConfig(75.0, 85.0, 1_500.0, 0.55),
-            ShootingConfig(85.0, 93.0, 1_500.0, 0.55),
+            ShootingConfig(20.0, 75.0, 1_400.0, 0.45),
+            ShootingConfig(75.0, 88.0, 1_500.0, 0.65),
+            ShootingConfig(88.0, 93.0, 1_600.0, 0.7),
             ShootingConfig(93.0, 98.0, 1_600.0, 0.7),
             ShootingConfig(98.0, 104.0, 1_600.0, 0.65),
             ShootingConfig(104.0, 110.0, 1_700.0, 0.65),

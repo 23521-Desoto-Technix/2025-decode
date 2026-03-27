@@ -104,7 +104,7 @@ class transitional21 : NextFTCOpMode() {
             }
         return SequentialGroup(
             Flywheel.setSpeed(1_500.0),
-            InstantCommand { Hood.position = 0.6 },
+            InstantCommand { Hood.position = 0.65 },
             InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             FollowPath(paths.getValue("startNearToShootMiddle")),
             Tube.shootAll(),
