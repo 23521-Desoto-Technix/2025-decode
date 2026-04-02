@@ -38,23 +38,14 @@ import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
-
-data class ShootingConfig(
-    val minDistance: Double,
-    val maxDistance: Double,
-    val flywheelSpeed: Double,
-    val hoodPosition: Double,
-)
+import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator
+import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator.ShootingZone
 
 data class TargetMetrics(
     val distanceToTarget: Double,
     val relativeAngleToTarget: dev.nextftc.core.units.Angle,
 )
 
-enum class ShootingZone {
-    NEAR,
-    FAR,
-}
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -82,23 +73,6 @@ class teleop : NextFTCOpMode() {
 
     val t = JoinedTelemetry(PanelsTelemetry.ftcTelemetry, telemetry)
 
-    val nearZoneConfigs =
-        listOf(
-            ShootingConfig(20.0, 75.0, 1_400.0, 0.45),
-            ShootingConfig(75.0, 88.0, 1_500.0, 0.65),
-            ShootingConfig(88.0, 93.0, 1_600.0, 0.7),
-            ShootingConfig(93.0, 98.0, 1_600.0, 0.7),
-            ShootingConfig(98.0, 104.0, 1_600.0, 0.65),
-            ShootingConfig(104.0, 110.0, 1_700.0, 0.65),
-        )
-    val nearZoneDefault = nearZoneConfigs.last()
-
-    val farZoneConfigs =
-        listOf(
-            ShootingConfig(120.0, 135.0, 1_950.0, 0.9),
-            //ShootingConfig(135.0, 160.0, 2_050.0, 0.95),
-        )
-    val farZoneDefault = farZoneConfigs.first()
 
     var activeShootingZone = ShootingZone.NEAR
 
@@ -128,21 +102,6 @@ class teleop : NextFTCOpMode() {
         return Pair(rotatedForward, rotatedStrafe)
     }
 
-    fun getShootingConfigForDistance(distance: Double): ShootingConfig? {
-        val configs =
-            when (activeShootingZone) {
-                ShootingZone.NEAR -> nearZoneConfigs
-                ShootingZone.FAR -> farZoneConfigs
-            }
-        val matchedConfig = configs.firstOrNull {
-            distance >= it.minDistance && distance < it.maxDistance
-        }
-        return matchedConfig
-            ?: when (activeShootingZone) {
-                ShootingZone.NEAR -> nearZoneDefault
-                ShootingZone.FAR -> farZoneDefault
-            }
-    }
 
     fun applyRobotSpaceOffset(pose: Pose, localX: Double, localY: Double): Pose {
         val heading = pose.heading
@@ -404,8 +363,8 @@ class teleop : NextFTCOpMode() {
         val distanceToTarget = targetMetrics.distanceToTarget
         val relativeAngleToTarget = targetMetrics.relativeAngleToTarget
 
-        val config = getShootingConfigForDistance(distanceToTarget)
-        if (config != null && autoRangingEnabled) {
+        if (autoRangingEnabled) {
+            val config = ShootingConfigInterpolator.getConfig(distanceToTarget, activeShootingZone)
             if (Flywheel.targetSpeed != config.flywheelSpeed) {
                 Flywheel.enable().then(Flywheel.setSpeed(config.flywheelSpeed)).schedule()
             }
