@@ -400,6 +400,7 @@ class teleop : NextFTCOpMode() {
         t.addData("Heading", PedroComponent.follower.pose.heading)
         t.addData("Distance to Target", distanceToTarget)
         t.addData("Lift", liftEncoder.currentPosition)
+        t.addData("Lift above 60,000", liftEncoder.currentPosition < 60_000)
         t.addData("Loop Time (ms)", String.format(Locale.US, "%.1f", loopMs))
         val shootingModeDisplay =
             if (autoRangingEnabled) {
@@ -421,7 +422,7 @@ class teleop : NextFTCOpMode() {
         t.addData("Hood position", Hood.position)
 
         if (abs(gamepad2.left_stick_y) > 0.1) {
-            if (BotState.enabled && liftEncoder.currentPosition < 61_500) {
+            if (BotState.enabled && liftEncoder.currentPosition < 60_000) {
                 backRight.power = gamepad2.left_stick_y.toDouble()
                 backLeft.power = gamepad2.left_stick_y.toDouble()
             } else {
