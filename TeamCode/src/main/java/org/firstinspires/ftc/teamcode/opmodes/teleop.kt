@@ -24,8 +24,9 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.BotConstants
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
@@ -45,7 +46,6 @@ data class TargetMetrics(
     val distanceToTarget: Double,
     val relativeAngleToTarget: dev.nextftc.core.units.Angle,
 )
-
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -72,7 +72,6 @@ class teleop : NextFTCOpMode() {
     private var lastUpdateNs = 0L
 
     val t = JoinedTelemetry(PanelsTelemetry.ftcTelemetry, telemetry)
-
 
     var activeShootingZone = ShootingZone.NEAR
 
@@ -102,7 +101,6 @@ class teleop : NextFTCOpMode() {
         return Pair(rotatedForward, rotatedStrafe)
     }
 
-
     fun applyRobotSpaceOffset(pose: Pose, localX: Double, localY: Double): Pose {
         val heading = pose.heading
         val fieldX = pose.x + localX * cos(heading) - localY * sin(heading)
@@ -110,7 +108,7 @@ class teleop : NextFTCOpMode() {
         return Pose(fieldX, fieldY, pose.heading)
     }
 
-    fun calculateTargetMetrics(currentPose: Pose): TargetMetrics {
+    fun calculateTargetMetrics(currentPose: Pose, angularVelocity: Double = 0.0): TargetMetrics {
         val targetPose =
             if (currentPose.y < 48.0) {
                 if (BotState.alliance == Alliance.BLUE) {
@@ -142,8 +140,12 @@ class teleop : NextFTCOpMode() {
         val angleToPoseB = atan2(anglePoseB.y - currentY, anglePoseB.x - currentX)
         val absoluteAngleToTarget =
             atan2(sin(angleToPoseA) + sin(angleToPoseB), cos(angleToPoseA) + cos(angleToPoseB)).rad
-        val relativeAngleToTarget =
-            (currentPose.heading.rad - absoluteAngleToTarget + 180.deg).normalized
+        val predictiveHeading =
+            currentPose.heading.rad +
+                (angularVelocity / 1.seconds.inWholeMicroseconds *
+                        300.milliseconds.inWholeMicroseconds)
+                    .rad
+        val relativeAngleToTarget = (predictiveHeading - absoluteAngleToTarget + 180.deg).normalized
 
         return TargetMetrics(distanceToTarget, relativeAngleToTarget)
     }
@@ -359,7 +361,10 @@ class teleop : NextFTCOpMode() {
         lastUpdateNs = nowNs
 
         val targetMetrics =
-            calculateTargetMetrics(applyRobotSpaceOffset(PedroComponent.follower.pose, -1.633, 0.0))
+            calculateTargetMetrics(
+                applyRobotSpaceOffset(PedroComponent.follower.pose, -1.633, 0.0),
+                PedroComponent.follower.angularVelocity,
+            )
         val distanceToTarget = targetMetrics.distanceToTarget
         val relativeAngleToTarget = targetMetrics.relativeAngleToTarget
 
@@ -406,30 +411,6 @@ class teleop : NextFTCOpMode() {
         t.addData("Flywheel Target Speed", Flywheel.targetSpeed)
         t.addData("Flywheel Actual Speed", Flywheel.speed)
         t.addData("Hood position", Hood.position)
-        /* HTML telemetry reference
-        t.addLine("<b>Bold text</b>")
-        t.addLine("<i>Italic text</i>")
-        t.addLine("<u>Underlined text</u>")
-        t.addLine("<font color=\"#FF0000\">Red text</font>")
-        t.addLine("<font color=\"#00FF00\">Green text</font>")
-        t.addLine("<b><i>Bold and italic</i></b>")
-        t.addLine(
-            "<span style=\"background-color: yellow; color: black;\">Yellow background</span>"
-        )
-        t.addLine(
-            "<span style=\"background-color: #FF0000; color: white;\">Red background</span>"
-        )
-        t.addLine(
-            "<span style=\"background-color: #0000FF; color: white;\">Blue background</span>"
-        )*/
-
-        var tatag = 0
-
-        if (BotState.alliance == Alliance.RED) {
-            tatag = BotConstants.RED_ALLIANCE_APRILTAG_ID
-        } else if (BotState.alliance == Alliance.BLUE) {
-            tatag = BotConstants.BLUE_ALLIANCE_APRILTAG_ID
-        }
 
         if (abs(gamepad2.left_stick_y) > 0.1) {
             if (BotState.enabled) {
@@ -493,15 +474,6 @@ class teleop : NextFTCOpMode() {
             rotatedTurn = 0.0
             return
         }
-
-        /*
-        if (!ignorePinpoint) {
-          Turret.setTargetAngle(-relativeAngleToTarget)
-        } else if (targetTagBearing == null) {
-          Turret.setTargetAngle(0.0.deg)
-        } else {
-          Turret.setTargetAngle(Turret.currentAngle - targetTagBearing.deg)
-        }*/
 
         if (!ignorePinpoint && !lockTurret) {
             Turret.setTargetAngle(-relativeAngleToTarget)
