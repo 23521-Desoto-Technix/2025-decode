@@ -421,7 +421,7 @@ class teleop : NextFTCOpMode() {
         t.addData("Hood position", Hood.position)
 
         if (abs(gamepad2.left_stick_y) > 0.1) {
-            if (BotState.enabled) {
+            if (BotState.enabled && liftEncoder.currentPosition < 61_500) {
                 backRight.power = gamepad2.left_stick_y.toDouble()
                 backLeft.power = gamepad2.left_stick_y.toDouble()
             } else {
