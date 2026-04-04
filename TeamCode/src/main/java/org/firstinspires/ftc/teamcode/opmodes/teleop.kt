@@ -81,6 +81,8 @@ class teleop : NextFTCOpMode() {
 
     var lockTurret = false
 
+    val MAX_LIFT = 59_500
+
     private lateinit var backRight: DcMotor
     private lateinit var frontLeft: DcMotor
     private lateinit var backLeft: DcMotor
@@ -400,7 +402,7 @@ class teleop : NextFTCOpMode() {
         t.addData("Heading", PedroComponent.follower.pose.heading)
         t.addData("Distance to Target", distanceToTarget)
         t.addData("Lift", liftEncoder.currentPosition)
-        t.addData("Lift under 60,000", liftEncoder.currentPosition < 60_000)
+        t.addData("Lift under $MAX_LIFT", liftEncoder.currentPosition < MAX_LIFT)
         t.addData("Loop Time (ms)", String.format(Locale.US, "%.1f", loopMs))
         val shootingModeDisplay =
             if (autoRangingEnabled) {
@@ -422,7 +424,7 @@ class teleop : NextFTCOpMode() {
         t.addData("Hood position", Hood.position)
 
         if (abs(gamepad2.left_stick_y) > 0.1) {
-            if (BotState.enabled && liftEncoder.currentPosition < 60_000) {
+            if (BotState.enabled && liftEncoder.currentPosition < MAX_LIFT) {
                 backRight.power = gamepad2.left_stick_y.toDouble()
                 backLeft.power = gamepad2.left_stick_y.toDouble()
             } else {
