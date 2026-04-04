@@ -21,14 +21,15 @@ object Hood : Subsystem {
       if (!BotState.enabled) {
           return
       }
+      position = position.coerceIn(0.45, 1.0)
       servo.position = position
   }
 
   fun bumpUp() = InstantCommand {
-    position = (position + BUMP_AMOUNT).coerceIn(0.0, 1.0)
+    position = (position + BUMP_AMOUNT).coerceIn(0.45, 1.0)
   }
 
   fun bumpDown() = InstantCommand {
-    position = (position - BUMP_AMOUNT).coerceIn(0.0, 1.0)
+    position = (position - BUMP_AMOUNT).coerceIn(0.45, 1.0)
   }
 }

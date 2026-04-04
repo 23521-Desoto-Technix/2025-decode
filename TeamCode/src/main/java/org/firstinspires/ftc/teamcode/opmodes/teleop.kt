@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode.opmodes
 import com.bylazar.telemetry.JoinedTelemetry
 import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.geometry.Pose
+import com.pedropathing.math.Vector
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.Servo
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
@@ -18,14 +20,6 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
-import java.util.Locale
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.hypot
-import kotlin.math.sin
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -41,6 +35,14 @@ import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator.ShootingZone
+import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.sin
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 data class TargetMetrics(
     val distanceToTarget: Double,
@@ -79,11 +81,13 @@ class teleop : NextFTCOpMode() {
 
     var lockTurret = false
 
-    private lateinit var backRight: com.qualcomm.robotcore.hardware.DcMotor
-    private lateinit var frontLeft: com.qualcomm.robotcore.hardware.DcMotor
-    private lateinit var backLeft: com.qualcomm.robotcore.hardware.DcMotor
-    private lateinit var frontRight: com.qualcomm.robotcore.hardware.DcMotor
+    private lateinit var backRight: DcMotor
+    private lateinit var frontLeft: DcMotor
+    private lateinit var backLeft: DcMotor
+    private lateinit var frontRight: DcMotor
     private lateinit var pto: Servo
+
+    private lateinit var liftEncoder: DcMotor
 
     val redReference = Pose(110.0, 131.3, 90.0.deg.inRad)
     val blueReference = mirrorPose(redReference)
@@ -108,7 +112,7 @@ class teleop : NextFTCOpMode() {
         return Pose(fieldX, fieldY, pose.heading)
     }
 
-    fun calculateTargetMetrics(currentPose: Pose, angularVelocity: Double = 0.0): TargetMetrics {
+    fun calculateTargetMetrics(currentPose: Pose, angularVelocity: Double = 0.0, velocity: Vector): TargetMetrics {
         val targetPose =
             if (currentPose.y < 48.0) {
                 if (BotState.alliance == Alliance.BLUE) {
@@ -123,9 +127,10 @@ class teleop : NextFTCOpMode() {
                     Pose(144.0, 144.0, 0.0)
                 }
             }
+        val velocity = velocity.times(90.milliseconds.inWholeMicroseconds.toDouble() / 1.seconds.inWholeMicroseconds.toDouble())
 
-        val currentX = currentPose.x
-        val currentY = currentPose.y
+        val currentX = currentPose.x + velocity.xComponent
+        val currentY = currentPose.y + velocity.yComponent
         val deltaX = targetPose.x - currentX
         val deltaY = targetPose.y - currentY
         val distanceToTarget = hypot(deltaX, deltaY)
@@ -143,7 +148,7 @@ class teleop : NextFTCOpMode() {
         val predictiveHeading =
             currentPose.heading.rad +
                 (angularVelocity / 1.seconds.inWholeMicroseconds *
-                        300.milliseconds.inWholeMicroseconds)
+                        90.milliseconds.inWholeMicroseconds)
                     .rad
         val relativeAngleToTarget = (predictiveHeading - absoluteAngleToTarget + 180.deg).normalized
 
@@ -156,6 +161,7 @@ class teleop : NextFTCOpMode() {
         backLeft = hardwareMap.dcMotor["backLeft"]
         frontRight = hardwareMap.dcMotor["frontRight"]
         pto = hardwareMap.servo["pto"]
+        liftEncoder = frontLeft
         t.setDisplayFormat(Telemetry.DisplayFormat.HTML)
         // t.msTransmissionInterval = 100
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
@@ -364,6 +370,7 @@ class teleop : NextFTCOpMode() {
             calculateTargetMetrics(
                 applyRobotSpaceOffset(PedroComponent.follower.pose, -1.633, 0.0),
                 PedroComponent.follower.angularVelocity,
+                PedroComponent.follower.velocity,
             )
         val distanceToTarget = targetMetrics.distanceToTarget
         val relativeAngleToTarget = targetMetrics.relativeAngleToTarget
@@ -392,6 +399,7 @@ class teleop : NextFTCOpMode() {
         t.addData("Y", PedroComponent.follower.pose.y)
         t.addData("Heading", PedroComponent.follower.pose.heading)
         t.addData("Distance to Target", distanceToTarget)
+        t.addData("Lift", liftEncoder.currentPosition)
         t.addData("Loop Time (ms)", String.format(Locale.US, "%.1f", loopMs))
         val shootingModeDisplay =
             if (autoRangingEnabled) {
