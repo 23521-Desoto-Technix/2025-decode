@@ -15,7 +15,7 @@ object Turret : Subsystem {
     private var lastVoltage: Double = 0.0
     private var lastTimeNs: Long = 0L
 
-    const val OFFSET = 0.016
+    const val OFFSET = 0.02
 
     var currentAngle: Angle = 0.0.deg
         private set
