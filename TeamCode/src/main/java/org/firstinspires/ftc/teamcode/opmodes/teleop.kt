@@ -21,6 +21,14 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
+import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.sin
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -36,14 +44,6 @@ import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator.ShootingZone
-import java.util.Locale
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.hypot
-import kotlin.math.sin
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 data class TargetMetrics(
     val distanceToTarget: Double,
@@ -92,8 +92,11 @@ class teleop : NextFTCOpMode() {
 
     private lateinit var liftEncoder: DcMotor
 
-    val redReference = Pose(110.0, 131.3, 90.0.deg.inRad)
-    val blueReference = mirrorPose(redReference)
+    val redReferenceNear = Pose(109.6, 131.84, 90.0.deg.inRad)
+    val blueReferenceNear = mirrorPose(redReferenceNear)
+
+    val redReferenceFar = Pose(11.52, 9.3, -180.0.deg.inRad)
+    val blueReferenceFar = mirrorPose(redReferenceFar)
 
     private lateinit var allHubs: MutableList<LynxModule?>
 
@@ -115,7 +118,11 @@ class teleop : NextFTCOpMode() {
         return Pose(fieldX, fieldY, pose.heading)
     }
 
-    fun calculateTargetMetrics(currentPose: Pose, angularVelocity: Double = 0.0, velocity: Vector): TargetMetrics {
+    fun calculateTargetMetrics(
+        currentPose: Pose,
+        angularVelocity: Double = 0.0,
+        velocity: Vector,
+    ): TargetMetrics {
         val targetPose =
             if (currentPose.y < 48.0) {
                 if (BotState.alliance == Alliance.BLUE) {
@@ -130,7 +137,11 @@ class teleop : NextFTCOpMode() {
                     Pose(144.0, 144.0, 0.0)
                 }
             }
-        val velocity = velocity.times(90.milliseconds.inWholeMicroseconds.toDouble() / 1.seconds.inWholeMicroseconds.toDouble())
+        val velocity =
+            velocity.times(
+                90.milliseconds.inWholeMicroseconds.toDouble() /
+                    1.seconds.inWholeMicroseconds.toDouble()
+            )
 
         val currentX = currentPose.x + velocity.xComponent
         val currentY = currentPose.y + velocity.yComponent
@@ -319,21 +330,23 @@ class teleop : NextFTCOpMode() {
         val baseHeading =
             button { gamepad1.right_bumper }
                 .whenBecomesTrue {
-                    headingLocked = if (BotState.alliance == Alliance.RED) {
-                        135.deg
-                    } else {
-                        45.deg
-                    }
+                    headingLocked =
+                        if (BotState.alliance == Alliance.RED) {
+                            135.deg
+                        } else {
+                            45.deg
+                        }
                 }
                 .whenBecomesFalse { headingLocked = null }
         val gateHeading =
             button { gamepad1.left_bumper }
                 .whenBecomesTrue {
-                    headingLocked = if (BotState.alliance == Alliance.RED) {
-                        33.deg
-                    } else {
-                        147.deg
-                    }
+                    headingLocked =
+                        if (BotState.alliance == Alliance.RED) {
+                            33.deg
+                        } else {
+                            147.deg
+                        }
                 }
                 .whenBecomesFalse { headingLocked = null }
         val autoAimToggle =
@@ -358,9 +371,17 @@ class teleop : NextFTCOpMode() {
             button { gamepad1.ps }
                 .whenBecomesTrue {
                     if (BotState.alliance == Alliance.RED) {
-                        PedroComponent.follower.pose = redReference
+                        PedroComponent.follower.pose =
+                            when (activeShootingZone) {
+                                ShootingZone.NEAR -> redReferenceNear
+                                ShootingZone.FAR -> redReferenceFar
+                            }
                     } else if (BotState.alliance == Alliance.BLUE) {
-                        PedroComponent.follower.pose = blueReference
+                        PedroComponent.follower.pose =
+                            when (activeShootingZone) {
+                                ShootingZone.NEAR -> blueReferenceNear
+                                ShootingZone.FAR -> blueReferenceFar
+                            }
                     }
                 }
         val tiltDown =
@@ -482,7 +503,9 @@ class teleop : NextFTCOpMode() {
             rotatedTurn =
                 headingPID.calculate(
                     KineticState(
-                        -((headingLocked!! - PedroComponent.follower.pose.heading.rad).normalized.inDeg),
+                        -((headingLocked!! - PedroComponent.follower.pose.heading.rad)
+                            .normalized
+                            .inDeg),
                         PedroComponent.follower.angularVelocity.rad.inDeg,
                     )
                 )
