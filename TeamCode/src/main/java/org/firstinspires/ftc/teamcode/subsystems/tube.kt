@@ -77,7 +77,7 @@ object Tube : Subsystem {
         }
     }
 
-    fun isFull() = !top.state && !middleA.state && !middleB.state && !bottom.state
+    fun isFull() = !top.state && (!middleA.state || !middleB.state) && !bottom.state
 
     val stopAll = InstantCommand { transitionTo(TubeState.IDLE) }
 
@@ -127,7 +127,7 @@ object Tube : Subsystem {
             TubeState.INTAKE_WAIT_MIDDLE -> {
                 if (isBottomContinuouslyTripped(1500.milliseconds)) {
                     transitionTo(TubeState.INTAKE_FINAL_PUSH)
-                } else if (!middleA.state && !middleB.state) {
+                } else if (!middleA.state || !middleB.state) {
                     transitionTo(TubeState.INTAKE_DELAY_AFTER_MIDDLE)
                 }
             }
@@ -162,7 +162,7 @@ object Tube : Subsystem {
                 if (elapsedSinceStep() >= 200.milliseconds)
                     transitionTo(TubeState.SHOOTING_WAIT_CLEAR)
             TubeState.SHOOTING_WAIT_CLEAR ->
-                if (top.state && middleA.state && bottom.state) {
+                if (top.state && (middleA.state || middleB.state) && bottom.state) {
                     transitionTo(TubeState.SHOOTING_DELAY_BEFORE_IDLE)
                 }
             TubeState.SHOOTING_DELAY_BEFORE_IDLE ->
