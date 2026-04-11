@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.opmodes
 
 import com.bylazar.telemetry.JoinedTelemetry
 import com.bylazar.telemetry.PanelsTelemetry
-import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.math.Vector
 import com.qualcomm.hardware.lynx.LynxModule
@@ -19,7 +18,6 @@ import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
-import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
@@ -309,34 +307,15 @@ class teleop : NextFTCOpMode() {
         val autoPark =
             button { gamepad2.left_bumper }
                 .whenBecomesTrue {
-                    PedroComponent.follower.followPath(
-                        PedroComponent.follower
-                            .pathBuilder()
-                            .addPath(
-                                BezierLine(
-                                    PedroComponent.follower.pose,
-                                    when (BotState.alliance) {
-                                        Alliance.RED -> redBase
-                                        else -> blueBase
-                                    },
-                                )
-                            )
-                            .setConstantHeadingInterpolation(
-                                when (BotState.alliance) {
-                                    Alliance.RED -> redBase.heading
-                                    else -> blueBase.heading
-                                }
-                            )
-                            .build(),
-                        true,
+                    PedroComponent.follower.holdPoint(
+                        when (BotState.alliance) {
+                            Alliance.RED -> redBase
+                            else -> blueBase
+                        }
                     )
                 }
-                .whenTrue {
-                    PedroComponent.follower.update()
-                }
-                .whenBecomesFalse {
-                    PedroComponent.follower.breakFollowing()
-                }
+                .whenTrue { PedroComponent.follower.update() }
+                .whenBecomesFalse { PedroComponent.follower.breakFollowing() }
 
         val driveCancel =
             button { abs(gamepad2.left_stick_y) > 0.1 || gamepad2.left_bumper }
