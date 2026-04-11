@@ -100,7 +100,7 @@ class transitional21 : NextFTCOpMode() {
             intake(
                 SequentialGroup(
                     FollowPath(paths.getValue("shootMiddleGateIntake")),
-                    Delay(1100.milliseconds),
+                    Delay(850.milliseconds),
                     FollowPath(paths.getValue("gateIntakeShootMiddle")),
                 ),
                 1.0,
@@ -113,7 +113,7 @@ class transitional21 : NextFTCOpMode() {
             }
         return SequentialGroup(
             Flywheel.setSpeed(1_500.0),
-            InstantCommand { Hood.position = 0.65 },
+            InstantCommand { Hood.position = 0.675 },
             InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             FollowPath(paths.getValue("startNearToShootMiddle")),
             Tube.shootAll(),
@@ -123,8 +123,8 @@ class transitional21 : NextFTCOpMode() {
             intake(FollowPath(paths.getValue("spike1Combined")), 1.0),
             gateIntake,
             Tube.intakeAll,
-            Flywheel.setSpeed(1_950.0),
-            InstantCommand { Hood.position = 0.95 },
+            Flywheel.setSpeed(1_900.0),
+            InstantCommand { Hood.position = 0.96 },
             InstantCommand { Turret.setTargetAngle(farTurretAngle) },
             intakeFar(FollowPath(paths.getValue("spike3CombinedFar")), 0.7),
             intakeFarLast(FollowPath(paths.getValue("shootFarHumanIntake")), 0.7),
