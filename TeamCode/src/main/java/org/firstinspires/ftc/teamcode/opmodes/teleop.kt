@@ -329,7 +329,7 @@ class teleop : NextFTCOpMode() {
                             )
                             .build(),
                         true,
-                    )
+                    ).schedule()
                 }
                 .whenBecomesFalse {
                     PedroComponent.follower.breakFollowing()
