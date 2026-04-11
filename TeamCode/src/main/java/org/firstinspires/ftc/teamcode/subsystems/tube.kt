@@ -31,7 +31,8 @@ object Tube : Subsystem {
     val transfer = MotorEx("transfer")
     val hardStop = ServoEx("hardStop")
     lateinit var top: DigitalChannel
-    lateinit var middle: DigitalChannel
+    lateinit var middleA: DigitalChannel
+    lateinit var middleB: DigitalChannel
     lateinit var bottom: DigitalChannel
     private var state = TubeState.IDLE
     private var stepStartedAt = now()
@@ -48,10 +49,12 @@ object Tube : Subsystem {
             return
         }
         top = ActiveOpMode.hardwareMap.digitalChannel["top"]
-        middle = ActiveOpMode.hardwareMap.digitalChannel["middle"]
+        middleA = ActiveOpMode.hardwareMap.digitalChannel["middleA"]
+        middleB = ActiveOpMode.hardwareMap.digitalChannel["middleB"]
         bottom = ActiveOpMode.hardwareMap.digitalChannel["bottom"]
         top.mode = DigitalChannel.Mode.INPUT
-        middle.mode = DigitalChannel.Mode.INPUT
+        middleA.mode = DigitalChannel.Mode.INPUT
+        middleB.mode = DigitalChannel.Mode.INPUT
         bottom.mode = DigitalChannel.Mode.INPUT
         hardStop.position = 0.65
         hardStop.position = 0.9
@@ -74,7 +77,7 @@ object Tube : Subsystem {
         }
     }
 
-    fun isFull() = !top.state && !middle.state && !bottom.state
+    fun isFull() = !top.state && !middleA.state && !middleB.state && !bottom.state
 
     val stopAll = InstantCommand { transitionTo(TubeState.IDLE) }
 
@@ -124,7 +127,7 @@ object Tube : Subsystem {
             TubeState.INTAKE_WAIT_MIDDLE -> {
                 if (isBottomContinuouslyTripped(1500.milliseconds)) {
                     transitionTo(TubeState.INTAKE_FINAL_PUSH)
-                } else if (!middle.state) {
+                } else if (!middleA.state && !middleB.state) {
                     transitionTo(TubeState.INTAKE_DELAY_AFTER_MIDDLE)
                 }
             }
@@ -159,7 +162,7 @@ object Tube : Subsystem {
                 if (elapsedSinceStep() >= 200.milliseconds)
                     transitionTo(TubeState.SHOOTING_WAIT_CLEAR)
             TubeState.SHOOTING_WAIT_CLEAR ->
-                if (top.state && middle.state && bottom.state) {
+                if (top.state && middleA.state && bottom.state) {
                     transitionTo(TubeState.SHOOTING_DELAY_BEFORE_IDLE)
                 }
             TubeState.SHOOTING_DELAY_BEFORE_IDLE ->
