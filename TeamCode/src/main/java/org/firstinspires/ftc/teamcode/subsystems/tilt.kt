@@ -30,11 +30,5 @@ object Tilt : Subsystem {
 
     fun down() = InstantCommand { position = DOWN }
 
-    fun brake() = InstantCommand {
-        position = if (position == UP) {
-            BRAKE
-        } else {
-            UP
-        }
-    }
+    fun brake() = InstantCommand { position = BRAKE }
 }
