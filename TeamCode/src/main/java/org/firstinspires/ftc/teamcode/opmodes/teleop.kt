@@ -309,7 +309,6 @@ class teleop : NextFTCOpMode() {
         val autoPark =
             button { gamepad2.left_bumper }
                 .whenBecomesTrue {
-                    driverControlled.stop(false)
                     FollowPath(
                         PedroComponent.follower
                             .pathBuilder()
@@ -334,11 +333,10 @@ class teleop : NextFTCOpMode() {
                 }
                 .whenBecomesFalse {
                     PedroComponent.follower.breakFollowing()
-                    driverControlled.schedule()
                 }
 
         val driveCancel =
-            button { abs(gamepad2.left_stick_y) > 0.1 }
+            button { abs(gamepad2.left_stick_y) > 0.1 || gamepad2.left_bumper }
                 .whenBecomesTrue { driverControlled.cancel() }
                 .whenBecomesFalse { driverControlled.schedule() }
         val ptoOn =
