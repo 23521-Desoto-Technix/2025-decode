@@ -309,7 +309,7 @@ class teleop : NextFTCOpMode() {
         val autoPark =
             button { gamepad2.left_bumper }
                 .whenBecomesTrue {
-                    FollowPath(
+                    PedroComponent.follower.followPath(
                         PedroComponent.follower
                             .pathBuilder()
                             .addPath(
@@ -329,7 +329,10 @@ class teleop : NextFTCOpMode() {
                             )
                             .build(),
                         true,
-                    ).schedule()
+                    )
+                }
+                .whenTrue {
+                    PedroComponent.follower.update()
                 }
                 .whenBecomesFalse {
                     PedroComponent.follower.breakFollowing()
