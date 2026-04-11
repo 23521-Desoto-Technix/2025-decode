@@ -75,7 +75,7 @@ class teleop : NextFTCOpMode() {
 
     var activeShootingZone = ShootingZone.NEAR
 
-    val headingPID = controlSystem { posPid(0.0085, 0.0, 0.0) }
+    val headingPID = controlSystem { posPid(0.0085, 0.0, 0.0002) }
 
     var lockTurret = false
 
