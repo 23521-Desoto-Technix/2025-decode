@@ -327,7 +327,7 @@ class teleop : NextFTCOpMode() {
                 }
                 .whenBecomesFalse { headingLocked = null }
         val gateHeading =
-            button { gamepad1.right_bumper }
+            button { gamepad1.left_bumper }
                 .whenBecomesTrue {
                     headingLocked = if (BotState.alliance == Alliance.RED) {
                         33.deg
