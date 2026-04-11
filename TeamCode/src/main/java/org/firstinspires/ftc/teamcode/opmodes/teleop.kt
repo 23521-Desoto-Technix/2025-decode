@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes
 
 import com.bylazar.telemetry.JoinedTelemetry
 import com.bylazar.telemetry.PanelsTelemetry
+import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.math.Vector
 import com.qualcomm.hardware.lynx.LynxModule
@@ -18,17 +19,10 @@ import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
+import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.NextFTCOpMode
-import java.util.Locale
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.hypot
-import kotlin.math.sin
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -44,11 +38,16 @@ import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator.ShootingZone
+import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.sin
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
-data class TargetMetrics(
-    val distanceToTarget: Double,
-    val relativeAngleToTarget: dev.nextftc.core.units.Angle,
-)
+data class TargetMetrics(val distanceToTarget: Double, val relativeAngleToTarget: Angle)
 
 @TeleOp
 class teleop : NextFTCOpMode() {
@@ -98,13 +97,12 @@ class teleop : NextFTCOpMode() {
     val redReferenceFar = Pose(11.52, 9.3, -180.0.deg.inRad)
     val blueReferenceFar = mirrorPose(redReferenceFar)
 
+    val redBase = Pose(34.3, 30.3, -135.deg.inRad)
+    val blueBase = mirrorPose(redBase)
+
     private lateinit var allHubs: MutableList<LynxModule?>
 
-    fun rotateJoystickInput(
-        forward: Double,
-        strafe: Double,
-        angle: dev.nextftc.core.units.Angle,
-    ): Pair<Double, Double> {
+    fun rotateJoystickInput(forward: Double, strafe: Double, angle: Angle): Pair<Double, Double> {
         val angleRadians = angle.value
         val rotatedForward = forward * cos(angleRadians) - strafe * sin(angleRadians)
         val rotatedStrafe = forward * sin(angleRadians) + strafe * cos(angleRadians)
@@ -293,7 +291,7 @@ class teleop : NextFTCOpMode() {
                             .schedule()
                     }
                 }
-        val hoodUp =
+        /*val hoodUp =
             button { gamepad2.left_bumper }
                 .whenBecomesTrue {
                     if (!autoRangingEnabled) {
@@ -306,7 +304,39 @@ class teleop : NextFTCOpMode() {
                     if (!autoRangingEnabled) {
                         Hood.bumpDown().schedule()
                     }
+                }*/
+
+        val autoPark =
+            button { gamepad2.left_bumper }
+                .whenBecomesTrue {
+                    driverControlled.stop(false)
+                    FollowPath(
+                        PedroComponent.follower
+                            .pathBuilder()
+                            .addPath(
+                                BezierLine(
+                                    PedroComponent.follower.pose,
+                                    when (BotState.alliance) {
+                                        Alliance.RED -> redBase
+                                        else -> blueBase
+                                    },
+                                )
+                            )
+                            .setConstantHeadingInterpolation(
+                                when (BotState.alliance) {
+                                    Alliance.RED -> redBase.heading
+                                    else -> blueBase.heading
+                                }
+                            )
+                            .build(),
+                        true,
+                    )
                 }
+                .whenBecomesFalse {
+                    PedroComponent.follower.breakFollowing()
+                    driverControlled.schedule()
+                }
+
         val driveCancel =
             button { abs(gamepad2.left_stick_y) > 0.1 }
                 .whenBecomesTrue { driverControlled.cancel() }
