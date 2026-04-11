@@ -15,6 +15,7 @@ import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
@@ -67,7 +68,7 @@ class teleop : NextFTCOpMode() {
 
     var ignorePinpoint = false
 
-    var headingLocked = false
+    var headingLocked: Angle? = null
 
     var autoRangingEnabled = true
 
@@ -315,13 +316,26 @@ class teleop : NextFTCOpMode() {
                 }
         val ignorePinpointToggle =
             button { gamepad2.square }.whenBecomesTrue { ignorePinpoint = !ignorePinpoint }
-        val headingLock =
+        val baseHeading =
             button { gamepad1.right_bumper }
-                .whenTrue { headingLocked = true }
-                .whenFalse { headingLocked = false }
-        /*val slow =
-        button { gamepad1.left_bumper }.whenTrue { slowMode = true }
-            .whenFalse { slowMode = false }*/
+                .whenBecomesTrue {
+                    headingLocked = if (BotState.alliance == Alliance.RED) {
+                        135.deg
+                    } else {
+                        45.deg
+                    }
+                }
+                .whenBecomesFalse { headingLocked = null }
+        val gateHeading =
+            button { gamepad1.right_bumper }
+                .whenBecomesTrue {
+                    headingLocked = if (BotState.alliance == Alliance.RED) {
+                        33.deg
+                    } else {
+                        147.deg
+                    }
+                }
+                .whenBecomesFalse { headingLocked = null }
         val autoAimToggle =
             button { gamepad2.ps }.whenBecomesTrue { autoRangingEnabled = !autoRangingEnabled }
         val lockTurretToggle =
@@ -462,17 +476,13 @@ class teleop : NextFTCOpMode() {
             rotatedStrafe *= 0.5
         }*/
 
-        if (headingLocked) {
-            if (BotState.alliance == Alliance.RED) {
-                headingPID.goal = KineticState(135.0, 0.0)
-            } else if (BotState.alliance == Alliance.BLUE) {
-                headingPID.goal = KineticState(45.0, 0.0)
-            }
+        if (headingLocked != null) {
+            headingPID.goal = KineticState(0.0, 0.0)
 
             rotatedTurn =
                 headingPID.calculate(
                     KineticState(
-                        PedroComponent.follower.pose.heading.rad.inDeg,
+                        (headingLocked!! - PedroComponent.follower.pose.heading.rad).normalized.inDeg,
                         PedroComponent.follower.angularVelocity.rad.inDeg,
                     )
                 )
