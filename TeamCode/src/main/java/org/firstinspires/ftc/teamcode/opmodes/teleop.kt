@@ -395,12 +395,12 @@ class teleop : NextFTCOpMode() {
                     }
                 }
         val tiltDown =
-            button { gamepad1.dpad_down }
+            button { gamepad1.dpad_up }
                 .whenBecomesTrue {
                     Tilt.down().schedule()
                     pto.position = 0.95
                 }
-        val tiltUp = button { gamepad1.dpad_up }.whenBecomesTrue { Tilt.up().schedule() }
+        val tiltBrake = button { gamepad1.dpad_down }.whenBecomesTrue { Tilt.brake().schedule() }
     }
 
     override fun onUpdate() {

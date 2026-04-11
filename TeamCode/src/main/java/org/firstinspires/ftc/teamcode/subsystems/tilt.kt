@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 object Tilt : Subsystem {
     val servo = ServoEx("tilt")
     const val UP = 0.26
+    const val BRAKE = 0.23
     const val DOWN = 0.6
     var position = UP
 
@@ -28,4 +29,12 @@ object Tilt : Subsystem {
     fun up() = InstantCommand { position = UP }
 
     fun down() = InstantCommand { position = DOWN }
+
+    fun brake() = InstantCommand {
+        position = if (position == UP) {
+            BRAKE
+        } else {
+            UP
+        }
+    }
 }
