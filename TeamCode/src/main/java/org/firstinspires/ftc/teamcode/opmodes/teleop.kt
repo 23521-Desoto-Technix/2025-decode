@@ -482,7 +482,7 @@ class teleop : NextFTCOpMode() {
             rotatedTurn =
                 headingPID.calculate(
                     KineticState(
-                        (headingLocked!! - PedroComponent.follower.pose.heading.rad).normalized.inDeg,
+                        -((headingLocked!! - PedroComponent.follower.pose.heading.rad).normalized.inDeg),
                         PedroComponent.follower.angularVelocity.rad.inDeg,
                     )
                 )
