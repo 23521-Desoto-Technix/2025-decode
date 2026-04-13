@@ -427,11 +427,12 @@ class teleop : NextFTCOpMode() {
 
         panelsField.setFill(PanelsField.BLUE)
         panelsField.moveCursor(botPose.x, botPose.y)
-        panelsField.circle(0.5)
+        panelsField.circle(2.0)
 
         panelsField.setFill(PanelsField.RED)
         panelsField.moveCursor(turretPose.x, turretPose.y)
-        panelsField.circle(0.5)
+        panelsField.circle(2.0)
+        panelsField.update()
 
 
         val targetMetrics =
