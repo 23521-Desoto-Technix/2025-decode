@@ -14,19 +14,23 @@ import kotlin.time.Duration.Companion.nanoseconds
 
 private enum class TubeState {
     IDLE,
-    INTAKE_PHASE0,
+    INTAKE_WAIT_TOP,
     INTAKE_DELAY_AFTER_TOP,
     INTAKE_WAIT_MIDDLE,
     INTAKE_DELAY_AFTER_MIDDLE,
     INTAKE_WAIT_BOTTOM,
     INTAKE_DELAY_AFTER_BOTTOM,
-    INTAKE_FINAL_PUSH,
     SHOOTING_HARDSTOP_SETTLE,
     SHOOTING_WAIT_CLEAR,
     SHOOTING_DELAY_BEFORE_IDLE,
 }
 
 object Tube : Subsystem {
+    // Intake sequence tuning values.
+    private val intakeTopDelay = 500.milliseconds
+    private val intakeMiddleDelay = 500.milliseconds
+    private val intakeBottomDelay = 500.milliseconds
+
     val intake = MotorEx("intake").reversed()
     val transfer = MotorEx("transfer")
     val hardStop = ServoEx("hardStop")
@@ -34,11 +38,10 @@ object Tube : Subsystem {
     lateinit var middleA: DigitalChannel
     lateinit var middleB: DigitalChannel
     lateinit var bottom: DigitalChannel
+
     private var state = TubeState.IDLE
     private var stepStartedAt = now()
     private var shootSpeed = 1.0
-    private var bottomTripStartedAt: Long? = null
-    private var lastBottomState = true
     private var waitForAllStartedAt: Long? = null
 
     override fun initialize() {
@@ -48,14 +51,17 @@ object Tube : Subsystem {
             hardStop.position = 0.9
             return
         }
+
         top = ActiveOpMode.hardwareMap.digitalChannel["top"]
         middleA = ActiveOpMode.hardwareMap.digitalChannel["middleA"]
         middleB = ActiveOpMode.hardwareMap.digitalChannel["middleB"]
         bottom = ActiveOpMode.hardwareMap.digitalChannel["bottom"]
+
         top.mode = DigitalChannel.Mode.INPUT
         middleA.mode = DigitalChannel.Mode.INPUT
         middleB.mode = DigitalChannel.Mode.INPUT
         bottom.mode = DigitalChannel.Mode.INPUT
+
         hardStop.position = 0.65
         hardStop.position = 0.9
         applyStateOutputs(state)
@@ -68,12 +74,13 @@ object Tube : Subsystem {
             hardStop.position = 0.9
             return
         }
+
         advanceStateMachine()
     }
 
     val intakeAll = InstantCommand {
         if (BotState.enabled) {
-            transitionTo(TubeState.INTAKE_PHASE0)
+            transitionTo(TubeState.INTAKE_WAIT_TOP)
         }
     }
 
@@ -82,9 +89,8 @@ object Tube : Subsystem {
     val stopAll = InstantCommand { transitionTo(TubeState.IDLE) }
 
     fun shootAll(speed: Double = 1.0) = InstantCommand {
-        if (!BotState.enabled) {
-            return@InstantCommand
-        }
+        if (!BotState.enabled) return@InstantCommand
+
         shootSpeed = speed
         transitionTo(TubeState.SHOOTING_HARDSTOP_SETTLE)
     }
@@ -96,8 +102,7 @@ object Tube : Subsystem {
                 if (d == null) {
                     this.state == TubeState.INTAKE_DELAY_AFTER_BOTTOM
                 } else {
-                    this.state == TubeState.INTAKE_DELAY_AFTER_BOTTOM ||
-                        elapsedSinceWaitStart() >= d
+                    this.state == TubeState.INTAKE_DELAY_AFTER_BOTTOM || elapsedSinceWaitStart() >= d
                 }
             }
 
@@ -107,97 +112,73 @@ object Tube : Subsystem {
     }
 
     private fun advanceStateMachine() {
-        updateBottomTripTimer()
-
         when (state) {
-            TubeState.INTAKE_PHASE0 -> {
-                if (isBottomContinuouslyTripped(1500.milliseconds)) {
-                    transitionTo(TubeState.INTAKE_FINAL_PUSH)
-                } else if (!top.state) {
+            TubeState.INTAKE_WAIT_TOP -> {
+                if (!top.state) {
                     transitionTo(TubeState.INTAKE_DELAY_AFTER_TOP)
                 }
             }
+
             TubeState.INTAKE_DELAY_AFTER_TOP -> {
-                if (isBottomContinuouslyTripped(1500.milliseconds)) {
-                    transitionTo(TubeState.INTAKE_FINAL_PUSH)
-                } else if (elapsedSinceStep() >= 300.milliseconds) {
+                if (elapsedSinceStep() >= intakeTopDelay) {
                     transitionTo(TubeState.INTAKE_WAIT_MIDDLE)
                 }
             }
+
             TubeState.INTAKE_WAIT_MIDDLE -> {
-                if (isBottomContinuouslyTripped(1500.milliseconds)) {
-                    transitionTo(TubeState.INTAKE_FINAL_PUSH)
-                } else if (!middleA.state || !middleB.state) {
+                if (!middleA.state || !middleB.state) {
                     transitionTo(TubeState.INTAKE_DELAY_AFTER_MIDDLE)
                 }
             }
+
             TubeState.INTAKE_DELAY_AFTER_MIDDLE -> {
-                if (isBottomContinuouslyTripped(1500.milliseconds)) {
-                    transitionTo(TubeState.INTAKE_FINAL_PUSH)
-                } else if (elapsedSinceStep() >= 200.milliseconds) {
+                if (elapsedSinceStep() >= intakeMiddleDelay) {
                     transitionTo(TubeState.INTAKE_WAIT_BOTTOM)
                 }
             }
+
             TubeState.INTAKE_WAIT_BOTTOM -> {
-                if (isBottomContinuouslyTripped(1500.milliseconds)) {
-                    transitionTo(TubeState.INTAKE_FINAL_PUSH)
-                } else if (!bottom.state) {
+                if (!bottom.state) {
                     transitionTo(TubeState.INTAKE_DELAY_AFTER_BOTTOM)
                 }
             }
+
             TubeState.INTAKE_DELAY_AFTER_BOTTOM -> {
-                if (isBottomContinuouslyTripped(1500.milliseconds)) {
-                    transitionTo(TubeState.INTAKE_FINAL_PUSH)
-                } else if (elapsedSinceStep() >= 50.milliseconds) {
-                    transitionTo(TubeState.INTAKE_FINAL_PUSH)
-                }
-            }
-            TubeState.INTAKE_FINAL_PUSH ->
-                if (elapsedSinceStep() >= 50.milliseconds) {
+                if (elapsedSinceStep() >= intakeBottomDelay) {
                     transitionTo(TubeState.IDLE)
                     ActiveOpMode.gamepad1.rumbleBlips(3)
                     ActiveOpMode.gamepad2.rumbleBlips(3)
                 }
-            TubeState.SHOOTING_HARDSTOP_SETTLE ->
-                if (elapsedSinceStep() >= 200.milliseconds)
+            }
+
+            TubeState.SHOOTING_HARDSTOP_SETTLE -> {
+                if (elapsedSinceStep() >= 200.milliseconds) {
                     transitionTo(TubeState.SHOOTING_WAIT_CLEAR)
-            TubeState.SHOOTING_WAIT_CLEAR ->
+                }
+            }
+
+            TubeState.SHOOTING_WAIT_CLEAR -> {
                 if (top.state && (middleA.state || middleB.state) && bottom.state) {
                     transitionTo(TubeState.SHOOTING_DELAY_BEFORE_IDLE)
                 }
-            TubeState.SHOOTING_DELAY_BEFORE_IDLE ->
-                if (elapsedSinceStep() >= 500.milliseconds) transitionTo(TubeState.IDLE)
+            }
+
+            TubeState.SHOOTING_DELAY_BEFORE_IDLE -> {
+                if (elapsedSinceStep() >= 500.milliseconds) {
+                    transitionTo(TubeState.IDLE)
+                }
+            }
+
             else -> {}
         }
     }
 
     private fun transitionTo(newState: TubeState) {
         if (state == newState) return
+
         state = newState
         markStepStart()
-        resetBottomTripTimer()
         applyStateOutputs(newState)
-    }
-
-    private fun updateBottomTripTimer() {
-        val currentBottomTripped = !bottom.state
-
-        if (currentBottomTripped && !lastBottomState) {
-            bottomTripStartedAt = now()
-        } else if (!currentBottomTripped && lastBottomState) {
-            bottomTripStartedAt = null
-        }
-
-        lastBottomState = currentBottomTripped
-    }
-
-    private fun isBottomContinuouslyTripped(duration: kotlin.time.Duration): Boolean {
-        if (bottomTripStartedAt == null) return false
-        return (now() - bottomTripStartedAt!!) >= duration.inWholeNanoseconds
-    }
-
-    private fun resetBottomTripTimer() {
-        bottomTripStartedAt = null
     }
 
     private fun applyStateOutputs(targetState: TubeState) {
@@ -207,12 +188,14 @@ object Tube : Subsystem {
                 transfer.power = 0.0
                 hardStop.position = 0.9
             }
-            TubeState.INTAKE_PHASE0 -> {
+
+            TubeState.INTAKE_WAIT_TOP,
+            TubeState.INTAKE_DELAY_AFTER_TOP -> {
                 intake.power = 1.0
                 transfer.power = 1.0
                 hardStop.position = 0.9
             }
-            TubeState.INTAKE_DELAY_AFTER_TOP,
+
             TubeState.INTAKE_WAIT_MIDDLE,
             TubeState.INTAKE_DELAY_AFTER_MIDDLE,
             TubeState.INTAKE_WAIT_BOTTOM,
@@ -221,16 +204,13 @@ object Tube : Subsystem {
                 transfer.power = 0.0
                 hardStop.position = 0.9
             }
-            TubeState.INTAKE_FINAL_PUSH -> {
-                intake.power = 1.0
-                transfer.power = 1.0
-                hardStop.position = 0.9
-            }
+
             TubeState.SHOOTING_HARDSTOP_SETTLE -> {
                 intake.power = 0.0
                 transfer.power = 0.0
                 hardStop.position = 0.65
             }
+
             TubeState.SHOOTING_WAIT_CLEAR,
             TubeState.SHOOTING_DELAY_BEFORE_IDLE -> {
                 intake.power = shootSpeed
