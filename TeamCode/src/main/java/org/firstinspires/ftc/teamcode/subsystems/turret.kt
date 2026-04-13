@@ -45,7 +45,7 @@ object Turret : Subsystem {
 
     fun setTargetAngle(angle: Angle) {
         val normalizedAngle = angle.normalized.inDeg
-        val targetPosition = 0.5 - normalizedAngle * 0.0031666667
+        val targetPosition = 0.5 - normalizedAngle * 0.0031167
         left.position = targetPosition + OFFSET
         right.position = targetPosition - OFFSET
     }
