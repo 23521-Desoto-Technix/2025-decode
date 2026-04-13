@@ -27,9 +27,9 @@ private enum class TubeState {
 
 object Tube : Subsystem {
     // Intake sequence tuning values.
-    private val intakeTopDelay = 500.milliseconds
-    private val intakeMiddleDelay = 500.milliseconds
-    private val intakeBottomDelay = 500.milliseconds
+    private val intakeTopDelay = 100.milliseconds
+    private val intakeMiddleDelay = 200.milliseconds
+    private val intakeBottomDelay = 150.milliseconds
 
     val intake = MotorEx("intake").reversed()
     val transfer = MotorEx("transfer")
@@ -152,7 +152,7 @@ object Tube : Subsystem {
             }
 
             TubeState.SHOOTING_HARDSTOP_SETTLE -> {
-                if (elapsedSinceStep() >= 200.milliseconds) {
+                if (elapsedSinceStep() >= 100.milliseconds) {
                     transitionTo(TubeState.SHOOTING_WAIT_CLEAR)
                 }
             }

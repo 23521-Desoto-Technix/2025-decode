@@ -25,24 +25,25 @@ object ShootingConfigInterpolator {
             points =
                 listOf(
                     ShootingConfigPoint(47.5, ShootingConfig(1_400.0, 0.47)),
-                    ShootingConfigPoint(60.0, ShootingConfig(1_400.0, 0.58)),
-                    ShootingConfigPoint(81.5, ShootingConfig(1_500.0, 0.68)),
-                    ShootingConfigPoint(90.5, ShootingConfig(1_600.0, 0.73)),
-                    ShootingConfigPoint(95.5, ShootingConfig(1_600.0, 0.78)),
-                    ShootingConfigPoint(101.0, ShootingConfig(1_600.0, 0.73)),
-                    ShootingConfigPoint(107.0, ShootingConfig(1_700.0, 0.75)),
+                    ShootingConfigPoint(60.0, ShootingConfig(1_400.0, 0.60)),
+                    ShootingConfigPoint(81.5, ShootingConfig(1_500.0, 0.74)),
+                    ShootingConfigPoint(90.5, ShootingConfig(1_600.0, 0.77)),
+                    ShootingConfigPoint(95.5, ShootingConfig(1_600.0, 0.80)),
+                    ShootingConfigPoint(101.0, ShootingConfig(1_600.0, 0.75)),
+                    ShootingConfigPoint(107.0, ShootingConfig(1_700.0, 0.77)),
                 ),
         )
 
     private val farZoneConfig =
         ZoneConfig(
             minDistance = 120.0,
-            maxDistance = 135.0,
+            maxDistance = 160.0,
             defaultConfig = ShootingConfig(1_950.0, 0.9),
             points =
                 listOf(
-                    ShootingConfigPoint(127.5, ShootingConfig(2_000.0, 0.96)),
-                    ShootingConfigPoint(144.0, ShootingConfig(2_050.0, 0.94)),
+                    ShootingConfigPoint(127.5, ShootingConfig(1_950.0, 0.96)),
+                    ShootingConfigPoint(133.5, ShootingConfig(1_950.0, 0.94)),
+                    ShootingConfigPoint(144.0, ShootingConfig(2_000.0, 0.94)),
                     ShootingConfigPoint(150.0, ShootingConfig(2_050.0, 0.92)),
                 ),
         )
