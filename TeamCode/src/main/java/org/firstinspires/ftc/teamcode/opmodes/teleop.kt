@@ -36,6 +36,7 @@ import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator.ShootingZone
+import com.bylazar.field.PanelsField
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -80,6 +81,8 @@ class teleop : NextFTCOpMode() {
     var lockTurret = false
 
     val MAX_LIFT = 59_500
+
+    val panelsField = PanelsField.field
 
     private lateinit var backRight: DcMotor
     private lateinit var frontLeft: DcMotor
@@ -405,6 +408,8 @@ class teleop : NextFTCOpMode() {
                 .toggleOnBecomesTrue()
                 .whenBecomesTrue { Tilt.brake().schedule() }
                 .whenBecomesFalse { Tilt.up().schedule() }
+
+        panelsField.setOffsets(PanelsField.presets.PEDRO_PATHING)
     }
 
     override fun onUpdate() {
@@ -417,9 +422,21 @@ class teleop : NextFTCOpMode() {
         val loopMs = if (lastUpdateNs == 0L) 0.0 else (nowNs - lastUpdateNs) / 1_000_000.0
         lastUpdateNs = nowNs
 
+        val botPose = PedroComponent.follower.pose
+        val turretPose = applyRobotSpaceOffset(botPose, -1.633, 0.0)
+
+        panelsField.setFill(PanelsField.BLUE)
+        panelsField.moveCursor(botPose.x, botPose.y)
+        panelsField.circle(0.5)
+
+        panelsField.setFill(PanelsField.RED)
+        panelsField.moveCursor(turretPose.x, turretPose.y)
+        panelsField.circle(0.5)
+
+
         val targetMetrics =
             calculateTargetMetrics(
-                applyRobotSpaceOffset(PedroComponent.follower.pose, -1.633, 0.0),
+                turretPose,
                 PedroComponent.follower.angularVelocity,
                 PedroComponent.follower.velocity,
             )
