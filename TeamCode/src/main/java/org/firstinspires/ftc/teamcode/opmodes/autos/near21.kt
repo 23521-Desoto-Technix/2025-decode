@@ -83,7 +83,7 @@ class near21 : NextFTCOpMode() {
             )
         return SequentialGroup(
             Flywheel.setSpeed(1_500.0),
-            InstantCommand { Hood.position = 0.55 },
+            InstantCommand { Hood.position = 0.6 },
             InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             FollowPath(paths.getValue("startNearToShootMiddle")),
             Delay(200.milliseconds),
