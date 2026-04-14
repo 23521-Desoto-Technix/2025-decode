@@ -26,7 +26,6 @@ private enum class TubeState {
 }
 
 object Tube : Subsystem {
-    // Intake sequence tuning values.
     private val intakeTopDelay = 100.milliseconds
     private val intakeMiddleDelay = 200.milliseconds
     private val intakeBottomDelay = 150.milliseconds

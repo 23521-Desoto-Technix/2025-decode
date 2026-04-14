@@ -225,7 +225,7 @@ class teleop : NextFTCOpMode() {
                 range { rotatedStrafe },
                 range { rotatedTurn },
             )
-        driverControlled()
+        //driverControlled()
         BindingManager.layer = null
 
         val intake =
@@ -320,10 +320,10 @@ class teleop : NextFTCOpMode() {
                 .whenTrue { PedroComponent.follower.update() }
                 .whenBecomesFalse { PedroComponent.follower.breakFollowing() }
 
-        val driveCancel =
+        /*val driveCancel =
             button { abs(gamepad2.left_stick_y) > 0.1 || gamepad2.left_bumper }
                 .whenBecomesTrue { driverControlled.cancel() }
-                .whenBecomesFalse { driverControlled.schedule() }
+                .whenBecomesFalse { driverControlled.schedule() }*/
         val ptoOn =
             button { gamepad2.circle && gamepad2.ps }
                 .whenBecomesTrue {
@@ -490,22 +490,6 @@ class teleop : NextFTCOpMode() {
         t.addData("Flywheel Actual Speed", Flywheel.speed)
         t.addData("Hood position", Hood.position)
 
-        if (abs(gamepad2.left_stick_y) > 0.1) {
-            if (BotState.enabled && liftEncoder.currentPosition < MAX_LIFT) {
-                backRight.power = gamepad2.left_stick_y.toDouble()
-                backLeft.power = gamepad2.left_stick_y.toDouble()
-            } else {
-                backRight.power = 0.0
-                frontRight.power = 0.0
-                backLeft.power = 0.0
-                frontLeft.power = 0.0
-            }
-        } else if (!BotState.enabled) {
-            backRight.power = 0.0
-            frontRight.power = 0.0
-            backLeft.power = 0.0
-            frontLeft.power = 0.0
-        }
         BindingManager.update()
         t.update()
         var rotateBy = -PedroComponent.follower.pose.heading.rad
@@ -544,11 +528,28 @@ class teleop : NextFTCOpMode() {
         } else {
             rotatedTurn = -gamepad1.right_stick_x.toDouble()
         }
-        if (!BotState.enabled) {
-            rotatedForward = 0.0
-            rotatedStrafe = 0.0
-            rotatedTurn = 0.0
-            return
+
+        if (abs(gamepad2.left_stick_y) > 0.1) {
+            if (BotState.enabled && liftEncoder.currentPosition < MAX_LIFT) {
+                backRight.power = gamepad2.left_stick_y.toDouble()
+                backLeft.power = gamepad2.left_stick_y.toDouble()
+            } else {
+                backRight.power = 0.0
+                frontRight.power = 0.0
+                backLeft.power = 0.0
+                frontLeft.power = 0.0
+            }
+        } else if (gamepad2.left_bumper) {
+            PedroComponent.follower.holdPoint(
+                when (BotState.alliance) {
+                    Alliance.RED ->
+                        redBase
+                    else -> blueBase
+                }
+            )
+            PedroComponent.follower.update()
+        } else {
+            PedroComponent.follower.setTeleOpDrive(rotatedForward, rotatedStrafe, rotatedTurn, true)
         }
 
         if (!ignorePinpoint && !lockTurret) {
