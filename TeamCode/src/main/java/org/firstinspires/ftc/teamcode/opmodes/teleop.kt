@@ -225,7 +225,7 @@ class teleop : NextFTCOpMode() {
                 range { rotatedStrafe },
                 range { rotatedTurn },
             )
-        //driverControlled()
+        driverControlled()
         BindingManager.layer = null
 
         val intake =
@@ -320,10 +320,10 @@ class teleop : NextFTCOpMode() {
                 .whenTrue { PedroComponent.follower.update() }
                 .whenBecomesFalse { PedroComponent.follower.breakFollowing() }
 
-        /*val driveCancel =
+        val driveCancel =
             button { abs(gamepad2.left_stick_y) > 0.1 || gamepad2.left_bumper }
                 .whenBecomesTrue { driverControlled.cancel() }
-                .whenBecomesFalse { driverControlled.schedule() }*/
+                .whenBecomesFalse { driverControlled.schedule() }
         val ptoOn =
             button { gamepad2.circle && gamepad2.ps }
                 .whenBecomesTrue {
@@ -539,17 +539,6 @@ class teleop : NextFTCOpMode() {
                 backLeft.power = 0.0
                 frontLeft.power = 0.0
             }
-        } else if (gamepad2.left_bumper) {
-            PedroComponent.follower.holdPoint(
-                when (BotState.alliance) {
-                    Alliance.RED ->
-                        redBase
-                    else -> blueBase
-                }
-            )
-            PedroComponent.follower.update()
-        } else {
-            PedroComponent.follower.setTeleOpDrive(rotatedForward, rotatedStrafe, rotatedTurn, true)
         }
 
         if (!ignorePinpoint && !lockTurret) {
