@@ -48,6 +48,8 @@ import kotlin.time.Duration.Companion.seconds
 
 data class TargetMetrics(val distanceToTarget: Double, val relativeAngleToTarget: Angle)
 
+data class Point2(val x: Double, val y: Double)
+
 @TeleOp
 class teleop : NextFTCOpMode() {
     init {
@@ -83,6 +85,7 @@ class teleop : NextFTCOpMode() {
     val MAX_LIFT = 59_500
 
     val panelsField = PanelsField.field
+    val closeZone = listOf(Point2(0.0, 144.0), Point2(144.0, 144.0), Point2(72.0, 72.0))
 
     private lateinit var backRight: DcMotor
     private lateinit var frontLeft: DcMotor
@@ -115,6 +118,101 @@ class teleop : NextFTCOpMode() {
         val fieldX = pose.x + localX * cos(heading) - localY * sin(heading)
         val fieldY = pose.y + localX * sin(heading) + localY * cos(heading)
         return Pose(fieldX, fieldY, pose.heading)
+    }
+
+    fun robotCorners(pose: Pose, sideLength: Double = 16.0): List<Point2> {
+        val halfSide = sideLength / 2.0
+        val heading = pose.heading
+        val localCorners =
+            listOf(
+                Point2(-halfSide, -halfSide),
+                Point2(halfSide, -halfSide),
+                Point2(halfSide, halfSide),
+                Point2(-halfSide, halfSide),
+            )
+
+        return localCorners.map { local ->
+            Point2(
+                pose.x + local.x * cos(heading) - local.y * sin(heading),
+                pose.y + local.x * sin(heading) + local.y * cos(heading),
+            )
+        }
+    }
+
+    fun polyEdges(vertices: List<Point2>): List<Pair<Point2, Point2>> {
+        return vertices.indices.map { i -> vertices[i] to vertices[(i + 1) % vertices.size] }
+    }
+
+    fun cross(a: Point2, b: Point2, c: Point2): Double {
+        return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)
+    }
+
+    fun isInConvexPoly(
+        point: Point2,
+        polygon: List<Point2>,
+        epsilon: Double = 1e-6,
+    ): Boolean {
+        var hasPositive = false
+        var hasNegative = false
+
+        for (i in polygon.indices) {
+            val a = polygon[i]
+            val b = polygon[(i + 1) % polygon.size]
+            val value = cross(a, b, point)
+
+            if (value > epsilon) hasPositive = true
+            if (value < -epsilon) hasNegative = true
+
+            if (hasPositive && hasNegative) return false
+        }
+
+        return true
+    }
+
+    fun isOnSegment(a: Point2, b: Point2, p: Point2, epsilon: Double = 1e-6): Boolean {
+        if (abs(cross(a, b, p)) > epsilon) return false
+        return p.x <= maxOf(a.x, b.x) + epsilon &&
+            p.x >= minOf(a.x, b.x) - epsilon &&
+            p.y <= maxOf(a.y, b.y) + epsilon &&
+            p.y >= minOf(a.y, b.y) - epsilon
+    }
+
+    fun segsIntersect(
+        a1: Point2,
+        a2: Point2,
+        b1: Point2,
+        b2: Point2,
+        epsilon: Double = 1e-6,
+    ): Boolean {
+        val d1 = cross(a1, a2, b1)
+        val d2 = cross(a1, a2, b2)
+        val d3 = cross(b1, b2, a1)
+        val d4 = cross(b1, b2, a2)
+
+        val properIntersection =
+            ((d1 > epsilon && d2 < -epsilon) || (d1 < -epsilon && d2 > epsilon)) &&
+                ((d3 > epsilon && d4 < -epsilon) || (d3 < -epsilon && d4 > epsilon))
+        if (properIntersection) return true
+
+        return isOnSegment(a1, a2, b1, epsilon) ||
+            isOnSegment(a1, a2, b2, epsilon) ||
+            isOnSegment(b1, b2, a1, epsilon) ||
+            isOnSegment(b1, b2, a2, epsilon)
+    }
+
+    fun squareOverlapsTriangle(robotPose: Pose): Boolean {
+        val square = robotCorners(robotPose)
+        val allSquareCornersInside = square.all { isInConvexPoly(it, closeZone) }
+        if (allSquareCornersInside) return true
+
+        val anySquareCornerInsideTriangle = square.any { isInConvexPoly(it, closeZone) }
+        val anyTriangleCornerInsideSquare = closeZone.any { isInConvexPoly(it, square) }
+        val edgesIntersect =
+            polyEdges(square).any { (s1, s2) ->
+                polyEdges(closeZone).any { (t1, t2) -> segsIntersect(s1, s2, t1, t2) }
+            }
+
+        return anySquareCornerInsideTriangle || anyTriangleCornerInsideSquare || edgesIntersect
     }
 
     fun calculateTargetMetrics(
@@ -424,6 +522,7 @@ class teleop : NextFTCOpMode() {
 
         val botPose = PedroComponent.follower.pose
         val turretPose = applyRobotSpaceOffset(botPose, -1.633, 0.0)
+        val squareInside = squareOverlapsTriangle(botPose)
 
         panelsField.setFill(PanelsField.BLUE)
         panelsField.moveCursor(botPose.x, botPose.y)
@@ -441,6 +540,7 @@ class teleop : NextFTCOpMode() {
                 PedroComponent.follower.angularVelocity,
                 PedroComponent.follower.velocity,
             )
+        telemetry.addData("velocity", PedroComponent.follower.velocity.magnitude)
         val distanceToTarget = targetMetrics.distanceToTarget
         val relativeAngleToTarget = targetMetrics.relativeAngleToTarget
 
@@ -489,6 +589,13 @@ class teleop : NextFTCOpMode() {
         t.addData("Flywheel Target Speed", Flywheel.targetSpeed)
         t.addData("Flywheel Actual Speed", Flywheel.speed)
         t.addData("Hood position", Hood.position)
+        val squareTriangleBadge =
+            if (squareInside) {
+                HtmlTelemetryUtils.createColoredBadge("YES", "#00FF00", "black")
+            } else {
+                HtmlTelemetryUtils.createColoredBadge("NO", "#FF0000", "white")
+            }
+        t.addData("Inside Close Zone", squareTriangleBadge)
 
         BindingManager.update()
         t.update()
