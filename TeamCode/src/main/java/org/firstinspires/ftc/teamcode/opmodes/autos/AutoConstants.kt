@@ -155,7 +155,7 @@ object AutoConstants {
                 "gateHitToShootMiddle",
                 follower
                     .pathBuilder()
-                    .addPath(BezierCurve(p("gateHit"), p("shootMiddle")))
+                    .addPath(BezierLine(p("gateHit"), p("shootMiddle")))
                     .setLinearHeadingInterpolation(p("shootMiddle").heading, p("spike2End").heading)
                     .build(),
             )
