@@ -78,6 +78,7 @@ class far21 : NextFTCOpMode() {
             InstantCommand { Hood.position = 0.96 },
             InstantCommand { Turret.setTargetAngle(farTurretAngle) },
             FollowPath(paths.getValue("startFarToShootFar")),
+            Flywheel.waitForSpeed(),
             Tube.shootAll(),
             Delay(400.milliseconds),
             intake(FollowPath(paths.getValue("humanIntakeCombined"))),
