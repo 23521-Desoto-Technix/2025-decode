@@ -16,6 +16,7 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -26,7 +27,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Far 21", group = "Far", preselectTeleOp = "teleop")
 class far21 : NextFTCOpMode() {
@@ -79,9 +79,14 @@ class far21 : NextFTCOpMode() {
             InstantCommand { Turret.setTargetAngle(farTurretAngle) },
             FollowPath(paths.getValue("startFarToShootFar")),
             Tube.shootAll(),
-            intake(FollowPath(paths.getValue("humanIntakeCombined"))),
-            intake(FollowPath(paths.getValue("shootFarToSpike3Combined"))),
             Delay(400.milliseconds),
+            intake(FollowPath(paths.getValue("humanIntakeCombined"))),
+            intake(
+                SequentialGroup(
+                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    FollowPath(paths.getValue("spike3ToShootFar")),
+                )
+            ),
             Flywheel.stop(),
         )
     }
