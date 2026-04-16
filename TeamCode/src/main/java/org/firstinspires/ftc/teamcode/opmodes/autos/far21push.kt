@@ -78,7 +78,7 @@ class far21push : NextFTCOpMode() {
             InstantCommand { Hood.position = 0.96 },
             InstantCommand { Turret.setTargetAngle(farTurretAngle) },
             FollowPath(paths.getValue("startFarPush")),
-            FollowPath(paths.getValue("pushToShootFarPush")),
+            FollowPath(paths.getValue("pushToShootFar")),
             Delay(200.milliseconds),
             Tube.shootAll(),
             Delay(500.milliseconds),

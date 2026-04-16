@@ -20,9 +20,8 @@ object AutoConstants {
                 pose("startFar", Pose(79.94, 8.07, 0.0.deg.inRad))
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
                 pose("shootMiddle", Pose(89.0, 80.0, 0.0.deg.inRad))
-                pose("shootFarPush", Pose(80.0, 27.0, 0.0.deg.inRad))
-                pose("shootFar", Pose(85.0, 18.0, 0.0.deg.inRad))
-                pose("push", Pose(85.0, 8.5, 0.0.deg.inRad))
+                pose("shootFar", Pose(82.0, 18.0, 0.0.deg.inRad))
+                pose("push", Pose(90.0, 8.5, 0.0.deg.inRad))
                 pose("shootPark", Pose(85.0, 105.0, 0.0.deg.inRad))
                 pose("sideSpike1", Pose(119.0, 88.0, -90.0.deg.inRad))
                 pose("sideSpike1Ctrl", Pose(120.0, 100.0, -90.0.deg.inRad))
@@ -82,8 +81,8 @@ object AutoConstants {
                 angle("middleTurretBlue", 132.0.deg)
                 angle("parkTurretRed", (-90.0).deg)
                 angle("parkTurretBlue", 90.0.deg)
-                angle("farTurretRed", (-112.0).deg)
-                angle("farTurretBlue", 111.0.deg)
+                angle("farTurretRed", (-100.0).deg)
+                angle("farTurretBlue", 100.0.deg)
             }
 
         operator fun get(name: String): Angle = angles.getValue(name)
@@ -305,10 +304,10 @@ object AutoConstants {
                     .build(),
             )
             path(
-                "pushToShootFarPush",
+                "pushToShootFar",
                 follower
                     .pathBuilder()
-                    .addPath(BezierLine(p("push"), p("shootFarPush")))
+                    .addPath(BezierLine(p("push"), p("shootFar")))
                     .setConstantHeadingInterpolation(p("startFar").heading)
                     .build(),
             )
