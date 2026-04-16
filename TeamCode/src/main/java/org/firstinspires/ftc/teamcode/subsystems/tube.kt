@@ -33,6 +33,7 @@ object Tube : Subsystem {
     val intake = MotorEx("intake").reversed()
     val transfer = MotorEx("transfer")
     val hardStop = ServoEx("hardStop")
+    var readyToShoot = false
     lateinit var top: DigitalChannel
     lateinit var middleA: DigitalChannel
     lateinit var middleB: DigitalChannel
@@ -91,7 +92,24 @@ object Tube : Subsystem {
         if (!BotState.enabled) return@InstantCommand
 
         shootSpeed = speed
+        readyToShoot = true
+        if (state != TubeState.SHOOTING_HARDSTOP_SETTLE) {
+            transitionTo(TubeState.SHOOTING_HARDSTOP_SETTLE)
+        }
+    }
+
+    fun ready() = InstantCommand {
+        if (!BotState.enabled) return@InstantCommand
+
+        readyToShoot = false
         transitionTo(TubeState.SHOOTING_HARDSTOP_SETTLE)
+    }
+
+    fun unReady() = InstantCommand {
+        if (!BotState.enabled) return@InstantCommand
+
+        readyToShoot = false
+        transitionTo(TubeState.IDLE)
     }
 
     fun waitForAll(d: Duration? = null) =
@@ -151,7 +169,7 @@ object Tube : Subsystem {
             }
 
             TubeState.SHOOTING_HARDSTOP_SETTLE -> {
-                if (elapsedSinceStep() >= 100.milliseconds) {
+                if (elapsedSinceStep() >= 100.milliseconds && readyToShoot) {
                     transitionTo(TubeState.SHOOTING_WAIT_CLEAR)
                 }
             }

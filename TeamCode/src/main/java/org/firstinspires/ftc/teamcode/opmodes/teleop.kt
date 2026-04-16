@@ -72,6 +72,8 @@ class teleop : NextFTCOpMode() {
 
     var autoRangingEnabled = true
 
+    var insideCloseZone = false
+
     private var lastUpdateNs = 0L
 
     val t = JoinedTelemetry(PanelsTelemetry.ftcTelemetry, telemetry)
@@ -506,6 +508,10 @@ class teleop : NextFTCOpMode() {
                 .toggleOnBecomesTrue()
                 .whenBecomesTrue { Tilt.brake().schedule() }
                 .whenBecomesFalse { Tilt.up().schedule() }
+        val autoReady =
+            button { insideCloseZone }
+                .whenBecomesTrue { Tube.ready().schedule() }
+                .whenBecomesFalse { Tube.unReady().schedule() }
 
         panelsField.setOffsets(PanelsField.presets.PEDRO_PATHING)
     }
@@ -522,7 +528,7 @@ class teleop : NextFTCOpMode() {
 
         val botPose = PedroComponent.follower.pose
         val turretPose = applyRobotSpaceOffset(botPose, -1.633, 0.0)
-        val squareInside = squareOverlapsTriangle(botPose)
+        insideCloseZone = squareOverlapsTriangle(botPose)
 
         panelsField.setFill(PanelsField.BLUE)
         panelsField.moveCursor(botPose.x, botPose.y)
@@ -590,7 +596,7 @@ class teleop : NextFTCOpMode() {
         t.addData("Flywheel Actual Speed", Flywheel.speed)
         t.addData("Hood position", Hood.position)
         val squareTriangleBadge =
-            if (squareInside) {
+            if (insideCloseZone) {
                 HtmlTelemetryUtils.createColoredBadge("YES", "#00FF00", "black")
             } else {
                 HtmlTelemetryUtils.createColoredBadge("NO", "#FF0000", "white")
