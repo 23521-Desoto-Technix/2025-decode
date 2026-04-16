@@ -213,7 +213,7 @@ object Tube : Subsystem {
             TubeState.SHOOTING_WAIT_CLEAR,
             TubeState.SHOOTING_DELAY_BEFORE_IDLE -> {
                 intake.power = shootSpeed
-                transfer.power = shootSpeed
+                transfer.power = shootSpeed * 0.9
                 hardStop.position = 0.65
             }
         }

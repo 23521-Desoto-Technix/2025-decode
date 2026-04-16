@@ -334,9 +334,9 @@ class teleop : NextFTCOpMode() {
             button { gamepad1.triangle || gamepad1.left_trigger > 0.2 }
                 .whenBecomesTrue {
                     if (activeShootingZone == ShootingZone.NEAR) {
-                        Tube.shootAll().schedule()
+                        Tube.shootAll(1.0).schedule()
                     } else {
-                        Tube.shootAll(0.7).schedule()
+                        Tube.shootAll(1.0).schedule()
                     }
                 }
         val shootAllSlow =
