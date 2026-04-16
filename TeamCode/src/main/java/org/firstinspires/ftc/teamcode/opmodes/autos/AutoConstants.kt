@@ -81,8 +81,8 @@ object AutoConstants {
                 angle("middleTurretBlue", 132.0.deg)
                 angle("parkTurretRed", (-90.0).deg)
                 angle("parkTurretBlue", 90.0.deg)
-                angle("farTurretRed", (-112.0).deg)
-                angle("farTurretBlue", 112.0.deg)
+                angle("farTurretRed", (-116.0).deg)
+                angle("farTurretBlue", 116.0.deg)
             }
 
         operator fun get(name: String): Angle = angles.getValue(name)

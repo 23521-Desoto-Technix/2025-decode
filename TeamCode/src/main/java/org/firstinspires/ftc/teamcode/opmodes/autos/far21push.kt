@@ -74,7 +74,7 @@ class far21push : NextFTCOpMode() {
             SequentialGroup(Tube.intakeAll, path, Tube.shootAll(), Delay(400.milliseconds))
         }
         return SequentialGroup(
-            Flywheel.setSpeed(1_950.0),
+            Flywheel.setSpeed(1_975.0),
             InstantCommand { Hood.position = 0.96 },
             InstantCommand { Turret.setTargetAngle(farTurretAngle) },
             FollowPath(paths.getValue("startFarPush")),
