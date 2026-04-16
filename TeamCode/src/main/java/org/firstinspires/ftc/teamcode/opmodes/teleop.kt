@@ -508,10 +508,10 @@ class teleop : NextFTCOpMode() {
                 .toggleOnBecomesTrue()
                 .whenBecomesTrue { Tilt.brake().schedule() }
                 .whenBecomesFalse { Tilt.up().schedule() }
-        val autoReady =
+        /*val autoReady =
             button { insideCloseZone }
                 .whenBecomesTrue { Tube.ready().schedule() }
-                .whenBecomesFalse { Tube.unReady().schedule() }
+                .whenBecomesFalse { Tube.unReady().schedule() }*/
 
         panelsField.setOffsets(PanelsField.presets.PEDRO_PATHING)
     }
