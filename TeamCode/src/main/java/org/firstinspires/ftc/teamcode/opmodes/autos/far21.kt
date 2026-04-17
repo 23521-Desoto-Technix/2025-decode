@@ -81,7 +81,30 @@ class far21 : NextFTCOpMode() {
             Flywheel.waitForSpeed(),
             Tube.shootAll(),
             Delay(400.milliseconds),
-            intake(FollowPath(paths.getValue("humanIntakeCombined"))),
+            intake(
+                SequentialGroup(
+                    FollowPath(paths.getValue("shootFarToHumanIntake")),
+                    FollowPath(paths.getValue("humanIntakeToShootFar")),
+                )
+            ),
+            intake(
+                SequentialGroup(
+                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    FollowPath(paths.getValue("spike3ToShootFar")),
+                )
+            ),
+            intake(
+                SequentialGroup(
+                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    FollowPath(paths.getValue("spike3ToShootFar")),
+                )
+            ),
+            intake(
+                SequentialGroup(
+                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    FollowPath(paths.getValue("spike3ToShootFar")),
+                )
+            ),
             intake(
                 SequentialGroup(
                     FollowPath(paths.getValue("shootFarToSpike3")),
