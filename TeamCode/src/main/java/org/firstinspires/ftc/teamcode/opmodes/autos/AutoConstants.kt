@@ -45,6 +45,7 @@ object AutoConstants {
                 pose("wallEndC", Pose(130.0, 24.0, 0.0.deg.inRad))
                 pose("wallEndD", Pose(130.0, 18.0, 0.0.deg.inRad))
                 pose("wallEndE", Pose(130.0, 12.0, 0.0.deg.inRad))
+                pose("wallEndF", Pose(130.0, 10.0, 0.0.deg.inRad))
                 pose("spike3Ctrl", Pose(90.0, 35.0, 0.0.deg.inRad))
                 pose("spike3CtrlFar", Pose(85.0, 35.0, 0.0.deg.inRad))
                 pose("humanIntake", Pose(133.0, 8.5, 0.0.deg.inRad))
@@ -422,6 +423,22 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierLine(p("wallEndE"), p("shootFar")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "shootFarToWallIntakeF",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierCurve(p("shootFar"), Pose(x("shootFar"), y("wallEndF")) , p("wallEndF")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "wallIntakeFToShootFar",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("wallEndF"), p("shootFar")))
                     .setConstantHeadingInterpolation(p("startFar").heading)
                     .build(),
             )
