@@ -20,7 +20,7 @@ object AutoConstants {
                 pose("startFar", Pose(79.94, 8.07, 0.0.deg.inRad))
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
                 pose("shootMiddle", Pose(89.0, 80.0, 0.0.deg.inRad))
-                pose("shootFar", Pose(82.0, 18.0, 0.0.deg.inRad))
+                pose("shootFar", Pose(85.0, 22.0, 0.0.deg.inRad))
                 pose("push", Pose(90.0, 8.5, 0.0.deg.inRad))
                 pose("shootPark", Pose(85.0, 105.0, 0.0.deg.inRad))
                 pose("sideSpike1", Pose(119.0, 88.0, -90.0.deg.inRad))
@@ -39,6 +39,7 @@ object AutoConstants {
                 pose("spike2Ctrl", Pose(95.0, 56.0, 0.0.deg.inRad))
                 pose("spike3Start", Pose(105.0, 36.0, 0.0.deg.inRad))
                 pose("spike3End", Pose(120.0, 36.0, 0.0.deg.inRad))
+                pose("spike3Wall", Pose(130.0, 36.0, 0.0.deg.inRad))
                 pose("spike3Ctrl", Pose(90.0, 35.0, 0.0.deg.inRad))
                 pose("spike3CtrlFar", Pose(85.0, 35.0, 0.0.deg.inRad))
                 pose("humanIntake", Pose(133.0, 8.5, 0.0.deg.inRad))
@@ -333,6 +334,14 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierCurve(p("shootFar"), p("spike3CtrlFar"), p("spike3End")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "shootFarToSpike3Wall",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierCurve(p("shootFar"), p("spike3CtrlFar"), p("spike3Wall")))
                     .setConstantHeadingInterpolation(p("startFar").heading)
                     .build(),
             )

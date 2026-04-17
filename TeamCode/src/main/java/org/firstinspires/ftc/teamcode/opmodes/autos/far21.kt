@@ -95,37 +95,37 @@ class far21 : NextFTCOpMode() {
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    FollowPath(paths.getValue("shootFarTospike3Wall")),
                     FollowPath(paths.getValue("spike3ToShootFar")),
                 )
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    FollowPath(paths.getValue("shootFarTospike3Wall")),
                     FollowPath(paths.getValue("spike3ToShootFar")),
                 )
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    FollowPath(paths.getValue("shootFarTospike3Wall")),
                     FollowPath(paths.getValue("spike3ToShootFar")),
                 )
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    FollowPath(paths.getValue("shootFarTospike3Wall")),
                     FollowPath(paths.getValue("spike3ToShootFar")),
                 )
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    FollowPath(paths.getValue("shootFarTospike3Wall")),
                     FollowPath(paths.getValue("spike3ToShootFar")),
                 )
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    FollowPath(paths.getValue("shootFarTospike3Wall")),
                     FollowPath(paths.getValue("spike3ToShootFar")),
                 )
             ),
