@@ -351,6 +351,7 @@ object AutoConstants {
                     .pathBuilder()
                     .addPath(BezierLine(p("spike3End"), p("shootFar")))
                     .setConstantHeadingInterpolation(p("startFar").heading)
+                    .setBrakingStrength(2.0)
                     .build(),
             )
             path(
