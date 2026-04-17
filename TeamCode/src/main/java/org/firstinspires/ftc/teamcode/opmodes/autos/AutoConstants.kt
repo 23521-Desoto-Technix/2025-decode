@@ -40,6 +40,11 @@ object AutoConstants {
                 pose("spike3Start", Pose(105.0, 36.0, 0.0.deg.inRad))
                 pose("spike3End", Pose(120.0, 36.0, 0.0.deg.inRad))
                 pose("spike3Wall", Pose(130.0, 36.0, 0.0.deg.inRad))
+                pose("wallEndA", Pose(130.0, 36.0, 0.0.deg.inRad))
+                pose("wallEndB", Pose(130.0, 30.0, 0.0.deg.inRad))
+                pose("wallEndC", Pose(130.0, 24.0, 0.0.deg.inRad))
+                pose("wallEndD", Pose(130.0, 18.0, 0.0.deg.inRad))
+                pose("wallEndE", Pose(130.0, 12.0, 0.0.deg.inRad))
                 pose("spike3Ctrl", Pose(90.0, 35.0, 0.0.deg.inRad))
                 pose("spike3CtrlFar", Pose(85.0, 35.0, 0.0.deg.inRad))
                 pose("humanIntake", Pose(133.0, 8.5, 0.0.deg.inRad))
@@ -99,6 +104,9 @@ object AutoConstants {
         poses: Map<String, Pose>,
     ): Map<String, PathChain> {
         fun p(name: String) = poses.getValue(name)
+        fun x(name: String) = p(name).x
+        fun y(name: String) = p(name).y
+        fun h(name: String) = p(name).heading
 
         return linkedMapOf<String, PathChain>().apply {
             path(
@@ -338,10 +346,82 @@ object AutoConstants {
                     .build(),
             )
             path(
-                "shootFarToSpike3Wall",
+                "shootFarToWallIntakeA",
                 follower
                     .pathBuilder()
-                    .addPath(BezierCurve(p("shootFar"), p("spike3CtrlFar"), p("spike3Wall")))
+                    .addPath(BezierCurve(p("shootFar"), Pose(x("shootFar"), y("wallEndA")) , p("wallEndA")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "wallIntakeAToShootFar",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("wallEndA"), p("shootFar")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "shootFarToWallIntakeB",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierCurve(p("shootFar"), Pose(x("shootFar"), y("wallEndB")) , p("wallEndB")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "wallIntakeBToShootFar",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("wallEndB"), p("shootFar")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "shootFarToWallIntakeC",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierCurve(p("shootFar"), Pose(x("shootFar"), y("wallEndC")) , p("wallEndC")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "wallIntakeCToShootFar",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("wallEndC"), p("shootFar")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "shootFarToWallIntakeD",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierCurve(p("shootFar"), Pose(x("shootFar"), y("wallEndD")) , p("wallEndD")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "wallIntakeDToShootFar",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("wallEndD"), p("shootFar")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "shootFarToWallIntakeE",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierCurve(p("shootFar"), Pose(x("shootFar"), y("wallEndE")) , p("wallEndE")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "wallIntakeEToShootFar",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("wallEndE"), p("shootFar")))
                     .setConstantHeadingInterpolation(p("startFar").heading)
                     .build(),
             )
@@ -351,7 +431,6 @@ object AutoConstants {
                     .pathBuilder()
                     .addPath(BezierLine(p("spike3End"), p("shootFar")))
                     .setConstantHeadingInterpolation(p("startFar").heading)
-                    .setBrakingStrength(2.0)
                     .build(),
             )
             path(

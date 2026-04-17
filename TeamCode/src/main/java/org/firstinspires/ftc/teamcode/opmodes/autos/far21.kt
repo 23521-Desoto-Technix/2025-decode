@@ -95,32 +95,32 @@ class far21 : NextFTCOpMode() {
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToSpike3Wall")),
-                    FollowPath(paths.getValue("spike3ToShootFar")),
+                    FollowPath(paths.getValue("shootFarToWallIntakeA")),
+                    FollowPath(paths.getValue("wallIntakeAToShootFar")),
                 )
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToSpike3Wall")),
-                    FollowPath(paths.getValue("spike3ToShootFar")),
+                    FollowPath(paths.getValue("shootFarToWallIntakeB")),
+                    FollowPath(paths.getValue("wallIntakeBToShootFar")),
                 )
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToSpike3Wall")),
-                    FollowPath(paths.getValue("spike3ToShootFar")),
+                    FollowPath(paths.getValue("shootFarToWallIntakeC")),
+                    FollowPath(paths.getValue("wallIntakeCToShootFar")),
                 )
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToSpike3Wall")),
-                    FollowPath(paths.getValue("spike3ToShootFar")),
+                    FollowPath(paths.getValue("shootFarToWallIntakeD")),
+                    FollowPath(paths.getValue("wallIntakeDToShootFar")),
                 )
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToSpike3Wall")),
-                    FollowPath(paths.getValue("spike3ToShootFar")),
+                    FollowPath(paths.getValue("shootFarToWallIntakeE")),
+                    FollowPath(paths.getValue("wallIntakeEToShootFar")),
                 )
             ),
             intake(
