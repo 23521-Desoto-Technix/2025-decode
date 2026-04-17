@@ -111,6 +111,24 @@ class far21 : NextFTCOpMode() {
                     FollowPath(paths.getValue("spike3ToShootFar")),
                 )
             ),
+            intake(
+                SequentialGroup(
+                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    FollowPath(paths.getValue("spike3ToShootFar")),
+                )
+            ),
+            intake(
+                SequentialGroup(
+                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    FollowPath(paths.getValue("spike3ToShootFar")),
+                )
+            ),
+            intake(
+                SequentialGroup(
+                    FollowPath(paths.getValue("shootFarToSpike3")),
+                    FollowPath(paths.getValue("spike3ToShootFar")),
+                )
+            ),
             Flywheel.stop(),
         )
     }
