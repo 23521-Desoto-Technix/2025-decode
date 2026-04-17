@@ -41,7 +41,7 @@ object AutoConstants {
                 pose("spike3End", Pose(120.0, 36.0, 0.0.deg.inRad))
                 pose("spike3Ctrl", Pose(90.0, 35.0, 0.0.deg.inRad))
                 pose("spike3CtrlFar", Pose(85.0, 35.0, 0.0.deg.inRad))
-                pose("humanIntake", Pose(130.0, 8.5, 0.0.deg.inRad))
+                pose("humanIntake", Pose(133.0, 8.5, 0.0.deg.inRad))
                 pose("humanIntakeCtrl", Pose(89.0, 8.5, 0.0.deg.inRad))
                 pose("parkFar", Pose(110.0, 20.0, 0.0.deg.inRad))
             }
@@ -333,8 +333,6 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierCurve(p("shootFar"), p("spike3CtrlFar"), p("spike3End")))
-                    .setConstantHeadingInterpolation(p("startFar").heading)
-                    .addPath(BezierLine(p("spike3End"), p("shootFar")))
                     .setConstantHeadingInterpolation(p("startFar").heading)
                     .build(),
             )
