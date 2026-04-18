@@ -129,7 +129,9 @@ class far21 : NextFTCOpMode() {
                     FollowPath(paths.getValue("wallIntakeFToShootFar")),
                 )
             ),
-            Flywheel.stop(),
+            Flywheel.stop(true),
+            FollowPath(paths.getValue("shootFarToParkFar")),
+            Flywheel.stop()
         )
     }
 
