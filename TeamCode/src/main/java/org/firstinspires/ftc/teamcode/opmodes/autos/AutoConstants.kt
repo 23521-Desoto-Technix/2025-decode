@@ -21,6 +21,7 @@ object AutoConstants {
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
                 pose("shootMiddle", Pose(89.0, 80.0, 0.0.deg.inRad))
                 pose("shootFar", Pose(85.0, 22.0, 0.0.deg.inRad))
+                pose("parkFar", Pose(95.0, 22.0, 0.0.deg.inRad))
                 pose("push", Pose(90.0, 8.5, 0.0.deg.inRad))
                 pose("shootPark", Pose(85.0, 105.0, 0.0.deg.inRad))
                 pose("sideSpike1", Pose(119.0, 88.0, -90.0.deg.inRad))
@@ -40,12 +41,12 @@ object AutoConstants {
                 pose("spike3Start", Pose(105.0, 36.0, 0.0.deg.inRad))
                 pose("spike3End", Pose(120.0, 36.0, 0.0.deg.inRad))
                 pose("spike3Wall", Pose(130.0, 36.0, 0.0.deg.inRad))
-                pose("wallEndA", Pose(130.0, 36.0, 0.0.deg.inRad))
-                pose("wallEndB", Pose(130.0, 30.0, 0.0.deg.inRad))
-                pose("wallEndC", Pose(130.0, 24.0, 0.0.deg.inRad))
-                pose("wallEndD", Pose(130.0, 18.0, 0.0.deg.inRad))
-                pose("wallEndE", Pose(130.0, 12.0, 0.0.deg.inRad))
-                pose("wallEndF", Pose(130.0, 10.0, 0.0.deg.inRad))
+                pose("wallEndA", Pose(134.5, 36.0, 0.0.deg.inRad))
+                pose("wallEndB", Pose(134.5, 30.0, 0.0.deg.inRad))
+                pose("wallEndC", Pose(134.5, 24.0, 0.0.deg.inRad))
+                pose("wallEndD", Pose(134.5, 18.0, 0.0.deg.inRad))
+                pose("wallEndE", Pose(134.5, 12.0, 0.0.deg.inRad))
+                pose("wallEndF", Pose(134.5, 10.0, 0.0.deg.inRad))
                 pose("spike3Ctrl", Pose(90.0, 35.0, 0.0.deg.inRad))
                 pose("spike3CtrlFar", Pose(85.0, 35.0, 0.0.deg.inRad))
                 pose("humanIntake", Pose(133.0, 8.5, 0.0.deg.inRad))
@@ -455,6 +456,14 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierLine(p("push"), p("shootFar")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "shootFarToParkFar",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("shootFar"), p("parkFar")))
                     .setConstantHeadingInterpolation(p("startFar").heading)
                     .build(),
             )
