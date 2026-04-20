@@ -223,7 +223,7 @@ object Tube : Subsystem {
             }
 
             TubeState.SHOOTING_HARDSTOP_SETTLE -> {
-                intake.power = 0.0
+                intake.power = shootSpeed
                 transfer.power = 0.0
                 hardStop.position = 0.65
             }
