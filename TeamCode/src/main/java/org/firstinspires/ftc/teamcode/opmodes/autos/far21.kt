@@ -71,11 +71,11 @@ class far21 : NextFTCOpMode() {
                 else -> 0.0.deg
             }
         val intake: (Command) -> Command = { path ->
-            SequentialGroup(Tube.intakeAll, path, Tube.shootAll(), Delay(400.milliseconds))
+            SequentialGroup(Tube.intakeAll, path, Delay(150.milliseconds), Tube.shootAll(.95), Delay(510.milliseconds))
         }
         return SequentialGroup(
-            Flywheel.setSpeed(1_975.0),
-            InstantCommand { Hood.position = 0.96 },
+            Flywheel.setSpeed(1_950.0),
+            InstantCommand { Hood.position = 0.94 },
             InstantCommand { Turret.setTargetAngle(farTurretAngle) },
             FollowPath(paths.getValue("startFarToShootFar")),
             Flywheel.waitForSpeed(),
@@ -95,33 +95,33 @@ class far21 : NextFTCOpMode() {
             ),
             intake(
                 SequentialGroup(
+                    FollowPath(paths.getValue("shootFarToHumanIntake")),
+                    FollowPath(paths.getValue("humanIntakeToShootFar")),
+                )
+            ),
+            intake(
+                SequentialGroup(
                     FollowPath(paths.getValue("shootFarToWallIntakeA")),
                     FollowPath(paths.getValue("wallIntakeAToShootFar")),
                 )
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToWallIntakeB")),
-                    FollowPath(paths.getValue("wallIntakeBToShootFar")),
+                    FollowPath(paths.getValue("shootFarToHumanIntake")),
+                    FollowPath(paths.getValue("humanIntakeToShootFar")),
                 )
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToWallIntakeC")),
-                    FollowPath(paths.getValue("wallIntakeCToShootFar")),
+                    FollowPath(paths.getValue("shootFarToWallIntakeA")),
+                    FollowPath(paths.getValue("wallIntakeAToShootFar")),
                 )
-            ),
-            intake(
-                SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToWallIntakeD")),
-                    FollowPath(paths.getValue("wallIntakeDToShootFar")),
-                )
-            ),
-            intake(
-                SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToWallIntakeE")),
-                    FollowPath(paths.getValue("wallIntakeEToShootFar")),
-                )
+//            ),
+//            intake(
+//                SequentialGroup(
+//                    FollowPath(paths.getValue("shootFarToWallIntakeB")),
+//                    FollowPath(paths.getValue("wallIntakeBToShootFar")),
+//                )
             ),
             intake(
                 SequentialGroup(
