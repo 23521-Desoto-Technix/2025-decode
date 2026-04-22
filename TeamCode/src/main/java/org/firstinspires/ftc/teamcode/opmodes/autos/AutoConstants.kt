@@ -147,6 +147,16 @@ object AutoConstants {
                     .build(),
             )
             path(
+                "spike1FastPark",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("shootMiddle"), p("spike1End")))
+                    .setLinearHeadingInterpolation(p("shootMiddle").heading, p("spike1End").heading)
+                    .addPath(BezierLine(p("spike1End"), p("shootMiddle")))
+                    .setReversed()
+                    .build(),
+            )
+            path(
                 "spike2Combined",
                 follower
                     .pathBuilder()
