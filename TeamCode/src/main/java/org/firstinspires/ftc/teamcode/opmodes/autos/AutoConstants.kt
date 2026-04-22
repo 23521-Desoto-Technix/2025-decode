@@ -152,7 +152,7 @@ object AutoConstants {
                     .pathBuilder()
                     .addPath(BezierLine(p("shootMiddle"), p("spike1End")))
                     .setLinearHeadingInterpolation(p("shootMiddle").heading, p("spike1End").heading)
-                    .addPath(BezierLine(p("spike1End"), p("shootMiddle")))
+                    .addPath(BezierLine(p("spike1End"), p("shootPark")))
                     .setReversed()
                     .build(),
             )

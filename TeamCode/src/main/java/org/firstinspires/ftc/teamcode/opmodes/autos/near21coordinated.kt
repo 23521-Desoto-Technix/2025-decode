@@ -77,7 +77,7 @@ class near21coordinated : NextFTCOpMode() {
             intake(
                 SequentialGroup(
                     FollowPath(paths.getValue("shootMiddleGateIntake")),
-                    Tube.waitForAll(1100.milliseconds),
+                    Tube.waitForAll(900.milliseconds),
                     FollowPath(paths.getValue("gateIntakeShootMiddle")),
                 )
             )
