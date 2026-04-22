@@ -93,10 +93,10 @@ class near21coordinated : NextFTCOpMode() {
             gateIntake,
             gateIntake,
             gateIntake,
-            intake(FollowPath(paths.getValue("spike1FastPark"))),
             Flywheel.setSpeed(1_500.0),
             InstantCommand { Hood.position = 0.65 },
             InstantCommand { Turret.setTargetAngle(parkTurretAngle) },
+            intake(FollowPath(paths.getValue("spike1FastPark"))),
             Delay(500.milliseconds),
             Flywheel.stop(),
         )
