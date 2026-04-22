@@ -31,14 +31,14 @@ object AutoConstants {
                 pose("sideSpike3", Pose(121.0, 45.0, -90.0.deg.inRad))
                 pose("sideSpike3TransitionalCtrl", Pose(118.0, 45.0, -90.0.deg.inRad))
                 pose("sideSpike3Ctrl", Pose(121.0, 58.0, -90.0.deg.inRad))
-                pose("gateHit", Pose(129.0, 62.0, -90.0.deg.inRad))
+                pose("gateHit", Pose(129.0, 65.0, -90.0.deg.inRad))
                 pose("gateHitCtrl", Pose(120.0, 58.0, -90.0.deg.inRad))
                 pose("gateIntake", Pose(132.0, 57.0, 30.0.deg.inRad))
                 pose("gateIntakeCtrl", Pose(105.0, 58.0, 40.0.deg.inRad))
                 pose("spike1End", Pose(113.0, 85.0, 0.0.deg.inRad))
                 pose("spike2End", Pose(113.0, 58.0, 0.0.deg.inRad))
                 pose("spike2Ctrl", Pose(95.0, 56.0, 0.0.deg.inRad))
-                pose("spike2CtrlGate", Pose(100.0, 59.0, 0.0.deg.inRad))
+                pose("spike2CtrlGate", Pose(97.0, 49.0, 0.0.deg.inRad))
                 pose("spike3Start", Pose(105.0, 36.0, 0.0.deg.inRad))
                 pose("spike3End", Pose(120.0, 36.0, 0.0.deg.inRad))
                 pose("spike3Wall", Pose(130.0, 36.0, 0.0.deg.inRad))
@@ -160,10 +160,8 @@ object AutoConstants {
                 "spike2GateHit",
                 follower
                     .pathBuilder()
-                    .addPath(BezierCurve(p("shootMiddle"), p("spike2CtrlGate"), p("spike2End")))
+                    .addPath(BezierCurve(p("shootMiddle"), p("spike2CtrlGate"), p("gateHit")))
                     .setLinearHeadingInterpolation(p("shootMiddle").heading, p("spike2End").heading)
-                    .addPath(BezierLine(p("spike2End"), p("gateHit")))
-                    .setLinearHeadingInterpolation(p("spike2End").heading, p("shootMiddle").heading)
                     .build(),
             )
             path(
