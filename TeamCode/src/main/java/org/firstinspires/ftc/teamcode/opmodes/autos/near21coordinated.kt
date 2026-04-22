@@ -66,8 +66,8 @@ class near21coordinated : NextFTCOpMode() {
             }
         val parkTurretAngle =
             when (BotState.alliance) {
-                Alliance.RED -> AutoConstants.Angles["parkTurretRed"]
-                Alliance.BLUE -> AutoConstants.Angles["parkTurretBlue"]
+                Alliance.RED -> AutoConstants.Angles["parkTurretRed1"]
+                Alliance.BLUE -> AutoConstants.Angles["parkTurretBlue1"]
                 else -> 0.0.deg
             }
         val intake: (Command) -> Command = { path ->

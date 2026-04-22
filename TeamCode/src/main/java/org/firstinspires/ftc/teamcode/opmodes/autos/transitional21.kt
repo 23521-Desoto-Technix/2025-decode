@@ -67,8 +67,8 @@ class transitional21 : NextFTCOpMode() {
             }
         val parkTurretAngle =
             when (BotState.alliance) {
-                Alliance.RED -> AutoConstants.Angles["parkTurretRed"]
-                Alliance.BLUE -> AutoConstants.Angles["parkTurretBlue"]
+                Alliance.RED -> AutoConstants.Angles["parkTurretRed3"]
+                Alliance.BLUE -> AutoConstants.Angles["parkTurretBlue3"]
                 else -> 0.0.deg
             }
         val intake: (Command, Double) -> Command = { path, shootSpeed ->
