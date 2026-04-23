@@ -104,7 +104,7 @@ class far21push : NextFTCOpMode() {
                     FollowPath(paths.getValue("spike3ToShootMiddle")),
                 )
             ),
-            intake(FollowPath(paths.getValue("spike2CombinedFarToNear"))),
+            intake(FollowPath(paths.getValue("spike2Combined"))),
             gateIntake,
             Flywheel.stop(),
         )
