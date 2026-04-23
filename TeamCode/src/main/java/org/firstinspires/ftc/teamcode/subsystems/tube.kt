@@ -169,7 +169,7 @@ object Tube : Subsystem {
             }
 
             TubeState.SHOOTING_HARDSTOP_SETTLE -> {
-                if (elapsedSinceStep() >= 150.milliseconds && readyToShoot) {
+                if (elapsedSinceStep() >= 0.milliseconds && readyToShoot) {
                     transitionTo(TubeState.SHOOTING_WAIT_CLEAR)
                 }
             }
