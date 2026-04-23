@@ -43,6 +43,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -75,6 +76,16 @@ class teleop : NextFTCOpMode() {
     var insideCloseZone = false
 
     private var lastUpdateNs = 0L
+    private var lastVelocityX = 0.0
+    private var lastVelocityY = 0.0
+    private var hasVelocitySample = false
+
+    private val positionLookahead = 300.milliseconds
+    private val headingLookahead = 90.milliseconds
+
+    private fun Duration.asSeconds(): Double {
+        return inWholeNanoseconds.toDouble() / 1.seconds.inWholeNanoseconds.toDouble()
+    }
 
     val t = JoinedTelemetry(PanelsTelemetry.ftcTelemetry, telemetry)
 
@@ -221,6 +232,8 @@ class teleop : NextFTCOpMode() {
         currentPose: Pose,
         angularVelocity: Double = 0.0,
         velocity: Vector,
+        accelerationX: Double,
+        accelerationY: Double,
     ): TargetMetrics {
         val targetPose =
             if (currentPose.y < 48.0) {
@@ -236,14 +249,13 @@ class teleop : NextFTCOpMode() {
                     Pose(144.0, 144.0, 0.0)
                 }
             }
-        val velocity =
-            velocity.times(
-                300.milliseconds.inWholeMicroseconds.toDouble() /
-                    1.seconds.inWholeMicroseconds.toDouble()
-            )
-
-        val currentX = currentPose.x + velocity.xComponent
-        val currentY = currentPose.y + velocity.yComponent
+        val positionLookaheadSeconds = positionLookahead.asSeconds()
+        val lookaheadVelocity = velocity.times(positionLookaheadSeconds)
+        val lookaheadAccelerationScalar = 0.5 * positionLookaheadSeconds * positionLookaheadSeconds
+        val currentX =
+            currentPose.x + lookaheadVelocity.xComponent + accelerationX * lookaheadAccelerationScalar
+        val currentY =
+            currentPose.y + lookaheadVelocity.yComponent + accelerationY * lookaheadAccelerationScalar
         val deltaX = targetPose.x - currentX
         val deltaY = targetPose.y - currentY
         val distanceToTarget = hypot(deltaX, deltaY)
@@ -259,10 +271,7 @@ class teleop : NextFTCOpMode() {
         val absoluteAngleToTarget =
             atan2(sin(angleToPoseA) + sin(angleToPoseB), cos(angleToPoseA) + cos(angleToPoseB)).rad
         val predictiveHeading =
-            currentPose.heading.rad +
-                (angularVelocity / 1.seconds.inWholeMicroseconds *
-                        90.milliseconds.inWholeMicroseconds)
-                    .rad
+            currentPose.heading.rad + (angularVelocity * headingLookahead.asSeconds()).rad
         val relativeAngleToTarget = (predictiveHeading - absoluteAngleToTarget + 180.deg).normalized
 
         return TargetMetrics(distanceToTarget, relativeAngleToTarget)
@@ -540,13 +549,35 @@ class teleop : NextFTCOpMode() {
         panelsField.update()
 
 
+        val followerVelocity = PedroComponent.follower.velocity
+        val velocityX = followerVelocity.xComponent
+        val velocityY = followerVelocity.yComponent
+        val loopSeconds = loopMs.milliseconds.asSeconds()
+        val accelerationX =
+            if (hasVelocitySample && loopSeconds > 1e-6) {
+                (velocityX - lastVelocityX) / loopSeconds
+            } else {
+                0.0
+            }
+        val accelerationY =
+            if (hasVelocitySample && loopSeconds > 1e-6) {
+                (velocityY - lastVelocityY) / loopSeconds
+            } else {
+                0.0
+            }
+        lastVelocityX = velocityX
+        lastVelocityY = velocityY
+        hasVelocitySample = true
+
         val targetMetrics =
             calculateTargetMetrics(
                 turretPose,
                 PedroComponent.follower.angularVelocity,
-                PedroComponent.follower.velocity,
+                followerVelocity,
+                accelerationX,
+                accelerationY,
             )
-        telemetry.addData("velocity", PedroComponent.follower.velocity.magnitude)
+        telemetry.addData("velocity", followerVelocity.magnitude)
         val distanceToTarget = targetMetrics.distanceToTarget
         val relativeAngleToTarget = targetMetrics.relativeAngleToTarget
 
