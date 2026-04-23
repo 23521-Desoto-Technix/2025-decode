@@ -203,7 +203,7 @@ object Tube : Subsystem {
             TubeState.IDLE -> {
                 intake.power = 0.0
                 transfer.power = 0.0
-                hardStop.position = 0.9
+                hardStop.position = 0.65
             }
 
             TubeState.INTAKE_WAIT_TOP,
