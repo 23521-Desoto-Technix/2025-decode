@@ -39,6 +39,7 @@ object AutoConstants {
                 pose("spike2End", Pose(113.0, 58.0, 0.0.deg.inRad))
                 pose("spike2Ctrl", Pose(95.0, 56.0, 0.0.deg.inRad))
                 pose("spike2CtrlGate", Pose(97.0, 49.0, 0.0.deg.inRad))
+                pose("spike2CtrlFar", Pose(97.0, 49.0, 0.0.deg.inRad))
                 pose("spike3Start", Pose(105.0, 36.0, 0.0.deg.inRad))
                 pose("spike3End", Pose(120.0, 36.0, 0.0.deg.inRad))
                 pose("spike3Wall", Pose(130.0, 36.0, 0.0.deg.inRad))
@@ -163,6 +164,16 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierCurve(p("shootMiddle"), p("spike2Ctrl"), p("spike2End")))
+                    .setLinearHeadingInterpolation(p("shootMiddle").heading, p("spike2End").heading)
+                    .addPath(BezierLine(p("spike2End"), p("shootMiddle")))
+                    .setLinearHeadingInterpolation(p("spike2End").heading, p("shootMiddle").heading)
+                    .build(),
+            )
+            path(
+                "spike2CombinedFarToNear",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierCurve(p("shootFar"), p("spike2CtrlFar"), p("spike2End")))
                     .setLinearHeadingInterpolation(p("shootMiddle").heading, p("spike2End").heading)
                     .addPath(BezierLine(p("spike2End"), p("shootMiddle")))
                     .setLinearHeadingInterpolation(p("spike2End").heading, p("shootMiddle").heading)
