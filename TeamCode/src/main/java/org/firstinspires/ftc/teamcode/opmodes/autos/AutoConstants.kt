@@ -474,6 +474,14 @@ object AutoConstants {
                     .build(),
             )
             path(
+                "spike3ToShootMiddle",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierLine(p("spike3End"), p("shootMiddle")))
+                    .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
                 "pushToShootFar",
                 follower
                     .pathBuilder()

@@ -70,6 +70,12 @@ class far21push : NextFTCOpMode() {
                 Alliance.BLUE -> AutoConstants.Angles["parkTurretBlue1"]
                 else -> 0.0.deg
             }
+        val middleTurretAngle =
+            when (BotState.alliance) {
+                Alliance.RED -> AutoConstants.Angles["middleTurretRed"]
+                Alliance.BLUE -> AutoConstants.Angles["middleTurretBlue"]
+                else -> 0.0.deg
+            }
         val intake: (Command) -> Command = { path ->
             SequentialGroup(Tube.intakeAll, path, Tube.shootAll(), Delay(400.milliseconds))
         }
@@ -89,10 +95,13 @@ class far21push : NextFTCOpMode() {
             FollowPath(paths.getValue("pushToShootFar")),
             Tube.shootAll(),
             Delay(400.milliseconds),
+            Flywheel.setSpeed(1_500.0),
+            InstantCommand { Hood.position = 0.65 },
+            InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             intake(
                 SequentialGroup(
                     FollowPath(paths.getValue("shootFarToSpike3")),
-                    FollowPath(paths.getValue("spike3ToShootFar")),
+                    FollowPath(paths.getValue("spike3ToShootMiddle")),
                 )
             ),
             intake(FollowPath(paths.getValue("spike2CombinedFarToNear"))),
