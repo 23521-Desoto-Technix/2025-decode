@@ -83,7 +83,7 @@ class far21push : NextFTCOpMode() {
             intake(
                 SequentialGroup(
                     FollowPath(paths.getValue("shootMiddleGateIntake")),
-                    Tube.waitForAll(900.milliseconds),
+                    Tube.waitForAll(1200.milliseconds),
                     FollowPath(paths.getValue("gateIntakeShootMiddle")),
                 )
             )
@@ -108,7 +108,7 @@ class far21push : NextFTCOpMode() {
             gateIntake,
             gateIntake,
             gateIntake,
-            intake(FollowPath(paths.getValue("spike1Combined"))),
+            intake(FollowPath(paths.getValue("spike1FastPark"))),
             Flywheel.stop(),
         )
     }
