@@ -108,6 +108,9 @@ class far21push : NextFTCOpMode() {
             gateIntake,
             gateIntake,
             gateIntake,
+            Flywheel.setSpeed(1_500.0),
+            InstantCommand { Hood.position = 0.65 },
+            InstantCommand { Turret.setTargetAngle(parkTurretAngle) },
             intake(FollowPath(paths.getValue("spike1FastPark"))),
             Flywheel.stop(),
         )
