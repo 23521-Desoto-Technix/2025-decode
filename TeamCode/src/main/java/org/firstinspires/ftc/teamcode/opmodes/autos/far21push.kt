@@ -106,6 +106,9 @@ class far21push : NextFTCOpMode() {
             ),
             intake(FollowPath(paths.getValue("spike2Combined"))),
             gateIntake,
+            gateIntake,
+            gateIntake,
+            intake(FollowPath(paths.getValue("spike1Combined"))),
             Flywheel.stop(),
         )
     }
