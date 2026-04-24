@@ -288,10 +288,21 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierLine(p("gateIntake"), p("shootMiddle")))
-                    .setLinearHeadingInterpolation(
-                        p("gateIntake").heading,
-                        p("shootMiddle").heading,
+                    .setHeadingInterpolation(
+                        HeadingInterpolator.piecewise(
+                            HeadingInterpolator.PiecewiseNode(
+                                0.0,
+                                0.8,
+                                HeadingInterpolator.tangent,
+                            ),
+                            HeadingInterpolator.PiecewiseNode(
+                                0.8,
+                                1.0,
+                                HeadingInterpolator.constant(h("spike3CtrlFarToNear")),
+                            ),
+                        )
                     )
+                    .setReversed()
                     .build(),
             )
             path(
