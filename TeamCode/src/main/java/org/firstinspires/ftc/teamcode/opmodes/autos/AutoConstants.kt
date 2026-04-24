@@ -267,9 +267,19 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierCurve(p("shootMiddle"), p("gateIntakeCtrl"), p("gateIntake")))
-                    .setLinearHeadingInterpolation(
-                        p("shootMiddle").heading,
-                        p("gateIntake").heading,
+                    .setHeadingInterpolation(
+                        HeadingInterpolator.piecewise(
+                            HeadingInterpolator.PiecewiseNode(
+                                0.0,
+                                0.7,
+                                HeadingInterpolator.tangent,
+                            ),
+                            HeadingInterpolator.PiecewiseNode(
+                                0.7,
+                                1.0,
+                                HeadingInterpolator.constant(h("gateIntake")),
+                            ),
+                        )
                     )
                     .build(),
             )
