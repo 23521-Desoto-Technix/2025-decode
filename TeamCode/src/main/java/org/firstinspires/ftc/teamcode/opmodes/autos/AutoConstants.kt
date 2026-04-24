@@ -271,11 +271,16 @@ object AutoConstants {
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
                                 0.0,
-                                0.7,
+                                0.1,
+                                HeadingInterpolator.constant(h("shootMiddle")),
+                            ),
+                            HeadingInterpolator.PiecewiseNode(
+                                0.1,
+                                0.6,
                                 HeadingInterpolator.tangent,
                             ),
                             HeadingInterpolator.PiecewiseNode(
-                                0.7,
+                                0.6,
                                 1.0,
                                 HeadingInterpolator.constant(h("gateIntake")),
                             ),
@@ -292,11 +297,11 @@ object AutoConstants {
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
                                 0.0,
-                                0.8,
+                                0.7,
                                 HeadingInterpolator.tangent,
                             ),
                             HeadingInterpolator.PiecewiseNode(
-                                0.8,
+                                0.7,
                                 1.0,
                                 HeadingInterpolator.constant(h("spike3CtrlFarToNear")),
                             ),
