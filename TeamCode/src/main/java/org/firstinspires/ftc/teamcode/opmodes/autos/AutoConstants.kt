@@ -10,7 +10,6 @@ import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.extensions.pedro.PedroComponent
 import org.firstinspires.ftc.teamcode.utils.Alliance
-import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
 
 object AutoConstants {
     object Poses {
@@ -64,7 +63,7 @@ object AutoConstants {
             get() = redPoses
 
         val blue: Map<String, Pose> by lazy {
-            redPoses.mapValues { (name, redPose) -> bluePoseOverrides[name] ?: mirrorPose(redPose) }
+            redPoses.mapValues { (name, redPose) -> bluePoseOverrides[name] ?: redPose.mirror() }
         }
 
         fun forAlliance(alliance: Alliance): Map<String, Pose> {
