@@ -12,7 +12,7 @@ import dev.nextftc.extensions.pedro.PedroComponent
 object PoseUtils {
 
   fun mirrorPose(pose: Pose): Pose {
-    return Pose(144.0 - pose.x, pose.y, (180.deg - pose.heading.rad).normalized.inRad)
+    return Pose(141.5 - pose.x, pose.y, (180.deg - pose.heading.rad).normalized.inRad)
   }
 
   fun createBasicPath(start: Pose, end: Pose): PathChain {
