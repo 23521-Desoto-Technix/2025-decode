@@ -94,7 +94,7 @@ object AutoConstants {
                 angle("parkTurretRed3", (-90.0).deg)
                 angle("parkTurretBlue3", 90.0.deg)
                 angle("parkTurretRed1", (-112.0).deg)
-                angle("parkTurretBlue1", 110.0.deg)
+                angle("parkTurretBlue1", 112.0.deg)
                 angle("farTurretRed", (-114.0).deg)
                 angle("farTurretBlue", 114.0.deg)
             }
