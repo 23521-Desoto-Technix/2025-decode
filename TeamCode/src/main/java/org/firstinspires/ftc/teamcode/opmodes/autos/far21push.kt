@@ -105,9 +105,21 @@ class far21push : NextFTCOpMode() {
                 )
             ),
             intake(FollowPath(paths.getValue("spike2Combined"))),
-            gateIntake,
-            gateIntake,
-            gateIntake,
+            intake(SequentialGroup(
+                FollowPath(paths.getValue("shootMiddleGateIntakeB")),
+                Tube.waitForAll(1200.milliseconds),
+                FollowPath(paths.getValue("gateIntakeShootMiddle")),
+            )),
+            intake(SequentialGroup(
+                FollowPath(paths.getValue("shootMiddleGateIntakeC")),
+                Tube.waitForAll(1200.milliseconds),
+                FollowPath(paths.getValue("gateIntakeShootMiddle")),
+            )),
+            intake(SequentialGroup(
+                FollowPath(paths.getValue("shootMiddleGateIntakeD")),
+                Tube.waitForAll(1200.milliseconds),
+                FollowPath(paths.getValue("gateIntakeShootMiddle")),
+            )),
             Flywheel.setSpeed(1_500.0),
             InstantCommand { Hood.position = 0.65 },
             InstantCommand { Turret.setTargetAngle(parkTurretAngle) },
