@@ -106,17 +106,17 @@ class far21push : NextFTCOpMode() {
             ),
             intake(FollowPath(paths.getValue("spike2Combined"))),
             intake(SequentialGroup(
+                FollowPath(paths.getValue("shootMiddleGateIntake")),
+                Tube.waitForAll(1200.milliseconds),
+                FollowPath(paths.getValue("gateIntakeShootMiddle")),
+            )),
+            intake(SequentialGroup(
                 FollowPath(paths.getValue("shootMiddleGateIntakeB")),
                 Tube.waitForAll(1200.milliseconds),
                 FollowPath(paths.getValue("gateIntakeShootMiddle")),
             )),
             intake(SequentialGroup(
                 FollowPath(paths.getValue("shootMiddleGateIntakeC")),
-                Tube.waitForAll(1200.milliseconds),
-                FollowPath(paths.getValue("gateIntakeShootMiddle")),
-            )),
-            intake(SequentialGroup(
-                FollowPath(paths.getValue("shootMiddleGateIntakeD")),
                 Tube.waitForAll(1200.milliseconds),
                 FollowPath(paths.getValue("gateIntakeShootMiddle")),
             )),
