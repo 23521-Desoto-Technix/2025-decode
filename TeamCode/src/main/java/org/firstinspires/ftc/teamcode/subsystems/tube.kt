@@ -27,7 +27,7 @@ private enum class TubeState {
 }
 
 object Tube : Subsystem {
-    private val intakeHardStopPrepDelay = 50.milliseconds
+    private val intakeHardStopPrepDelay = 70.milliseconds
     private val intakeTopDelay = 100.milliseconds
     private val intakeMiddleDelay = 200.milliseconds
     private val intakeBottomDelay = 150.milliseconds

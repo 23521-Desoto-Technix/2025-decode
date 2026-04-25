@@ -14,6 +14,9 @@ import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
 
 object AutoConstants {
     object Poses {
+        // Only add entries for poses that should not use automatic mirroring.
+        private val bluePoseOverrides = linkedMapOf<String, Pose>()
+
         private val redPoses =
             linkedMapOf<String, Pose>().apply {
                 pose("startNear", Pose(126.74, 111.15, 0.0.deg.inRad))
@@ -33,7 +36,7 @@ object AutoConstants {
                 pose("sideSpike3Ctrl", Pose(121.0, 58.0, -90.0.deg.inRad))
                 pose("gateHit", Pose(127.0, 62.0, -90.0.deg.inRad))
                 pose("gateHitCtrl", Pose(120.0, 58.0, -90.0.deg.inRad))
-                pose("gateIntake", Pose(131.81, 57.06, 30.0.deg.inRad))
+                pose("gateIntake", Pose(131.81, 57.06, 30.0.deg.inRad), Pose(13.28, 60.32, 150.0.deg.inRad))
                 pose("gateIntakeCtrl", Pose(105.0, 58.0, 40.0.deg.inRad))
                 pose("spike1End", Pose(113.0, 85.0, 0.0.deg.inRad))
                 pose("spike2End", Pose(113.0, 58.0, 0.0.deg.inRad))
@@ -60,14 +63,23 @@ object AutoConstants {
         val red: Map<String, Pose>
             get() = redPoses
 
-        val blue: Map<String, Pose> by lazy { redPoses.mapValues { mirrorPose(it.value) } }
+        val blue: Map<String, Pose> by lazy {
+            redPoses.mapValues { (name, redPose) -> bluePoseOverrides[name] ?: mirrorPose(redPose) }
+        }
 
         fun forAlliance(alliance: Alliance): Map<String, Pose> {
             return if (alliance == Alliance.BLUE) blue else red
         }
 
-        private fun MutableMap<String, Pose>.pose(name: String, pose: Pose) {
-            this[name] = pose
+        private fun MutableMap<String, Pose>.pose(
+            name: String,
+            redPose: Pose,
+            bluePoseOverride: Pose? = null,
+        ) {
+            this[name] = redPose
+            if (bluePoseOverride != null) {
+                bluePoseOverrides[name] = bluePoseOverride
+            }
         }
     }
 
