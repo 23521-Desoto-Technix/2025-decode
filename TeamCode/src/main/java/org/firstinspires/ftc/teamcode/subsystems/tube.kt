@@ -14,6 +14,7 @@ import kotlin.time.Duration.Companion.nanoseconds
 
 private enum class TubeState {
     IDLE,
+    INTAKE_HARDSTOP_PREP,
     INTAKE_WAIT_TOP,
     INTAKE_DELAY_AFTER_TOP,
     INTAKE_WAIT_MIDDLE,
@@ -26,6 +27,7 @@ private enum class TubeState {
 }
 
 object Tube : Subsystem {
+    private val intakeHardStopPrepDelay = 50.milliseconds
     private val intakeTopDelay = 100.milliseconds
     private val intakeMiddleDelay = 200.milliseconds
     private val intakeBottomDelay = 150.milliseconds
@@ -80,7 +82,7 @@ object Tube : Subsystem {
 
     val intakeAll = InstantCommand {
         if (BotState.enabled) {
-            transitionTo(TubeState.INTAKE_WAIT_TOP)
+            transitionTo(TubeState.INTAKE_HARDSTOP_PREP)
         }
     }
 
@@ -130,6 +132,12 @@ object Tube : Subsystem {
 
     private fun advanceStateMachine() {
         when (state) {
+            TubeState.INTAKE_HARDSTOP_PREP -> {
+                if (elapsedSinceStep() >= intakeHardStopPrepDelay) {
+                    transitionTo(TubeState.INTAKE_WAIT_TOP)
+                }
+            }
+
             TubeState.INTAKE_WAIT_TOP -> {
                 if (!top.state) {
                     transitionTo(TubeState.INTAKE_DELAY_AFTER_TOP)
@@ -204,6 +212,12 @@ object Tube : Subsystem {
                 intake.power = 0.0
                 transfer.power = 0.0
                 hardStop.position = 0.65
+            }
+
+            TubeState.INTAKE_HARDSTOP_PREP -> {
+                intake.power = 0.0
+                transfer.power = 0.0
+                hardStop.position = 0.9
             }
 
             TubeState.INTAKE_WAIT_TOP,
