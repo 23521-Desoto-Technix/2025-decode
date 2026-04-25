@@ -16,6 +16,7 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
+import kotlinx.coroutines.delay
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -86,6 +87,7 @@ class near21coordinated : NextFTCOpMode() {
             InstantCommand { Hood.position = 0.65 },
             InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             FollowPath(paths.getValue("startNearToShootMiddle")),
+            Delay(200.milliseconds),
             Tube.shootAll(),
             Delay(400.milliseconds),
             intake(SequentialGroup(FollowPath(paths.getValue("spike2GateHit")), Delay(500.milliseconds), FollowPath(paths.getValue("gateHitToShootMiddle")))),
@@ -93,7 +95,7 @@ class near21coordinated : NextFTCOpMode() {
             gateIntake,
             gateIntake,
             gateIntake,
-            Flywheel.setSpeed(1_500.0),
+            Flywheel.setSpeed(1_450.0),
             InstantCommand { Hood.position = 0.65 },
             InstantCommand { Turret.setTargetAngle(parkTurretAngle) },
             intake(FollowPath(paths.getValue("spike1FastPark"))),

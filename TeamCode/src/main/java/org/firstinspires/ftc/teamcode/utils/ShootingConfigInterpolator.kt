@@ -26,8 +26,9 @@ object ShootingConfigInterpolator {
                 listOf(
                     ShootingConfigPoint(47.5, ShootingConfig(1_400.0, 0.47)),
                     ShootingConfigPoint(60.0, ShootingConfig(1_400.0, 0.60)),
-                    ShootingConfigPoint(81.5, ShootingConfig(1_500.0, 0.74)),
-                    ShootingConfigPoint(90.5, ShootingConfig(1_600.0, 0.77)),
+                    ShootingConfigPoint(81.5, ShootingConfig(1_510.0, 0.70)),
+                    ShootingConfigPoint(87.5, ShootingConfig(1_510.0, 0.68)),
+                    ShootingConfigPoint(90.5, ShootingConfig(1_600.0, 0.76)),
                     ShootingConfigPoint(95.5, ShootingConfig(1_600.0, 0.80)),
                     ShootingConfigPoint(101.0, ShootingConfig(1_650.0, 0.75)),
                     ShootingConfigPoint(107.0, ShootingConfig(1_750.0, 0.77)),
