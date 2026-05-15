@@ -21,7 +21,6 @@ import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
-import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
@@ -32,7 +31,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class gateIntakeLoop : NextFTCOpMode() {
     init {
         addComponents(
-            SubsystemComponent(Flywheel, Hood, Turret, Tube),
+            SubsystemComponent(Flywheel, Hood, Turret),
             // BulkReadComponent,
             BindingsComponent,
             PedroComponent(Constants::createFollower),
@@ -47,7 +46,7 @@ class gateIntakeLoop : NextFTCOpMode() {
     override fun onInit() {
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
 
-        val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
+        val intake = button { gamepad1.circle }.whenBecomesTrue {  }
         Turret.setTargetAngle(0.0.deg)
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
         // telemetry.msTransmissionInterval = 100
@@ -71,7 +70,7 @@ class gateIntakeLoop : NextFTCOpMode() {
                 else -> 0.0.deg
             }
         val intake: (Command) -> Command = { path ->
-            SequentialGroup(Tube.intakeAll, path, Tube.shootAll())
+            SequentialGroup(path)
         }
         val gateIntake =
             intake(
