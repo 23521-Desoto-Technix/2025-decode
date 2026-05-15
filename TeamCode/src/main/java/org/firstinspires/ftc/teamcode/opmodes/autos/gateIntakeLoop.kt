@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
-import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -25,7 +24,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Gate Intake Loop", preselectTeleOp = "teleop")
 class gateIntakeLoop : NextFTCOpMode() {
@@ -46,7 +44,7 @@ class gateIntakeLoop : NextFTCOpMode() {
     override fun onInit() {
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
 
-        val intake = button { gamepad1.circle }.whenBecomesTrue {  }
+        val intake = button { gamepad1.circle }.whenBecomesTrue {}
         Turret.setTargetAngle(0.0.deg)
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
         // telemetry.msTransmissionInterval = 100
@@ -69,15 +67,11 @@ class gateIntakeLoop : NextFTCOpMode() {
                 Alliance.BLUE -> AutoConstants.Angles["parkTurretBlue3"]
                 else -> 0.0.deg
             }
-        val intake: (Command) -> Command = { path ->
-            SequentialGroup(path)
-        }
+        val intake: (Command) -> Command = { path -> SequentialGroup(path) }
         val gateIntake =
-            intake(
-                SequentialGroup(
-                    FollowPath(paths.getValue("shootMiddleGateIntake")),
-                    FollowPath(paths.getValue("gateIntakeShootMiddle")),
-                )
+            SequentialGroup(
+                FollowPath(paths.getValue("shootMiddleGateIntake")),
+                FollowPath(paths.getValue("gateIntakeShootMiddle")),
             )
         return SequentialGroup(
             Flywheel.setSpeed(1_500.0),
