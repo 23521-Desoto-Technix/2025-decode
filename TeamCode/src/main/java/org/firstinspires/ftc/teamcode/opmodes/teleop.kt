@@ -238,7 +238,7 @@ class teleop : NextFTCOpMode() {
             }
         val velocity =
             velocity.times(
-                300.milliseconds.inWholeMicroseconds.toDouble() /
+                400.milliseconds.inWholeMicroseconds.toDouble() /
                     1.seconds.inWholeMicroseconds.toDouble()
             )
 
