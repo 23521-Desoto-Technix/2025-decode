@@ -392,7 +392,7 @@ class teleop : NextFTCOpMode() {
                             .schedule()
                     }
                 }
-        /*val hoodUp =
+        val hoodUp =
             button { gamepad2.left_bumper }
                 .whenBecomesTrue {
                     if (!autoRangingEnabled) {
@@ -405,7 +405,7 @@ class teleop : NextFTCOpMode() {
                     if (!autoRangingEnabled) {
                         Hood.bumpDown().schedule()
                     }
-                }*/
+                }
 
         val autoPark =
             button { gamepad2.left_bumper }
