@@ -39,7 +39,7 @@ public class Constants {
                     .name("octoquad")
                     .deadwheelPortX(0)
                     .deadwheelPortY(1)
-                    .imuScalar(1)
+                    .imuScalar(1.0134F)
                     .deadwheelXTicksPerMM(19.9594F)
                     .deadwheelYTicksPerMM(19.8347F)
                     .deadwheelXDir(OctoQuad.EncoderDirection.FORWARD)
