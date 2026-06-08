@@ -81,6 +81,14 @@ class near21 : NextFTCOpMode() {
                     FollowPath(paths.getValue("gateIntakeShootMiddle")),
                 )
             )
+        val gateIntakeB =
+            intake(
+                SequentialGroup(
+                    FollowPath(paths.getValue("shootMiddleGateIntakeB")),
+                    Tube.waitForAll(900.milliseconds),
+                    FollowPath(paths.getValue("gateIntakeShootMiddle")),
+                )
+            )
         return SequentialGroup(
             Flywheel.setSpeed(1_500.0),
             InstantCommand { Hood.position = 0.65 },
@@ -93,7 +101,7 @@ class near21 : NextFTCOpMode() {
             gateIntake,
             gateIntake,
             intake(FollowPath(paths.getValue("spike1Combined"))),
-            gateIntake,
+            gateIntakeB,
             Flywheel.setSpeed(1_400.0),
             InstantCommand { Hood.position = 0.45 },
             InstantCommand { Turret.setTargetAngle(parkTurretAngle) },

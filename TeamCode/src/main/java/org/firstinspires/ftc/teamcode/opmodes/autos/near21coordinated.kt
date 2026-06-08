@@ -82,9 +82,17 @@ class near21coordinated : NextFTCOpMode() {
                     FollowPath(paths.getValue("gateIntakeShootMiddle")),
                 )
             )
+        val gateIntakeB =
+            intake(
+                SequentialGroup(
+                    FollowPath(paths.getValue("shootMiddleGateIntakeB")),
+                    Tube.waitForAll(900.milliseconds),
+                    FollowPath(paths.getValue("gateIntakeShootMiddle")),
+                )
+            )
         return SequentialGroup(
             Flywheel.setSpeed(1_500.0),
-            InstantCommand { Hood.position = 0.65 },
+            InstantCommand { Hood.position = 0.7 },
             InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             FollowPath(paths.getValue("startNearToShootMiddle")),
             Delay(200.milliseconds),
@@ -93,8 +101,8 @@ class near21coordinated : NextFTCOpMode() {
             intake(SequentialGroup(FollowPath(paths.getValue("spike2GateHit")), Delay(500.milliseconds), FollowPath(paths.getValue("gateHitToShootMiddle")))),
             gateIntake,
             gateIntake,
-            gateIntake,
-            gateIntake,
+            gateIntakeB,
+            gateIntakeB,
             Flywheel.setSpeed(1_450.0),
             InstantCommand { Hood.position = 0.65 },
             InstantCommand { Turret.setTargetAngle(parkTurretAngle) },

@@ -456,7 +456,7 @@ class teleop : NextFTCOpMode() {
                 .whenBecomesTrue {
                     headingLocked =
                         if (BotState.alliance == Alliance.RED) {
-                            28.deg
+                            29.deg
                         } else {
                             152.deg
                         }

@@ -21,17 +21,17 @@ object ShootingConfigInterpolator {
         ZoneConfig(
             minDistance = 20.0,
             maxDistance = 110.0,
-            defaultConfig = ShootingConfig(1_700.0, 0.65),
+            defaultConfig = ShootingConfig(1_750.0, 0.77),
             points =
                 listOf(
-                    ShootingConfigPoint(47.5, ShootingConfig(1_400.0, 0.47)),
-                    ShootingConfigPoint(60.0, ShootingConfig(1_400.0, 0.60)),
-                    ShootingConfigPoint(81.5, ShootingConfig(1_510.0, 0.70)),
-                    ShootingConfigPoint(87.5, ShootingConfig(1_510.0, 0.695)),
-                    ShootingConfigPoint(90.5, ShootingConfig(1_600.0, 0.76)),
-                    ShootingConfigPoint(95.5, ShootingConfig(1_600.0, 0.82)),
-                    ShootingConfigPoint(101.0, ShootingConfig(1_650.0, 0.75)),
-                    ShootingConfigPoint(107.0, ShootingConfig(1_750.0, 0.77)),
+                    ShootingConfigPoint(47.5, ShootingConfig(1_400.0, 0.40)),
+                    ShootingConfigPoint(60.0, ShootingConfig(1_450.0, 0.60)),
+                    ShootingConfigPoint(81.5, ShootingConfig(1_520.0, 0.70)),
+                    ShootingConfigPoint(87.5, ShootingConfig(1_520.0, 0.695)),
+                    ShootingConfigPoint(90.5, ShootingConfig(1_610.0, 0.76)),
+                    ShootingConfigPoint(95.5, ShootingConfig(1_610.0, 0.82)),
+                    ShootingConfigPoint(101.0, ShootingConfig(1_660.0, 0.75)),
+                    ShootingConfigPoint(107.0, ShootingConfig(1_760.0, 0.77)),
                 ),
         )
 
@@ -39,13 +39,13 @@ object ShootingConfigInterpolator {
         ZoneConfig(
             minDistance = 120.0,
             maxDistance = 160.0,
-            defaultConfig = ShootingConfig(1_950.0, 0.9),
+            defaultConfig = ShootingConfig(1_950.0, 0.85),
             points =
                 listOf(
-                    ShootingConfigPoint(127.5, ShootingConfig(1_950.0, 0.92)),
-                    ShootingConfigPoint(133.5, ShootingConfig(2_050.0, 0.88)),
-                    ShootingConfigPoint(144.0, ShootingConfig(2_100.0, 0.85)),
-                    ShootingConfigPoint(150.0, ShootingConfig(2_250.0, 0.85)),
+                    ShootingConfigPoint(127.5, ShootingConfig(1_850.0, 0.85)),
+                    ShootingConfigPoint(133.5, ShootingConfig(1_950.0, 0.85)),
+                    ShootingConfigPoint(144.0, ShootingConfig(2_000.0, 0.85)),
+                    ShootingConfigPoint(150.0, ShootingConfig(2_150.0, 0.85)),
                 ),
         )
 

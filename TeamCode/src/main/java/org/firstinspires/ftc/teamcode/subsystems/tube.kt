@@ -13,24 +13,14 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
 
 private enum class TubeState {
-    IDLE,
-    INTAKE_HARDSTOP_PREP,
-    INTAKE_WAIT_TOP,
-    INTAKE_DELAY_AFTER_TOP,
-    INTAKE_WAIT_MIDDLE,
-    INTAKE_DELAY_AFTER_MIDDLE,
-    INTAKE_WAIT_BOTTOM,
-    INTAKE_DELAY_AFTER_BOTTOM,
-    SHOOTING_HARDSTOP_SETTLE,
-    SHOOTING_WAIT_CLEAR,
-    SHOOTING_DELAY_BEFORE_IDLE,
+    IDLE, INTAKE_HARDSTOP_PREP, INTAKE_WAIT_TOP, INTAKE_DELAY_AFTER_TOP, INTAKE_WAIT_MIDDLE, INTAKE_DELAY_AFTER_MIDDLE, INTAKE_WAIT_BOTTOM, INTAKE_DELAY_AFTER_BOTTOM, SHOOTING_HARDSTOP_SETTLE, SHOOTING_WAIT_CLEAR, SHOOTING_DELAY_BEFORE_IDLE,
 }
 
 object Tube : Subsystem {
     private val intakeHardStopPrepDelay = 70.milliseconds
     private val intakeTopDelay = 100.milliseconds
     private val intakeMiddleDelay = 200.milliseconds
-    private val intakeBottomDelay = 150.milliseconds
+    private val intakeBottomDelay = 50.milliseconds
 
     val intake = MotorEx("intake").reversed()
     val transfer = MotorEx("transfer")
@@ -115,9 +105,7 @@ object Tube : Subsystem {
     }
 
     fun waitForAll(d: Duration? = null) =
-        LambdaCommand()
-            .setStart { waitForAllStartedAt = now() }
-            .setIsDone {
+        LambdaCommand().setStart { waitForAllStartedAt = now() }.setIsDone {
                 if (d == null) {
                     this.state == TubeState.INTAKE_DELAY_AFTER_BOTTOM
                 } else {
@@ -207,6 +195,9 @@ object Tube : Subsystem {
     }
 
     private fun applyStateOutputs(targetState: TubeState) {
+        if (!BotState.enabled) {
+            return
+        }
         when (targetState) {
             TubeState.IDLE -> {
                 intake.power = 0.0
@@ -220,17 +211,13 @@ object Tube : Subsystem {
                 hardStop.position = 0.9
             }
 
-            TubeState.INTAKE_WAIT_TOP,
-            TubeState.INTAKE_DELAY_AFTER_TOP -> {
+            TubeState.INTAKE_WAIT_TOP, TubeState.INTAKE_DELAY_AFTER_TOP -> {
                 intake.power = 1.0
                 transfer.power = 1.0
                 hardStop.position = 0.9
             }
 
-            TubeState.INTAKE_WAIT_MIDDLE,
-            TubeState.INTAKE_DELAY_AFTER_MIDDLE,
-            TubeState.INTAKE_WAIT_BOTTOM,
-            TubeState.INTAKE_DELAY_AFTER_BOTTOM -> {
+            TubeState.INTAKE_WAIT_MIDDLE, TubeState.INTAKE_DELAY_AFTER_MIDDLE, TubeState.INTAKE_WAIT_BOTTOM, TubeState.INTAKE_DELAY_AFTER_BOTTOM -> {
                 intake.power = 1.0
                 transfer.power = 0.0
                 hardStop.position = 0.9
@@ -242,8 +229,7 @@ object Tube : Subsystem {
                 hardStop.position = 0.65
             }
 
-            TubeState.SHOOTING_WAIT_CLEAR,
-            TubeState.SHOOTING_DELAY_BEFORE_IDLE -> {
+            TubeState.SHOOTING_WAIT_CLEAR, TubeState.SHOOTING_DELAY_BEFORE_IDLE -> {
                 intake.power = shootSpeed
                 transfer.power = shootSpeed
                 hardStop.position = 0.65

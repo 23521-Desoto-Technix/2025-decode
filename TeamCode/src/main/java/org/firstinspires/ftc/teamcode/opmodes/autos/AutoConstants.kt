@@ -35,8 +35,8 @@ object AutoConstants {
                 pose("sideSpike3Ctrl", Pose(121.0, 58.0, -90.0.deg.inRad))
                 pose("gateHit", Pose(127.0, 62.0, -90.0.deg.inRad))
                 pose("gateHitCtrl", Pose(120.0, 58.0, -90.0.deg.inRad))
-                pose("gateIntake", Pose(131.81, 57.06, 30.0.deg.inRad), Pose(7.9, 58.22, 150.0.deg.inRad))
-                pose("gateIntakeB", Pose(131.81, 57.06, 30.0.deg.inRad), Pose(8.0, 57.82, 150.0.deg.inRad))
+                pose("gateIntake", Pose(131.81, 57.0, 30.0.deg.inRad), Pose(8.0, 58.22, 150.0.deg.inRad))
+                pose("gateIntakeB", Pose(131.81, 59.0, 30.0.deg.inRad), Pose(8.0, 60.82, 150.0.deg.inRad))
                 pose("gateIntakeC", Pose(131.81, 57.06, 30.0.deg.inRad), Pose(8.0, 57.82, 150.0.deg.inRad))
                 pose("gateIntakeD", Pose(131.81, 57.06, 30.0.deg.inRad), Pose(10.0, 59.32, 150.0.deg.inRad))
                 pose("gateIntakeCtrl", Pose(105.0, 58.0, 40.0.deg.inRad))
@@ -110,7 +110,7 @@ object AutoConstants {
                 angle("parkTurretRed1", (-112.0).deg)
                 angle("parkTurretBlue1", 112.0.deg)
                 angle("farTurretRed", (-114.0).deg)
-                angle("farTurretBlue", 114.0.deg)
+                angle("farTurretBlue", 116.0.deg)
             }
 
         operator fun get(name: String): Angle = angles.getValue(name)

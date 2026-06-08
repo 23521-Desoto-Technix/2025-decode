@@ -71,11 +71,11 @@ class far21 : NextFTCOpMode() {
                 else -> 0.0.deg
             }
         val intake: (Command) -> Command = { path ->
-            SequentialGroup(Tube.intakeAll, path, Delay(150.milliseconds), Tube.shootAll(.95), Delay(510.milliseconds))
+            SequentialGroup(Tube.intakeAll, path, Delay(150.milliseconds), Tube.shootAll(.70), Delay(510.milliseconds))
         }
         return SequentialGroup(
-            Flywheel.setSpeed(1_950.0),
-            InstantCommand { Hood.position = 0.94 },
+            Flywheel.setSpeed(2_000.0),
+            InstantCommand { Hood.position = 0.955 },
             InstantCommand { Turret.setTargetAngle(farTurretAngle) },
             FollowPath(paths.getValue("startFarToShootFar")),
             Flywheel.waitForSpeed(),
