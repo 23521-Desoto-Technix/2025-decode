@@ -40,7 +40,6 @@ object Tube : Subsystem {
         if (!BotState.enabled) {
             intake.power = 0.0
             transfer.power = 0.0
-            hardStop.position = 0.9
             return
         }
 
@@ -63,7 +62,6 @@ object Tube : Subsystem {
         if (!BotState.enabled) {
             intake.power = 0.0
             transfer.power = 0.0
-            hardStop.position = 0.9
             return
         }
 
