@@ -6,13 +6,12 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
+import com.pedropathing.ftc.localization.constants.OctoQuadConstants;
+import com.pedropathing.ftc.localization.localizers.OctoQuadLocalizer;
 import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.hardware.digitalchickenlabs.OctoQuad;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.teamcode.OctoQuadConstants;
-import org.firstinspires.ftc.teamcode.OctoQuadLocalizer;
 
 public class Constants {
 
