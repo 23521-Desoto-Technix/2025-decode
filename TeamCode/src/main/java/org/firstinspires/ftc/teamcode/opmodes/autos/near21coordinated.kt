@@ -53,9 +53,9 @@ class near21coordinated : NextFTCOpMode() {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
         // telemetry.msTransmissionInterval = 100
         val selectRed =
-            button { gamepad1.circle }.whenBecomesTrue { BotState.alliance = Alliance.RED }
+            button { gamepad1.left_bumper }.whenBecomesTrue { BotState.alliance = Alliance.RED }
         val selectBlue =
-            button { gamepad1.cross }.whenBecomesTrue { BotState.alliance = Alliance.BLUE }
+            button { gamepad1.right_bumper }.whenBecomesTrue { BotState.alliance = Alliance.BLUE }
     }
 
     private fun buildRoutine(paths: Map<String, PathChain>): Command {
@@ -117,8 +117,8 @@ class near21coordinated : NextFTCOpMode() {
         val allianceDisplay = HtmlTelemetryUtils.createAllianceBadge(BotState.alliance)
 
         telemetry.addLine(allianceDisplay)
-        telemetry.addLine("RED: Circle ●")
-        telemetry.addLine("BLUE: Cross ✕")
+        telemetry.addLine("RED: ← bumper")
+        telemetry.addLine("BLUE: → bumper")
 
         BindingManager.update()
         telemetry.update()
