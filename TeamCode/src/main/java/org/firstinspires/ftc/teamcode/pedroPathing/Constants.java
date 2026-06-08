@@ -1,17 +1,18 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
-import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.control.PredictiveBrakingCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
-import com.pedropathing.ftc.localization.constants.PinpointConstants;
 import com.pedropathing.paths.PathConstraints;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.digitalchickenlabs.OctoQuad;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.teamcode.OctoQuadConstants;
+import org.firstinspires.ftc.teamcode.OctoQuadLocalizer;
 
 public class Constants {
 
@@ -34,14 +35,26 @@ public class Constants {
             .yVelocity(58.6)
             .useBrakeModeInTeleOp(true);
 
-    public static PinpointConstants localizerConstants =
-            new PinpointConstants()
+    public static OctoQuadConstants localizerConstants =
+            new OctoQuadConstants()
+                    .name("octoquad")
+                    .deadwheelPortX(0)
+                    .deadwheelPortY(1)
+                    .imuScalar(1)
+                    .deadwheelXTicksPerMM(9.9471F)
+                    .deadwheelYTicksPerMM(9.9471F)
+                    .deadwheelXDir(OctoQuad.EncoderDirection.FORWARD)
+                    .deadwheelYDir(OctoQuad.EncoderDirection.FORWARD)
+                    .tcpOffsetXMM(-89.154F)
+                    .tcpOffsetYMM(-74.168F);
+
+            /*new PinpointConstants()
                     .hardwareMapName("pinpoint")
                     .strafePodX(-3.51)
                     .forwardPodY(-2.92)
                     .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
                     .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-                    .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+                    .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);*/
 
     public static PathConstraints pathConstraints = new PathConstraints(
             0.97,
@@ -51,9 +64,11 @@ public class Constants {
     );
 
     public static Follower createFollower(HardwareMap hardwareMap) {
+        OctoQuadLocalizer localizer = new OctoQuadLocalizer(hardwareMap, localizerConstants, OctoQuadLocalizer.InitMode.INITIALIZE_OCTOQUAD);
+
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .mecanumDrivetrain(driveConstants)
-                .pinpointLocalizer(localizerConstants)
+                .setLocalizer(localizer)
                 .pathConstraints(pathConstraints)
                 .build();
     }
