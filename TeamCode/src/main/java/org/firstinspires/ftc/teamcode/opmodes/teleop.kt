@@ -97,10 +97,12 @@ class teleop : NextFTCOpMode() {
 
     private lateinit var liftEncoder: DcMotor
 
-    val redReferenceNear = Pose(109.6, 131.84, 90.0.deg.inRad)
+    //TODO blue references
+
+    val redReferenceNear = Pose(108.7, 131.3386, 90.0.deg.inRad)
     val blueReferenceNear = mirrorPose(redReferenceNear)
 
-    val redReferenceFar = Pose(11.52, 9.3, -180.0.deg.inRad)
+    val redReferenceFar = Pose(10.354, 10.3937, -180.0.deg.inRad)
     val blueReferenceFar = mirrorPose(redReferenceFar)
 
     val redBase = Pose(34.3, 30.3, -135.deg.inRad)
@@ -572,7 +574,7 @@ class teleop : NextFTCOpMode() {
 
         t.addData("X", PedroComponent.follower.pose.x)
         t.addData("Y", PedroComponent.follower.pose.y)
-        t.addData("Heading", PedroComponent.follower.pose.heading)
+        t.addData("Heading", PedroComponent.follower.pose.heading.rad.inDeg)
         t.addData("Distance to Target", distanceToTarget)
         t.addData("Lift", liftEncoder.currentPosition)
         t.addData("Lift under $MAX_LIFT", liftEncoder.currentPosition < MAX_LIFT)
