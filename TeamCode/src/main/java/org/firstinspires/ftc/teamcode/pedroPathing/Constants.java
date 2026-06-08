@@ -44,8 +44,8 @@ public class Constants {
                     .deadwheelYTicksPerMM(19.8347F)
                     .deadwheelXDir(OctoQuad.EncoderDirection.FORWARD)
                     .deadwheelYDir(OctoQuad.EncoderDirection.FORWARD)
-                    .tcpOffsetXMM(-89.154F)
-                    .tcpOffsetYMM(-74.168F);
+                    .tcpOffsetXMM(89.154F)
+                    .tcpOffsetYMM(74.168F);
 
             /*new PinpointConstants()
                     .hardwareMapName("pinpoint")
