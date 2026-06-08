@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
+import com.bylazar.field.PanelsField
 import com.bylazar.telemetry.JoinedTelemetry
 import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.geometry.Pose
@@ -36,7 +37,6 @@ import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator.ShootingZone
-import com.bylazar.field.PanelsField
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -89,6 +89,8 @@ class teleop : NextFTCOpMode() {
     val panelsField = PanelsField.field
     val closeZone = listOf(Point2(0.0, 144.0), Point2(144.0, 144.0), Point2(72.0, 72.0))
 
+    var turretOffset = 0.deg
+
     private lateinit var backRight: DcMotor
     private lateinit var frontLeft: DcMotor
     private lateinit var backLeft: DcMotor
@@ -97,7 +99,7 @@ class teleop : NextFTCOpMode() {
 
     private lateinit var liftEncoder: DcMotor
 
-    //TODO blue references
+    // TODO blue references
 
     val redReferenceNear = Pose(108.7, 131.3386, 90.0.deg.inRad)
     val blueReferenceNear = mirrorPose(redReferenceNear)
@@ -409,21 +411,12 @@ class teleop : NextFTCOpMode() {
                     }
                 }
 
-        val autoPark =
-            button { gamepad2.left_bumper }
-                .whenBecomesTrue {
-                    PedroComponent.follower.holdPoint(
-                        when (BotState.alliance) {
-                            Alliance.RED -> redBase
-                            else -> blueBase
-                        }
-                    )
-                }
-                .whenTrue { PedroComponent.follower.update() }
-                .whenBecomesFalse { PedroComponent.follower.breakFollowing() }
+        val turretLeft = button { gamepad2.left_bumper }.whenBecomesTrue { turretOffset -= 2.deg }
+
+        val turretRight = button { gamepad2.right_bumper }.whenBecomesTrue { turretOffset += 2.deg }
 
         val driveCancel =
-            button { abs(gamepad2.left_stick_y) > 0.1 || gamepad2.left_bumper }
+            button { abs(gamepad2.left_stick_y) > 0.1 }
                 .whenBecomesTrue { driverControlled.cancel() }
                 .whenBecomesFalse { driverControlled.schedule() }
         val ptoOn =
@@ -511,9 +504,9 @@ class teleop : NextFTCOpMode() {
                 .whenBecomesTrue { Tilt.brake().schedule() }
                 .whenBecomesFalse { Tilt.up().schedule() }
         /*val autoReady =
-            button { insideCloseZone }
-                .whenBecomesTrue { Tube.ready().schedule() }
-                .whenBecomesFalse { Tube.unReady().schedule() }*/
+        button { insideCloseZone }
+            .whenBecomesTrue { Tube.ready().schedule() }
+            .whenBecomesFalse { Tube.unReady().schedule() }*/
 
         panelsField.setOffsets(PanelsField.presets.PEDRO_PATHING)
     }
@@ -540,7 +533,6 @@ class teleop : NextFTCOpMode() {
         panelsField.moveCursor(turretPose.x, turretPose.y)
         panelsField.circle(2.0)
         panelsField.update()
-
 
         val targetMetrics =
             calculateTargetMetrics(
@@ -657,7 +649,7 @@ class teleop : NextFTCOpMode() {
         }
 
         if (!ignorePinpoint && !lockTurret) {
-            Turret.setTargetAngle(-relativeAngleToTarget)
+            Turret.setTargetAngle(-relativeAngleToTarget + turretOffset)
         } else {
             Turret.setTargetAngle(0.0.deg)
         }
