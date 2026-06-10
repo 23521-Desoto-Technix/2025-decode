@@ -7,6 +7,7 @@ import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
+import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
@@ -18,7 +19,6 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
-import org.firstinspires.ftc.teamcode.opmodes.teleop
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -92,10 +92,13 @@ class near21 : NextFTCOpMode() {
             Flywheel.setSpeed(1_500.0),
             InstantCommand { Hood.position = 0.65 },
             InstantCommand { Turret.setTargetAngle(startTurretAngle) },
-            FollowPath(paths.getValue("startNearToShootMiddle")),
-            Delay(200.milliseconds),
-            Tube.shootAll(),
-            Delay(400.milliseconds),
+            ParallelGroup(
+                FollowPath(paths.getValue("startNearToShootMiddle")),
+                SequentialGroup(
+                    Delay(200.milliseconds),
+                    Tube.shootAll(),
+                ),
+            ),
             InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             intake(FollowPath(paths.getValue("spike2Combined"))),
             gateIntake,
