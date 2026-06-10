@@ -138,6 +138,7 @@ object AutoConstants {
                     .pathBuilder()
                     .addPath(BezierLine(p("startNear"), p("shootNear")))
                     .setConstantHeadingInterpolation(p("startNear").heading)
+                    .setNoDeceleration()
                     .build(),
             )
             path(

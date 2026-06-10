@@ -89,16 +89,18 @@ class near21 : NextFTCOpMode() {
                 )
             )
         return SequentialGroup(
-            Flywheel.setSpeed(1_500.0),
+            Flywheel.setSpeed(1_700.0),
             InstantCommand { Hood.position = 0.65 },
             InstantCommand { Turret.setTargetAngle(startTurretAngle) },
             ParallelGroup(
                 FollowPath(paths.getValue("startNearToShootMiddle")),
                 SequentialGroup(
-                    Delay(200.milliseconds),
+                    Delay(600.milliseconds),
                     Tube.shootAll(),
                 ),
             ),
+            Flywheel.setSpeed(1_500.0),
+            InstantCommand { Hood.position = 0.65 },
             InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             intake(FollowPath(paths.getValue("spike2Combined"))),
             gateIntake,
