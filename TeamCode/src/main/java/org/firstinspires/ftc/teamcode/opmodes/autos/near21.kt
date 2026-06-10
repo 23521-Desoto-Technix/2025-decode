@@ -18,6 +18,7 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
+import org.firstinspires.ftc.teamcode.opmodes.teleop
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel
 import org.firstinspires.ftc.teamcode.subsystems.Hood
@@ -136,6 +137,7 @@ class near21 : NextFTCOpMode() {
         telemetry.addData("X", BotState.pose?.x)
         telemetry.addData("Y", BotState.pose?.y)
         telemetry.addData("Heading", BotState.pose?.heading?.rad?.inDeg)
+        telemetry.addData("Current path", PedroComponent.follower.currentPath.toString())
         telemetry.update()
         for (hub in allHubs) {
             hub!!.clearBulkCache()
