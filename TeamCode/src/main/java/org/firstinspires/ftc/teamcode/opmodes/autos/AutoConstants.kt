@@ -18,7 +18,7 @@ object AutoConstants {
 
         private val redPoses =
             linkedMapOf<String, Pose>().apply {
-                pose("startNear", Pose(126.74, 111.15, 0.0.deg.inRad))
+                pose("startNear", Pose(124.88, 123.83, -143.7.deg.inRad))
                 pose("startFar", Pose(79.94, 8.07, 0.0.deg.inRad))
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
                 pose("shootMiddle", Pose(89.0, 80.0, 0.0.deg.inRad))
@@ -35,7 +35,7 @@ object AutoConstants {
                 pose("sideSpike3Ctrl", Pose(121.0, 58.0, -90.0.deg.inRad))
                 pose("gateHit", Pose(127.0, 62.0, -90.0.deg.inRad))
                 pose("gateHitCtrl", Pose(120.0, 58.0, -90.0.deg.inRad))
-                pose("gateIntake", Pose(131.81, 57.0, 30.0.deg.inRad), Pose(8.0, 58.22, 150.0.deg.inRad))
+                pose("gateIntake", Pose(131.81, 59.0, 30.0.deg.inRad))
                 pose("gateIntakeB", Pose(131.81, 59.0, 30.0.deg.inRad), Pose(8.0, 60.82, 150.0.deg.inRad))
                 pose("gateIntakeC", Pose(131.81, 57.06, 30.0.deg.inRad), Pose(8.0, 57.82, 150.0.deg.inRad))
                 pose("gateIntakeD", Pose(131.81, 57.06, 30.0.deg.inRad), Pose(10.0, 59.32, 150.0.deg.inRad))
@@ -111,6 +111,8 @@ object AutoConstants {
                 angle("parkTurretBlue1", 112.0.deg)
                 angle("farTurretRed", (-114.0).deg)
                 angle("farTurretBlue", 116.0.deg)
+                angle("startTurretRed", (0.0).deg)
+                angle("startTurretBlue", 0.0.deg)
             }
 
         operator fun get(name: String): Angle = angles.getValue(name)
@@ -143,7 +145,7 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierLine(p("startNear"), p("shootMiddle")))
-                    .setConstantHeadingInterpolation(h("startNear"))
+                    .setTangentHeadingInterpolation()
                     .build(),
             )
             path(

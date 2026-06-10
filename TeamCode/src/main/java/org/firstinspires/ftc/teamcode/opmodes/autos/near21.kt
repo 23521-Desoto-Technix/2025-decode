@@ -70,6 +70,12 @@ class near21 : NextFTCOpMode() {
                 Alliance.BLUE -> AutoConstants.Angles["parkTurretBlue3"]
                 else -> 0.0.deg
             }
+        val startTurretAngle =
+            when (BotState.alliance) {
+                Alliance.RED -> AutoConstants.Angles["startTurretRed"]
+                Alliance.BLUE -> AutoConstants.Angles["startTurretBlue3"]
+                else -> 0.0.deg
+            }
         val intake: (Command) -> Command = { path ->
             SequentialGroup(Tube.intakeAll, path, Tube.shootAll(), Delay(500.milliseconds))
         }
@@ -81,27 +87,20 @@ class near21 : NextFTCOpMode() {
                     FollowPath(paths.getValue("gateIntakeShootMiddle")),
                 )
             )
-        val gateIntakeB =
-            intake(
-                SequentialGroup(
-                    FollowPath(paths.getValue("shootMiddleGateIntakeB")),
-                    Tube.waitForAll(900.milliseconds),
-                    FollowPath(paths.getValue("gateIntakeShootMiddle")),
-                )
-            )
         return SequentialGroup(
             Flywheel.setSpeed(1_500.0),
             InstantCommand { Hood.position = 0.65 },
-            InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
+            InstantCommand { Turret.setTargetAngle(startTurretAngle) },
             FollowPath(paths.getValue("startNearToShootMiddle")),
             Delay(200.milliseconds),
             Tube.shootAll(),
             Delay(400.milliseconds),
+            InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
             intake(FollowPath(paths.getValue("spike2Combined"))),
             gateIntake,
             gateIntake,
             intake(FollowPath(paths.getValue("spike1Combined"))),
-            gateIntakeB,
+            gateIntake,
             Flywheel.setSpeed(1_400.0),
             InstantCommand { Hood.position = 0.45 },
             InstantCommand { Turret.setTargetAngle(parkTurretAngle) },
