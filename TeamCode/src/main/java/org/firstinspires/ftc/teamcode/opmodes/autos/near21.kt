@@ -137,7 +137,11 @@ class near21 : NextFTCOpMode() {
         telemetry.addData("X", BotState.pose?.x)
         telemetry.addData("Y", BotState.pose?.y)
         telemetry.addData("Heading", BotState.pose?.heading?.rad?.inDeg)
-        telemetry.addData("Current path", PedroComponent.follower.currentPath.toString())
+        try {
+            telemetry.addData("Current path", PedroComponent.follower.currentPath.toString())
+        } catch (e: Exception) {
+            telemetry.addData("Current path", "None")
+        }
         telemetry.update()
         for (hub in allHubs) {
             hub!!.clearBulkCache()
