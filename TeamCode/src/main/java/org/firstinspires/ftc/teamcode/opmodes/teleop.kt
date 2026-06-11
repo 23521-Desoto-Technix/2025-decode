@@ -4,7 +4,6 @@ import com.bylazar.field.PanelsField
 import com.bylazar.telemetry.JoinedTelemetry
 import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.geometry.Pose
-import com.pedropathing.math.Vector
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DcMotor
@@ -33,20 +32,16 @@ import org.firstinspires.ftc.teamcode.subsystems.Tube
 import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
+import org.firstinspires.ftc.teamcode.utils.calculateTargetingPose
+import org.firstinspires.ftc.teamcode.utils.calculateTargetMetrics
 import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
 import org.firstinspires.ftc.teamcode.utils.PoseUtils.mirrorPose
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator.ShootingZone
 import java.util.Locale
 import kotlin.math.abs
-import kotlin.math.atan2
 import kotlin.math.cos
-import kotlin.math.hypot
 import kotlin.math.sin
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
-
-data class TargetMetrics(val distanceToTarget: Double, val relativeAngleToTarget: Angle)
 
 data class Point2(val x: Double, val y: Double)
 
@@ -117,13 +112,6 @@ class teleop : NextFTCOpMode() {
         val rotatedForward = forward * cos(angleRadians) - strafe * sin(angleRadians)
         val rotatedStrafe = forward * sin(angleRadians) + strafe * cos(angleRadians)
         return Pair(rotatedForward, rotatedStrafe)
-    }
-
-    fun applyRobotSpaceOffset(pose: Pose, localX: Double, localY: Double): Pose {
-        val heading = pose.heading
-        val fieldX = pose.x + localX * cos(heading) - localY * sin(heading)
-        val fieldY = pose.y + localX * sin(heading) + localY * cos(heading)
-        return Pose(fieldX, fieldY, pose.heading)
     }
 
     fun robotCorners(pose: Pose, sideLength: Double = 20.0): List<Point2> {
@@ -221,56 +209,6 @@ class teleop : NextFTCOpMode() {
         return anySquareCornerInsideTriangle || anyTriangleCornerInsideSquare || edgesIntersect
     }
 
-    fun calculateTargetMetrics(
-        currentPose: Pose,
-        angularVelocity: Double = 0.0,
-        velocity: Vector,
-    ): TargetMetrics {
-        val targetPose =
-            if (currentPose.y < 48.0) {
-                if (BotState.alliance == Alliance.BLUE) {
-                    Pose(4.0, 140.0, 0.0)
-                } else {
-                    Pose(140.0, 140.0, 0.0)
-                }
-            } else {
-                if (BotState.alliance == Alliance.BLUE) {
-                    Pose(0.0, 144.0, 0.0)
-                } else {
-                    Pose(144.0, 144.0, 0.0)
-                }
-            }
-        val velocity =
-            velocity.times(
-                400.milliseconds.inWholeMicroseconds.toDouble() /
-                    1.seconds.inWholeMicroseconds.toDouble()
-            )
-
-        val currentX = currentPose.x + velocity.xComponent
-        val currentY = currentPose.y + velocity.yComponent
-        val deltaX = targetPose.x - currentX
-        val deltaY = targetPose.y - currentY
-        val distanceToTarget = hypot(deltaX, deltaY)
-
-        val redAnglePoseA = Pose(144.0, 125.0, 0.0)
-        val redAnglePoseB = Pose(125.0, 144.0, 0.0)
-        val anglePoseA =
-            if (BotState.alliance == Alliance.BLUE) mirrorPose(redAnglePoseA) else redAnglePoseA
-        val anglePoseB =
-            if (BotState.alliance == Alliance.BLUE) mirrorPose(redAnglePoseB) else redAnglePoseB
-        val angleToPoseA = atan2(anglePoseA.y - currentY, anglePoseA.x - currentX)
-        val angleToPoseB = atan2(anglePoseB.y - currentY, anglePoseB.x - currentX)
-        val absoluteAngleToTarget =
-            atan2(sin(angleToPoseA) + sin(angleToPoseB), cos(angleToPoseA) + cos(angleToPoseB)).rad
-        val predictiveHeading =
-            currentPose.heading.rad +
-                (angularVelocity / 1.seconds.inWholeMicroseconds *
-                        90.milliseconds.inWholeMicroseconds)
-                    .rad
-        val relativeAngleToTarget = (predictiveHeading - absoluteAngleToTarget + 180.deg).normalized
-
-        return TargetMetrics(distanceToTarget, relativeAngleToTarget)
-    }
 
     override fun onInit() {
         backRight = hardwareMap.dcMotor["backRight"]
@@ -522,7 +460,7 @@ class teleop : NextFTCOpMode() {
         lastUpdateNs = nowNs
 
         val botPose = PedroComponent.follower.pose
-        val turretPose = applyRobotSpaceOffset(botPose, -1.633, 0.0)
+        val turretPose = calculateTargetingPose(botPose)
         insideCloseZone = squareOverlapsTriangle(botPose)
 
         panelsField.setFill(PanelsField.BLUE)
@@ -536,7 +474,7 @@ class teleop : NextFTCOpMode() {
 
         val targetMetrics =
             calculateTargetMetrics(
-                turretPose,
+                botPose,
                 PedroComponent.follower.angularVelocity,
                 PedroComponent.follower.velocity,
             )

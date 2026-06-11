@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.autos
 
+import com.pedropathing.geometry.Pose
+import com.pedropathing.math.Vector
 import com.pedropathing.paths.PathChain
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
@@ -17,7 +19,6 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -28,6 +29,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
+import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator
+import org.firstinspires.ftc.teamcode.utils.calculateTargetMetrics
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Near 21", group = "Near", preselectTeleOp = "teleop")
 class near21 : NextFTCOpMode() {
@@ -42,6 +46,8 @@ class near21 : NextFTCOpMode() {
     }
 
     lateinit var routine: Command
+
+    val targetPose: Pose? = null
 
     private lateinit var allHubs: MutableList<LynxModule?>
 
@@ -89,21 +95,21 @@ class near21 : NextFTCOpMode() {
                 )
             )
         return SequentialGroup(
-            Flywheel.setSpeed(1_700.0),
+            /*Flywheel.setSpeed(1_700.0),
             InstantCommand { Hood.position = 0.65 },
-            InstantCommand { Turret.setTargetAngle(startTurretAngle) },
+            InstantCommand { Turret.setTargetAngle(startTurretAngle) },*/
             ParallelGroup(
                 FollowPath(paths.getValue("startNearToSpike2")),
                 SequentialGroup(
-                    Delay(600.milliseconds),
+                    Delay(400.milliseconds),
                     Tube.shootAll(),
                     Delay(500.milliseconds),
                     Tube.intakeAll,
                 ),
             ),
-            Flywheel.setSpeed(1_500.0),
+            /*Flywheel.setSpeed(1_500.0),
             InstantCommand { Hood.position = 0.65 },
-            InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
+            InstantCommand { Turret.setTargetAngle(middleTurretAngle) },*/
             FollowPath(paths.getValue("spike2ToShootMiddle")),
             Tube.shootAll(),
             Delay(500.milliseconds),
@@ -142,6 +148,30 @@ class near21 : NextFTCOpMode() {
     }
 
     override fun onUpdate() {
+        val targetMetrics =
+            if (targetPose != null) {
+                calculateTargetMetrics(
+                    targetPose,
+                    0.0,
+                    Vector(),
+                )
+            } else {
+                calculateTargetMetrics(
+                    PedroComponent.follower.pose,
+                    PedroComponent.follower.angularVelocity,
+                    PedroComponent.follower.velocity,
+                )
+            }
+        val distanceToTarget = targetMetrics.distanceToTarget
+        val relativeAngleToTarget = targetMetrics.relativeAngleToTarget
+        val config = ShootingConfigInterpolator.getConfig(distanceToTarget, ShootingConfigInterpolator.ShootingZone.NEAR)
+        if (Flywheel.targetSpeed != config.flywheelSpeed) {
+            Flywheel.enable().then(Flywheel.setSpeed(config.flywheelSpeed)).schedule()
+        }
+        if (Hood.position != config.hoodPosition) {
+            Hood.position = config.hoodPosition
+        }
+        Turret.setTargetAngle(-relativeAngleToTarget)
         BotState.pose = PedroComponent.follower.pose
         telemetry.addData("X", BotState.pose?.x)
         telemetry.addData("Y", BotState.pose?.y)

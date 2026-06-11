@@ -178,6 +178,7 @@ object AutoConstants {
                     .pathBuilder()
                     .addPath(BezierLine(p("spike2End"), p("shootMiddle")))
                     .setTangentHeadingInterpolation()
+                    .setReversed()
                     .build(),
             )
             path(
