@@ -262,7 +262,7 @@ object AutoConstants {
                 "sideSpike3Combined",
                 follower
                     .pathBuilder()
-                    .addPath(BezierCurve(p("shootMiddle"), p("sideSpike3")))
+                    .addPath(BezierLine(p("shootMiddle"), p("sideSpike3")))
                     .setHeadingInterpolation(
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
