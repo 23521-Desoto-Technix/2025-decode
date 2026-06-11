@@ -250,9 +250,9 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierCurve(p("shootMiddle"), p("spike3Ctrl"), p("spike3Start")))
-                    .setLinearHeadingInterpolation(p("shootMiddle").heading, p("spike3End").heading)
+                    .setTangentHeadingInterpolation()
                     .addPath(BezierLine(p("spike3Start"), p("spike3End")))
-                    .setLinearHeadingInterpolation(p("spike3End").heading, p("shootMiddle").heading)
+                    .setTangentHeadingInterpolation()
                     .addPath(BezierLine(p("spike3End"), p("shootPark")))
                     .setTangentHeadingInterpolation()
                     .setReversed()
