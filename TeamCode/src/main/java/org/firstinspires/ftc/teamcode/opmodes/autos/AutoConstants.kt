@@ -320,11 +320,11 @@ object AutoConstants {
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
                                 0.0,
-                                0.6,
+                                0.55,
                                 HeadingInterpolator.tangent,
                             ),
                             HeadingInterpolator.PiecewiseNode(
-                                0.6,
+                                0.55,
                                 1.0,
                                 HeadingInterpolator.constant(h("gateIntake")),
                             ),
