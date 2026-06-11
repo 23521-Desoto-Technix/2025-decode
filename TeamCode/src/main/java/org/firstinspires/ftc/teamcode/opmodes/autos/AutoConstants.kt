@@ -35,7 +35,7 @@ object AutoConstants {
                 pose("sideSpike3Ctrl", Pose(121.0, 58.0, -90.0.deg.inRad))
                 pose("gateHit", Pose(127.0, 62.0, -90.0.deg.inRad))
                 pose("gateHitCtrl", Pose(120.0, 58.0, -90.0.deg.inRad))
-                pose("gateIntake", Pose(131.8, 60.0, 30.0.deg.inRad))
+                pose("gateIntake", Pose(132.0, 58.0, 30.0.deg.inRad))
                 pose(
                     "gateIntakeB",
                     Pose(131.81, 59.0, 30.0.deg.inRad),
@@ -410,7 +410,7 @@ object AutoConstants {
                             HeadingInterpolator.PiecewiseNode(
                                 0.1,
                                 1.0,
-                                HeadingInterpolator.tangent,
+                                HeadingInterpolator.tangent.reverse(),
                             ),
                         )
                     )

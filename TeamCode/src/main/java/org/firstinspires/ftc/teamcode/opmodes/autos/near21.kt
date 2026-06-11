@@ -102,7 +102,7 @@ class near21 : NextFTCOpMode() {
                 FollowPath(paths.getValue("startNearToSpike2")),
                 SequentialGroup(
                     InstantCommand { PedroComponent.follower.setMaxPower(0.7) },
-                    Delay(600.milliseconds),
+                    Delay(800.milliseconds),
                     Tube.shootAll(),
                     Delay(200.milliseconds),
                     InstantCommand { PedroComponent.follower.setMaxPower(1.0) },
@@ -115,7 +115,7 @@ class near21 : NextFTCOpMode() {
             InstantCommand { Turret.setTargetAngle(middleTurretAngle) },*/
             FollowPath(paths.getValue("spike2ToShootMiddle")),
             Tube.shootAll(),
-            Delay(500.milliseconds),
+            Delay(200.milliseconds),
             gateIntake,
             gateIntake,
             intake(FollowPath(paths.getValue("spike1Combined"))),
