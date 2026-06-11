@@ -84,7 +84,7 @@ class near21 : NextFTCOpMode() {
                 else -> 0.0.deg
             }
         val intake: (Command) -> Command = { path ->
-            SequentialGroup(Tube.intakeAll, path, Tube.shootAll(), Delay(500.milliseconds))
+            SequentialGroup(Tube.intakeAll, path, Tube.shootAll(), Delay(200.milliseconds))
         }
         val gateIntake =
             intake(
