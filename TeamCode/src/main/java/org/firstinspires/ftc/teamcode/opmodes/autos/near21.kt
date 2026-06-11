@@ -101,7 +101,7 @@ class near21 : NextFTCOpMode() {
             ParallelGroup(
                 FollowPath(paths.getValue("startNearToSpike2")),
                 SequentialGroup(
-                    Delay(400.milliseconds),
+                    Delay(600.milliseconds),
                     Tube.shootAll(),
                     Delay(500.milliseconds),
                     Tube.intakeAll,
