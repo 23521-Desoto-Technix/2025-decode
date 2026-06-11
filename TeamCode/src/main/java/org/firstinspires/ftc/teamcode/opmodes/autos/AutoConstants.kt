@@ -30,7 +30,7 @@ object AutoConstants {
                 pose("sideSpike1Ctrl", Pose(120.0, 100.0, -90.0.deg.inRad))
                 pose("sideSpike2", Pose(121.0, 74.0, -90.0.deg.inRad))
                 pose("sideSpike2Ctrl", Pose(121.0, 93.0, -90.0.deg.inRad))
-                pose("sideSpike3", Pose(121.0, 45.0, -90.0.deg.inRad))
+                pose("sideSpike3", Pose(118.0, 40.0, -90.0.deg.inRad))
                 pose("sideSpike3TransitionalCtrl", Pose(118.0, 45.0, -90.0.deg.inRad))
                 pose("sideSpike3Ctrl", Pose(121.0, 58.0, -90.0.deg.inRad))
                 pose("gateHit", Pose(127.0, 62.0, -90.0.deg.inRad))
@@ -253,6 +253,30 @@ object AutoConstants {
                     .setTangentHeadingInterpolation()
                     .addPath(BezierLine(p("spike3Start"), p("spike3End")))
                     .setTangentHeadingInterpolation()
+                    .addPath(BezierLine(p("spike3End"), p("shootPark")))
+                    .setTangentHeadingInterpolation()
+                    .setReversed()
+                    .build(),
+            )
+            path(
+                "sideSpike3Combined",
+                follower
+                    .pathBuilder()
+                    .addPath(BezierCurve(p("shootMiddle"), p("sideSpike3")))
+                    .setHeadingInterpolation(
+                        HeadingInterpolator.piecewise(
+                            HeadingInterpolator.PiecewiseNode(
+                                0.0,
+                                0.6,
+                                HeadingInterpolator.tangent,
+                            ),
+                            HeadingInterpolator.PiecewiseNode(
+                                0.6,
+                                1.0,
+                                HeadingInterpolator.constant(p("sideSpike3").heading),
+                            ),
+                        )
+                    )
                     .addPath(BezierLine(p("spike3End"), p("shootPark")))
                     .setTangentHeadingInterpolation()
                     .setReversed()

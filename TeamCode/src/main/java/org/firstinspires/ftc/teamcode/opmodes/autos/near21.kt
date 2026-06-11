@@ -104,7 +104,7 @@ class near21 : NextFTCOpMode() {
                     InstantCommand { PedroComponent.follower.setMaxPower(0.7) },
                     Delay(800.milliseconds),
                     Tube.shootAll(),
-                    Delay(200.milliseconds),
+                    Delay(100.milliseconds),
                     InstantCommand { PedroComponent.follower.setMaxPower(1.0) },
                     Delay(100.milliseconds),
                     Tube.intakeAll,
@@ -122,8 +122,8 @@ class near21 : NextFTCOpMode() {
             gateIntake,
             gateIntake,
             gateIntake,
-            intake(FollowPath(paths.getValue("spike3Combined"))),
-            Delay(500.milliseconds),
+            intake(FollowPath(paths.getValue("sideSpike3Combined"))),
+            Delay(200.milliseconds),
             Flywheel.stop(),
         )
     }
