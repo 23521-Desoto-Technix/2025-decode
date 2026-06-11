@@ -315,7 +315,7 @@ object AutoConstants {
                 "shootMiddleGateIntake",
                 follower
                     .pathBuilder()
-                    .addPath(BezierCurve(p("shootMiddle"), p("gateIntake")))
+                    .addPath(BezierLine(p("shootMiddle"), p("gateIntake")))
                     .setHeadingInterpolation(
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
