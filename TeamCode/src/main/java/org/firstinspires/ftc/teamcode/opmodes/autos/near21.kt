@@ -17,6 +17,7 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -27,7 +28,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Near 21", group = "Near", preselectTeleOp = "teleop")
 class near21 : NextFTCOpMode() {
@@ -93,16 +93,20 @@ class near21 : NextFTCOpMode() {
             InstantCommand { Hood.position = 0.65 },
             InstantCommand { Turret.setTargetAngle(startTurretAngle) },
             ParallelGroup(
-                FollowPath(paths.getValue("startNearToShootMiddle")),
+                FollowPath(paths.getValue("startNearToSpike2")),
                 SequentialGroup(
                     Delay(600.milliseconds),
                     Tube.shootAll(),
+                    Delay(500.milliseconds),
+                    Tube.intakeAll,
                 ),
             ),
             Flywheel.setSpeed(1_500.0),
             InstantCommand { Hood.position = 0.65 },
             InstantCommand { Turret.setTargetAngle(middleTurretAngle) },
-            intake(FollowPath(paths.getValue("spike2Combined"))),
+            FollowPath(paths.getValue("spike2ToShootMiddle")),
+            Tube.shootAll(),
+            Delay(500.milliseconds),
             gateIntake,
             gateIntake,
             intake(FollowPath(paths.getValue("spike1Combined"))),
