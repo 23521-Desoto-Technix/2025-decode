@@ -21,7 +21,7 @@ object AutoConstants {
                 pose("startNear", Pose(124.88, 123.83, -143.7.deg.inRad))
                 pose("startFar", Pose(79.94, 8.07, 0.0.deg.inRad))
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
-                pose("shootMiddle", Pose(89.0, 80.0, 0.0.deg.inRad))
+                pose("shootMiddle", Pose(89.0, 80.0, -20.0.deg.inRad))
                 pose("shootFar", Pose(85.0, 22.0, 0.0.deg.inRad))
                 pose("parkFar", Pose(88.0, 22.0, 0.0.deg.inRad))
                 pose("push", Pose(90.0, 8.5, 0.0.deg.inRad))
@@ -404,13 +404,13 @@ object AutoConstants {
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
                                 0.0,
-                                0.1,
+                                0.2,
                                 HeadingInterpolator.constant(h("gateIntake")),
                             ),
                             HeadingInterpolator.PiecewiseNode(
-                                0.1,
+                                0.2,
                                 1.0,
-                                HeadingInterpolator.tangent.reverse(),
+                                HeadingInterpolator.constant(h("shootMiddle")),
                             ),
                         )
                     )
