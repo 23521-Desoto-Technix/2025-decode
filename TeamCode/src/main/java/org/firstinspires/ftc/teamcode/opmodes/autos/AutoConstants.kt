@@ -404,17 +404,16 @@ object AutoConstants {
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
                                 0.0,
-                                0.2,
+                                0.5,
                                 HeadingInterpolator.constant(h("gateIntake")),
                             ),
                             HeadingInterpolator.PiecewiseNode(
-                                0.2,
+                                0.5,
                                 1.0,
-                                HeadingInterpolator.constant(h("shootMiddle")),
+                                HeadingInterpolator.tangent.reverse(),
                             ),
                         )
                     )
-                    .setReversed()
                     .build(),
             )
             path(
