@@ -98,6 +98,11 @@ object Flywheel : Subsystem {
             .setIsDone { true }
             .requires(this)
 
+    fun setSpeedSafe(speed: Double) {
+        this.usingPID = true
+        this.targetSpeed = speed.coerceAtLeast(0.0)
+    }
+
     fun waitForSpeed() =
         LambdaCommand("waitForSpeed")
             .setIsDone { abs(targetSpeed - speed) <= SPEED_TOLERANCE }

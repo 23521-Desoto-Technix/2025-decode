@@ -166,7 +166,7 @@ class near21 : NextFTCOpMode() {
         val relativeAngleToTarget = targetMetrics.relativeAngleToTarget
         val config = ShootingConfigInterpolator.getConfig(distanceToTarget, ShootingConfigInterpolator.ShootingZone.NEAR)
         if (Flywheel.targetSpeed != config.flywheelSpeed) {
-            Flywheel.enable().then(Flywheel.setSpeed(config.flywheelSpeed)).schedule()
+            Flywheel.setSpeedSafe(config.flywheelSpeed)
         }
         if (Hood.position != config.hoodPosition) {
             Hood.position = config.hoodPosition
