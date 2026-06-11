@@ -315,16 +315,16 @@ object AutoConstants {
                 "shootMiddleGateIntake",
                 follower
                     .pathBuilder()
-                    .addPath(BezierCurve(p("shootMiddle"), p("gateIntakeCtrl"), p("gateIntake")))
+                    .addPath(BezierCurve(p("shootMiddle"), p("gateIntake")))
                     .setHeadingInterpolation(
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
                                 0.0,
-                                0.55,
+                                0.7,
                                 HeadingInterpolator.tangent,
                             ),
                             HeadingInterpolator.PiecewiseNode(
-                                0.55,
+                                0.7,
                                 1.0,
                                 HeadingInterpolator.constant(h("gateIntake")),
                             ),
@@ -404,11 +404,11 @@ object AutoConstants {
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
                                 0.0,
-                                0.2,
+                                0.05,
                                 HeadingInterpolator.constant(h("gateIntake")),
                             ),
                             HeadingInterpolator.PiecewiseNode(
-                                0.2,
+                                0.05,
                                 1.0,
                                 HeadingInterpolator.tangent.reverse(),
                             ),
