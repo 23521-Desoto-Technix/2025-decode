@@ -404,11 +404,11 @@ object AutoConstants {
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
                                 0.0,
-                                0.5,
+                                0.2,
                                 HeadingInterpolator.constant(h("gateIntake")),
                             ),
                             HeadingInterpolator.PiecewiseNode(
-                                0.5,
+                                0.2,
                                 1.0,
                                 HeadingInterpolator.tangent.reverse(),
                             ),
