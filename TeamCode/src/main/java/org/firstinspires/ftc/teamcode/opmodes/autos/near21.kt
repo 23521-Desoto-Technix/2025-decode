@@ -101,7 +101,7 @@ class near21 : NextFTCOpMode() {
             ParallelGroup(
                 FollowPath(paths.getValue("startNearToSpike2")),
                 SequentialGroup(
-                    InstantCommand { PedroComponent.follower.setMaxPower(0.5) },
+                    InstantCommand { PedroComponent.follower.setMaxPower(0.7) },
                     Delay(600.milliseconds),
                     Tube.shootAll(),
                     Delay(200.milliseconds),

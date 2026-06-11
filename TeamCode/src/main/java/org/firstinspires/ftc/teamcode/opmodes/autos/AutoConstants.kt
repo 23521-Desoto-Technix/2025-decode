@@ -35,7 +35,7 @@ object AutoConstants {
                 pose("sideSpike3Ctrl", Pose(121.0, 58.0, -90.0.deg.inRad))
                 pose("gateHit", Pose(127.0, 62.0, -90.0.deg.inRad))
                 pose("gateHitCtrl", Pose(120.0, 58.0, -90.0.deg.inRad))
-                pose("gateIntake", Pose(132.0, 59.5, 30.0.deg.inRad))
+                pose("gateIntake", Pose(131.8, 60.0, 30.0.deg.inRad))
                 pose(
                     "gateIntakeB",
                     Pose(131.81, 59.0, 30.0.deg.inRad),
@@ -53,7 +53,7 @@ object AutoConstants {
                 )
                 pose("gateIntakeCtrl", Pose(105.0, 58.0, 40.0.deg.inRad))
                 pose("spike1End", Pose(113.0, 85.0, 0.0.deg.inRad))
-                pose("spike2End", Pose(113.0, 58.0, 0.0.deg.inRad))
+                pose("spike2End", Pose(120.0, 58.0, 0.0.deg.inRad))
                 pose("spike2Ctrl", Pose(95.0, 56.0, 0.0.deg.inRad))
                 pose("spike2CtrlGate", Pose(97.0, 49.0, 0.0.deg.inRad))
                 pose("spike2CtrlFar", Pose(97.0, 49.0, 0.0.deg.inRad))
@@ -321,7 +321,7 @@ object AutoConstants {
                             HeadingInterpolator.PiecewiseNode(
                                 0.0,
                                 0.55,
-                                HeadingInterpolator.constant(h("shootMiddle")),
+                                HeadingInterpolator.tangent,
                             ),
                             HeadingInterpolator.PiecewiseNode(
                                 0.55,
@@ -404,13 +404,13 @@ object AutoConstants {
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
                                 0.0,
-                                0.6,
-                                HeadingInterpolator.tangent,
+                                0.1,
+                                HeadingInterpolator.constant(h("gateIntake")),
                             ),
                             HeadingInterpolator.PiecewiseNode(
-                                0.6,
+                                0.1,
                                 1.0,
-                                HeadingInterpolator.constant(h("spike3CtrlFarToNear")),
+                                HeadingInterpolator.tangent,
                             ),
                         )
                     )
