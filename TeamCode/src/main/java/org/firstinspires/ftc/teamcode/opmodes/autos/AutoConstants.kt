@@ -337,7 +337,7 @@ object AutoConstants {
                             HeadingInterpolator.PiecewiseNode(
                                 0.5,
                                 1.0,
-                                HeadingInterpolator.constant(h("gateIntake")),
+                                HeadingInterpolator.linear(h("shootMiddle"), h("gateIntake")),
                             ),
                         )
                     )
