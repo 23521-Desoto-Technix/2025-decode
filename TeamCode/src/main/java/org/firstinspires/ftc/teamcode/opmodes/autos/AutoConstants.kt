@@ -331,16 +331,18 @@ object AutoConstants {
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
                                 0.0,
-                                0.5,
+                                0.55,
                                 HeadingInterpolator.tangent,
                             ),
                             HeadingInterpolator.PiecewiseNode(
-                                0.5,
+                                0.55,
                                 1.0,
                                 HeadingInterpolator.linear(h("shootMiddle"), h("gateIntake")),
                             ),
                         )
                     )
+                    .setGlobalDeceleration()
+                    .setBrakingStart(5.0)
                     .build(),
             )
             path(
