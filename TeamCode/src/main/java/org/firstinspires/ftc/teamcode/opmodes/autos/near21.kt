@@ -121,7 +121,6 @@ class near21 : NextFTCOpMode() {
             intake(FollowPath(paths.getValue("spike1Combined"))),
             gateIntake,
             gateIntake,
-            gateIntake,
             intake(FollowPath(paths.getValue("sideSpike3Combined"))),
             Delay(200.milliseconds),
             Flywheel.stop(),

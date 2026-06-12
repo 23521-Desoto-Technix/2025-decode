@@ -21,7 +21,7 @@ object AutoConstants {
                 pose("startNear", Pose(124.88, 123.83, -143.7.deg.inRad))
                 pose("startFar", Pose(79.94, 8.07, 0.0.deg.inRad))
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
-                pose("shootMiddle", Pose(89.0, 80.0, -20.0.deg.inRad))
+                pose("shootMiddle", Pose(88.0, 80.0, -20.0.deg.inRad))
                 pose("shootFar", Pose(85.0, 22.0, 0.0.deg.inRad))
                 pose("parkFar", Pose(88.0, 22.0, 0.0.deg.inRad))
                 pose("push", Pose(90.0, 8.5, 0.0.deg.inRad))
@@ -194,9 +194,10 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierLine(p("shootMiddle"), p("spike1End")))
-                    .setLinearHeadingInterpolation(p("shootMiddle").heading, p("spike1End").heading)
+                    .setTangentHeadingInterpolation()
                     .addPath(BezierLine(p("spike1End"), p("shootMiddle")))
-                    .setLinearHeadingInterpolation(p("spike1End").heading, p("shootMiddle").heading)
+                    .setTangentHeadingInterpolation()
+                    .setReversed()
                     .build(),
             )
             path(
@@ -263,20 +264,7 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierLine(p("shootMiddle"), p("sideSpike3")))
-                    .setHeadingInterpolation(
-                        HeadingInterpolator.piecewise(
-                            HeadingInterpolator.PiecewiseNode(
-                                0.0,
-                                0.6,
-                                HeadingInterpolator.tangent,
-                            ),
-                            HeadingInterpolator.PiecewiseNode(
-                                0.6,
-                                1.0,
-                                HeadingInterpolator.constant(p("sideSpike3").heading),
-                            ),
-                        )
-                    )
+                    .setTangentHeadingInterpolation()
                     .addPath(BezierLine(p("spike3End"), p("shootPark")))
                     .setTangentHeadingInterpolation()
                     .setReversed()
