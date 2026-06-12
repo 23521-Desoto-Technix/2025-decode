@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
+import dev.nextftc.core.commands.conditionals.IfElseCommand
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
@@ -49,19 +50,23 @@ class near21 : NextFTCOpMode() {
 
     val targetPose: Pose? = null
 
+    var doThirdSpike = false
+
     private lateinit var allHubs: MutableList<LynxModule?>
 
     override fun onInit() {
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
 
-        val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
         Turret.setTargetAngle(0.0.deg)
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML)
-        // telemetry.msTransmissionInterval = 100
+
+        val intake = button { gamepad1.circle }.whenBecomesTrue { Tube.intakeAll.schedule() }
         val selectRed =
             button { gamepad1.left_bumper }.whenBecomesTrue { BotState.alliance = Alliance.RED }
         val selectBlue =
             button { gamepad1.right_bumper }.whenBecomesTrue { BotState.alliance = Alliance.BLUE }
+        val toggleThirdSpike =
+            button { gamepad1.triangle }.whenBecomesTrue { doThirdSpike = !doThirdSpike }
     }
 
     private fun buildRoutine(paths: Map<String, PathChain>): Command {
@@ -121,7 +126,7 @@ class near21 : NextFTCOpMode() {
             intake(FollowPath(paths.getValue("spike1Combined"))),
             gateIntake,
             gateIntake,
-            intake(FollowPath(paths.getValue("sideSpike3Combined"))),
+            IfElseCommand({ doThirdSpike },intake(FollowPath(paths.getValue("sideSpike3Combined"))),gateIntake),
             Delay(200.milliseconds),
             Flywheel.stop(),
         )
@@ -134,6 +139,16 @@ class near21 : NextFTCOpMode() {
         telemetry.addLine(allianceDisplay)
         telemetry.addLine("RED: ← bumper")
         telemetry.addLine("BLUE: → bumper")
+        telemetry.addLine("Toggle third spike: ▲")
+        telemetry.addLine("Intake: ●")
+
+        val squareTriangleBadge =
+            if (doThirdSpike) {
+                HtmlTelemetryUtils.createColoredBadge("YES", "#00FF00", "black")
+            } else {
+                HtmlTelemetryUtils.createColoredBadge("NO", "#FF0000", "white")
+            }
+        telemetry.addData("Will do third spike", squareTriangleBadge)
 
         BindingManager.update()
         telemetry.update()
