@@ -21,7 +21,7 @@ object AutoConstants {
                 pose("startNear", Pose(124.88, 123.83, -143.7.deg.inRad))
                 pose("startFar", Pose(79.94, 8.07, 0.0.deg.inRad))
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
-                pose("shootMiddle", Pose(88.0, 80.0, -20.0.deg.inRad))
+                pose("shootMiddle", Pose(88.0, 80.0, 0.0.deg.inRad))
                 pose("shootFar", Pose(85.0, 22.0, 0.0.deg.inRad))
                 pose("parkFar", Pose(88.0, 22.0, 0.0.deg.inRad))
                 pose("push", Pose(90.0, 8.5, 0.0.deg.inRad))
@@ -30,7 +30,7 @@ object AutoConstants {
                 pose("sideSpike1Ctrl", Pose(120.0, 100.0, -90.0.deg.inRad))
                 pose("sideSpike2", Pose(121.0, 74.0, -90.0.deg.inRad))
                 pose("sideSpike2Ctrl", Pose(121.0, 93.0, -90.0.deg.inRad))
-                pose("sideSpike3", Pose(118.0, 40.0, -90.0.deg.inRad))
+                pose("sideSpike3", Pose(125.0, 15.0, -90.0.deg.inRad))
                 pose("sideSpike3TransitionalCtrl", Pose(118.0, 45.0, -90.0.deg.inRad))
                 pose("sideSpike3Ctrl", Pose(121.0, 58.0, -90.0.deg.inRad))
                 pose("gateHit", Pose(127.0, 62.0, -90.0.deg.inRad))
@@ -194,10 +194,9 @@ object AutoConstants {
                 follower
                     .pathBuilder()
                     .addPath(BezierLine(p("shootMiddle"), p("spike1End")))
-                    .setTangentHeadingInterpolation()
+                    .setConstantHeadingInterpolation(h("shootMiddle"))
                     .addPath(BezierLine(p("spike1End"), p("shootMiddle")))
-                    .setTangentHeadingInterpolation()
-                    .setReversed()
+                    .setConstantHeadingInterpolation(h("shootMiddle"))
                     .build(),
             )
             path(
