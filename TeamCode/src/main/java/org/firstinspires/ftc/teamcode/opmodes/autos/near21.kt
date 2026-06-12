@@ -50,7 +50,9 @@ class near21 : NextFTCOpMode() {
 
     val targetPose: Pose? = null
 
-    var doThirdSpike = false
+    var withPartner = false
+
+    var doPark = false
 
     private lateinit var allHubs: MutableList<LynxModule?>
 
@@ -66,7 +68,8 @@ class near21 : NextFTCOpMode() {
         val selectBlue =
             button { gamepad1.right_bumper }.whenBecomesTrue { BotState.alliance = Alliance.BLUE }
         val toggleThirdSpike =
-            button { gamepad1.triangle }.whenBecomesTrue { doThirdSpike = !doThirdSpike }
+            button { gamepad1.triangle }.whenBecomesTrue { withPartner = !withPartner }
+        val togglePark = button {gamepad1.cross }.whenBecomesTrue { doPark = !doPark }
     }
 
     private fun buildRoutine(paths: Map<String, PathChain>): Command {
@@ -126,9 +129,11 @@ class near21 : NextFTCOpMode() {
             intake(FollowPath(paths.getValue("spike1Combined"))),
             gateIntake,
             gateIntake,
-            IfElseCommand({ doThirdSpike },intake(FollowPath(paths.getValue("sideSpike3Combined"))),gateIntake),
+            IfElseCommand({ withPartner },gateIntake, intake(FollowPath(paths.getValue("sideSpike3Combined")))),
             Delay(200.milliseconds),
+            IfElseCommand({doPark && withPartner}, FollowPath(paths.getValue("shootMiddleToParkNear"))),
             Flywheel.stop(),
+            Flywheel.disable()
         )
     }
 
@@ -140,15 +145,26 @@ class near21 : NextFTCOpMode() {
         telemetry.addLine("RED: ← bumper")
         telemetry.addLine("BLUE: → bumper")
         telemetry.addLine("Toggle third spike: ▲")
+        telemetry.addLine("Toggle park: ✕")
         telemetry.addLine("Intake: ●")
 
-        val squareTriangleBadge =
-            if (doThirdSpike) {
+        val partnerBadge =
+            if (withPartner) {
                 HtmlTelemetryUtils.createColoredBadge("YES", "#00FF00", "black")
             } else {
                 HtmlTelemetryUtils.createColoredBadge("NO", "#FF0000", "white")
             }
-        telemetry.addData("Will do third spike", squareTriangleBadge)
+        telemetry.addData("For partner", partnerBadge)
+
+        val parkBadge =
+            if (doPark) {
+                HtmlTelemetryUtils.createColoredBadge("YES", "#00FF00", "black")
+            } else {
+                HtmlTelemetryUtils.createColoredBadge("NO", "#FF0000", "white")
+            }
+        if (withPartner) {
+            telemetry.addData("Do park", parkBadge)
+        }
 
         BindingManager.update()
         telemetry.update()
