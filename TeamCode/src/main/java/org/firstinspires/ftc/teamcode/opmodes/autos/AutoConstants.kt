@@ -342,7 +342,7 @@ object AutoConstants {
                         )
                     )
                     .setGlobalDeceleration()
-                    .setBrakingStart(5.0)
+                    .setBrakingStart(100.0)
                     .build(),
             )
             path(
@@ -417,11 +417,11 @@ object AutoConstants {
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
                                 0.0,
-                                0.05,
+                                0.1,
                                 HeadingInterpolator.constant(h("gateIntake")),
                             ),
                             HeadingInterpolator.PiecewiseNode(
-                                0.05,
+                                0.1,
                                 1.0,
                                 HeadingInterpolator.tangent.reverse(),
                             ),
