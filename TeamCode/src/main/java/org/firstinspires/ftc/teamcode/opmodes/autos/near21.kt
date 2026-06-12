@@ -183,7 +183,7 @@ class near21 : NextFTCOpMode() {
     }
 
     override fun onUpdate() {
-        val endPose = PedroComponent.follower.currentPath.endPose()
+        val endPose = PedroComponent.follower.currentPath.endPose() ?: Pose(0.0, 0.0, 0.0)
 
         val targetMetrics =
             if (targetPose != null) {
