@@ -48,7 +48,9 @@ class near21 : NextFTCOpMode() {
 
     lateinit var routine: Command
 
-    val targetPose: Pose? = null
+    var targetPose: Pose? = null
+
+    var forceCurrent = true
 
     var withPartner = false
 
@@ -114,6 +116,7 @@ class near21 : NextFTCOpMode() {
                     Tube.shootAll(),
                     Delay(100.milliseconds),
                     InstantCommand { PedroComponent.follower.setMaxPower(1.0) },
+                    InstantCommand { forceCurrent = false },
                     Delay(100.milliseconds),
                     Tube.intakeAll,
                 ),
@@ -180,18 +183,26 @@ class near21 : NextFTCOpMode() {
     }
 
     override fun onUpdate() {
+        val endPose = PedroComponent.follower.currentPath.endPose()
+
         val targetMetrics =
             if (targetPose != null) {
                 calculateTargetMetrics(
-                    targetPose,
+                    targetPose!!,
                     0.0,
                     Vector(),
                 )
-            } else {
+            } else if (endPose.roughlyEquals(PedroComponent.follower.pose, 10.0) || forceCurrent) {
                 calculateTargetMetrics(
                     PedroComponent.follower.pose,
                     PedroComponent.follower.angularVelocity,
                     PedroComponent.follower.velocity,
+                )
+            } else {
+                calculateTargetMetrics(
+                    Pose(endPose.x, endPose.y, PedroComponent.follower.pose.heading),
+                    0.0,
+                    Vector(),
                 )
             }
         val distanceToTarget = targetMetrics.distanceToTarget
