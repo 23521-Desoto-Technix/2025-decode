@@ -331,11 +331,11 @@ object AutoConstants {
                         HeadingInterpolator.piecewise(
                             HeadingInterpolator.PiecewiseNode(
                                 0.0,
-                                0.55,
+                                0.6,
                                 HeadingInterpolator.tangent,
                             ),
                             HeadingInterpolator.PiecewiseNode(
-                                0.55,
+                                0.6,
                                 1.0,
                                 HeadingInterpolator.linear(h("shootMiddle"), h("gateIntake")),
                             ),
@@ -422,6 +422,11 @@ object AutoConstants {
                             ),
                             HeadingInterpolator.PiecewiseNode(
                                 0.1,
+                                0.15,
+                                HeadingInterpolator.linear(h("gateIntake"), h("shootMiddle")),
+                            ),
+                            HeadingInterpolator.PiecewiseNode(
+                                0.15,
                                 1.0,
                                 HeadingInterpolator.tangent.reverse(),
                             ),
