@@ -102,7 +102,7 @@ class far21 : NextFTCOpMode() {
             intake(
                 SequentialGroup(
                     FollowPath(paths.getValue("shootFarToWallSweep")),
-                    FollowPath(paths.getValue("wallSweepToFarShoot")),
+                    FollowPath(paths.getValue("wallSweepToShootFar")),
                 )
             ),
             intake(
