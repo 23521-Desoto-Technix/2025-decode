@@ -55,6 +55,7 @@ object AutoConstants {
                 pose("gateIntakeCtrl", Pose(105.0, 58.0, 40.0.deg.inRad))
                 pose("spike1End", Pose(113.0, 85.0, 0.0.deg.inRad))
                 pose("spike2End", Pose(120.0, 58.0, 0.0.deg.inRad))
+                pose("spike2Gate", Pose(127.0, 62.0, 0.0.deg.inRad))
                 pose("spike2Ctrl", Pose(95.0, 56.0, 0.0.deg.inRad))
                 pose("spike2CtrlGate", Pose(97.0, 49.0, 0.0.deg.inRad))
                 pose("spike2CtrlFar", Pose(97.0, 49.0, 0.0.deg.inRad))
@@ -176,6 +177,16 @@ object AutoConstants {
                     .pathBuilder()
                     .addPath(
                         BezierCurve(p("startNear"), p("sotmCtrl1"), p("sotmCtrl2"), p("spike2End"))
+                    )
+                    .setTangentHeadingInterpolation()
+                    .build(),
+            )
+            path(
+                "startNearToSpike2Gate",
+                follower
+                    .pathBuilder()
+                    .addPath(
+                        BezierCurve(p("startNear"), p("sotmCtrl1"), p("sotmCtrl2"), p("spike2Gate"))
                     )
                     .setTangentHeadingInterpolation()
                     .build(),

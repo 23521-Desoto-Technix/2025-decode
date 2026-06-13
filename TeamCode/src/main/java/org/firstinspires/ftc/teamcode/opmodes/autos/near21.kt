@@ -56,6 +56,8 @@ class near21 : NextFTCOpMode() {
 
     var doPark = false
 
+    var gateBonk = false
+
     private lateinit var allHubs: MutableList<LynxModule?>
 
     override fun onInit() {
@@ -72,27 +74,10 @@ class near21 : NextFTCOpMode() {
         val toggleThirdSpike =
             button { gamepad1.triangle }.whenBecomesTrue { withPartner = !withPartner }
         val togglePark = button { gamepad1.cross }.whenBecomesTrue { doPark = !doPark }
+        val toggleGateBonk = button { gamepad1.square }.whenBecomesTrue { gateBonk = !gateBonk }
     }
 
     private fun buildRoutine(paths: Map<String, PathChain>): Command {
-        val middleTurretAngle =
-            when (BotState.alliance) {
-                Alliance.RED -> AutoConstants.Angles["middleTurretRed"]
-                Alliance.BLUE -> AutoConstants.Angles["middleTurretBlue"]
-                else -> 0.0.deg
-            }
-        val parkTurretAngle =
-            when (BotState.alliance) {
-                Alliance.RED -> AutoConstants.Angles["parkTurretRed3"]
-                Alliance.BLUE -> AutoConstants.Angles["parkTurretBlue3"]
-                else -> 0.0.deg
-            }
-        val startTurretAngle =
-            when (BotState.alliance) {
-                Alliance.RED -> AutoConstants.Angles["startTurretRed"]
-                Alliance.BLUE -> AutoConstants.Angles["startTurretBlue3"]
-                else -> 0.0.deg
-            }
         val intake: (Command) -> Command = { path ->
             SequentialGroup(Tube.intakeAll, path, Tube.shootAll(), Delay(200.milliseconds))
         }
@@ -105,11 +90,12 @@ class near21 : NextFTCOpMode() {
                 )
             )
         return SequentialGroup(
-            /*Flywheel.setSpeed(1_700.0),
-            InstantCommand { Hood.position = 0.65 },
-            InstantCommand { Turret.setTargetAngle(startTurretAngle) },*/
             ParallelGroup(
-                FollowPath(paths.getValue("startNearToSpike2")),
+                IfElseCommand(
+                    { gateBonk },
+                    FollowPath(paths.getValue("startNearToSpike2Gate")),
+                    FollowPath(paths.getValue("startNearToSpike2")),
+                ),
                 SequentialGroup(
                     InstantCommand { PedroComponent.follower.setMaxPower(0.7) },
                     Delay(800.milliseconds),
@@ -121,9 +107,6 @@ class near21 : NextFTCOpMode() {
                     Tube.intakeAll,
                 ),
             ),
-            /*Flywheel.setSpeed(1_500.0),
-            InstantCommand { Hood.position = 0.65 },
-            InstantCommand { Turret.setTargetAngle(middleTurretAngle) },*/
             FollowPath(paths.getValue("spike2ToShootMiddle")),
             Tube.shootAll(),
             Delay(200.milliseconds),
@@ -156,6 +139,7 @@ class near21 : NextFTCOpMode() {
         telemetry.addLine("BLUE: → bumper")
         telemetry.addLine("Toggle third spike: ▲")
         telemetry.addLine("Toggle park: ✕")
+        telemetry.addLine("Toggle gate bonk: ■")
         telemetry.addLine("Intake: ●")
 
         val partnerBadge =
@@ -175,6 +159,13 @@ class near21 : NextFTCOpMode() {
         if (withPartner) {
             telemetry.addData("Do park", parkBadge)
         }
+        val gateBonkBadge =
+            if (doPark) {
+                HtmlTelemetryUtils.createColoredBadge("YES", "#00FF00", "black")
+            } else {
+                HtmlTelemetryUtils.createColoredBadge("NO", "#FF0000", "white")
+            }
+        telemetry.addData("Bonk Gate", gateBonkBadge)
 
         BindingManager.update()
         telemetry.update()
