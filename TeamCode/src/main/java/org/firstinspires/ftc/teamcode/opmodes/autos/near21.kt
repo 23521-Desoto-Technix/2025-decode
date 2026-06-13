@@ -20,7 +20,6 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -33,6 +32,7 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator
 import org.firstinspires.ftc.teamcode.utils.calculateTargetMetrics
+import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Near 21", group = "Near", preselectTeleOp = "teleop")
 class near21 : NextFTCOpMode() {
@@ -58,6 +58,8 @@ class near21 : NextFTCOpMode() {
 
     var gateBonk = false
 
+    var roughTarget = Pose(0.0, 0.0, 0.0)
+
     private lateinit var poses: Map<String, Pose>
 
     private lateinit var allHubs: MutableList<LynxModule?>
@@ -79,7 +81,7 @@ class near21 : NextFTCOpMode() {
         val toggleGateBonk = button { gamepad1.square }.whenBecomesTrue { gateBonk = !gateBonk }
     }
 
-    private fun buildRoutine(paths: Map<String, PathChain>): Command {
+    private fun buildRoutine(paths: Map<String, PathChain>, poses: Map<String, Pose>): Command {
         val intake: (Command) -> Command = { path ->
             SequentialGroup(Tube.intakeAll, path, Tube.shootAll(), Delay(200.milliseconds))
         }
@@ -92,6 +94,7 @@ class near21 : NextFTCOpMode() {
                 )
             )
         return SequentialGroup(
+            InstantCommand { roughTarget = poses.getValue("shootMiddle") },
             ParallelGroup(
                 IfElseCommand(
                     { gateBonk },
@@ -120,7 +123,10 @@ class near21 : NextFTCOpMode() {
             IfElseCommand(
                 { withPartner },
                 gateIntake,
-                intake(FollowPath(paths.getValue("sideSpike3Combined"))),
+                SequentialGroup(
+                    InstantCommand { roughTarget = poses.getValue("shootPark") },
+                    intake(FollowPath(paths.getValue("sideSpike3Combined"))),
+                ),
             ),
             Delay(200.milliseconds),
             IfElseCommand(
@@ -176,15 +182,13 @@ class near21 : NextFTCOpMode() {
     override fun onStartButtonPressed() {
         poses = AutoConstants.Poses.forAlliance(BotState.alliance)
         val paths = AutoConstants.Paths.forAlliance(BotState.alliance)
-        routine = buildRoutine(paths)
+        routine = buildRoutine(paths, poses)
 
         PedroComponent.follower.pose = poses.getValue("startNear")
         routine.schedule()
     }
 
     override fun onUpdate() {
-        val endPose = poses.getValue("shootMiddle")
-
         val targetMetrics =
             if (targetPose != null) {
                 calculateTargetMetrics(
@@ -192,7 +196,9 @@ class near21 : NextFTCOpMode() {
                     0.0,
                     Vector(),
                 )
-            } else if (endPose.roughlyEquals(PedroComponent.follower.pose, 10.0) || forceCurrent) {
+            } else if (
+                roughTarget.roughlyEquals(PedroComponent.follower.pose, 10.0) || forceCurrent
+            ) {
                 calculateTargetMetrics(
                     PedroComponent.follower.pose,
                     PedroComponent.follower.angularVelocity,
@@ -200,7 +206,7 @@ class near21 : NextFTCOpMode() {
                 )
             } else {
                 calculateTargetMetrics(
-                    Pose(endPose.x, endPose.y, PedroComponent.follower.pose.heading),
+                    Pose(roughTarget.x, roughTarget.y, PedroComponent.follower.pose.heading),
                     0.0,
                     Vector(),
                 )
