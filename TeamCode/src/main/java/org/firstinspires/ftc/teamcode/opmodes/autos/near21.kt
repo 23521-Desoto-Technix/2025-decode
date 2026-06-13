@@ -20,6 +20,7 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -32,7 +33,6 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator
 import org.firstinspires.ftc.teamcode.utils.calculateTargetMetrics
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Near 21", group = "Near", preselectTeleOp = "teleop")
 class near21 : NextFTCOpMode() {
@@ -71,7 +71,7 @@ class near21 : NextFTCOpMode() {
             button { gamepad1.right_bumper }.whenBecomesTrue { BotState.alliance = Alliance.BLUE }
         val toggleThirdSpike =
             button { gamepad1.triangle }.whenBecomesTrue { withPartner = !withPartner }
-        val togglePark = button {gamepad1.cross }.whenBecomesTrue { doPark = !doPark }
+        val togglePark = button { gamepad1.cross }.whenBecomesTrue { doPark = !doPark }
     }
 
     private fun buildRoutine(paths: Map<String, PathChain>): Command {
@@ -132,11 +132,18 @@ class near21 : NextFTCOpMode() {
             intake(FollowPath(paths.getValue("spike1Combined"))),
             gateIntake,
             gateIntake,
-            IfElseCommand({ withPartner },gateIntake, intake(FollowPath(paths.getValue("sideSpike3Combined")))),
+            IfElseCommand(
+                { withPartner },
+                gateIntake,
+                intake(FollowPath(paths.getValue("sideSpike3Combined"))),
+            ),
             Delay(200.milliseconds),
-            IfElseCommand({doPark && withPartner}, FollowPath(paths.getValue("shootMiddleToParkNear"))),
+            IfElseCommand(
+                { doPark && withPartner },
+                FollowPath(paths.getValue("shootMiddleToParkNear")),
+            ),
             Flywheel.stop(),
-            Flywheel.disable()
+            Flywheel.disable(),
         )
     }
 
@@ -183,7 +190,12 @@ class near21 : NextFTCOpMode() {
     }
 
     override fun onUpdate() {
-        val endPose = PedroComponent.follower.currentPath.endPose() ?: Pose(0.0, 0.0, 0.0)
+        val endPose =
+            if (PedroComponent.follower.currentPath != null) {
+                PedroComponent.follower.currentPath.endPose()
+            } else {
+                Pose(0.0, 0.0, 0.0)
+            }
 
         val targetMetrics =
             if (targetPose != null) {
@@ -207,7 +219,11 @@ class near21 : NextFTCOpMode() {
             }
         val distanceToTarget = targetMetrics.distanceToTarget
         val relativeAngleToTarget = targetMetrics.relativeAngleToTarget
-        val config = ShootingConfigInterpolator.getConfig(distanceToTarget, ShootingConfigInterpolator.ShootingZone.NEAR)
+        val config =
+            ShootingConfigInterpolator.getConfig(
+                distanceToTarget,
+                ShootingConfigInterpolator.ShootingZone.NEAR,
+            )
         if (Flywheel.targetSpeed != config.flywheelSpeed) {
             Flywheel.setSpeedSafe(config.flywheelSpeed)
         }
