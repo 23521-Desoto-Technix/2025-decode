@@ -23,7 +23,7 @@ object AutoConstants {
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
                 pose("shootMiddle", Pose(88.0, 80.0, 0.0.deg.inRad))
                 pose("shootFar", Pose(85.0, 22.0, 0.0.deg.inRad))
-                pose("parkFar", Pose(88.0, 22.0, 0.0.deg.inRad))
+                pose("parkFar", Pose(95.0, 22.0, 0.0.deg.inRad))
                 pose("parkNear", Pose(100.0, 74.0, 0.0.deg.inRad))
                 pose("push", Pose(90.0, 8.5, 0.0.deg.inRad))
                 pose("shootPark", Pose(85.0, 105.0, 0.0.deg.inRad))
@@ -696,8 +696,8 @@ object AutoConstants {
                     .pathBuilder()
                     .addPath(
                         BezierLine(
-                            p("shootFar"),
                             p("wallSweep"),
+                            p("shootFar"),
                         )
                     )
                     .setHeadingInterpolation(
