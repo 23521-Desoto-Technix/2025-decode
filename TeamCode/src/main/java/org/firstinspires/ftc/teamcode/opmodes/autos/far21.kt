@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.autos
 
+import com.pedropathing.geometry.Pose
+import com.pedropathing.math.Vector
 import com.pedropathing.paths.PathChain
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
@@ -27,6 +29,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
+import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator
+import org.firstinspires.ftc.teamcode.utils.calculateTargetMetrics
 
 @Autonomous(name = "Far 21", group = "Far", preselectTeleOp = "teleop")
 class far21 : NextFTCOpMode() {
@@ -44,6 +48,8 @@ class far21 : NextFTCOpMode() {
 
     private lateinit var allHubs: MutableList<LynxModule?>
 
+    private lateinit var poses: Map<String, Pose>
+
     override fun onInit() {
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
 
@@ -58,25 +64,12 @@ class far21 : NextFTCOpMode() {
     }
 
     private fun buildRoutine(paths: Map<String, PathChain>): Command {
-        val farTurretAngle =
-            when (BotState.alliance) {
-                Alliance.RED -> AutoConstants.Angles["farTurretRed"]
-                Alliance.BLUE -> AutoConstants.Angles["farTurretBlue"]
-                else -> 0.0.deg
-            }
-        val parkTurretAngle =
-            when (BotState.alliance) {
-                Alliance.RED -> AutoConstants.Angles["parkTurretRed1"]
-                Alliance.BLUE -> AutoConstants.Angles["parkTurretBlue1"]
-                else -> 0.0.deg
-            }
         val intake: (Command) -> Command = { path ->
             SequentialGroup(Tube.intakeAll, path, Delay(400.milliseconds), Tube.shootAll(.60), Delay(510.milliseconds))
         }
         return SequentialGroup(
             Flywheel.setSpeed(2_000.0),
-            InstantCommand { Hood.position = 0.955 },
-            InstantCommand { Turret.setTargetAngle(farTurretAngle) },
+            InstantCommand { Hood.position = 0.85 },
             FollowPath(paths.getValue("startFarToShootFar")),
             Flywheel.waitForSpeed(),
             Tube.shootAll(),
@@ -148,7 +141,7 @@ class far21 : NextFTCOpMode() {
     }
 
     override fun onStartButtonPressed() {
-        val poses = AutoConstants.Poses.forAlliance(BotState.alliance)
+        poses = AutoConstants.Poses.forAlliance(BotState.alliance)
         val paths = AutoConstants.Paths.forAlliance(BotState.alliance)
         routine = buildRoutine(paths)
 
@@ -157,6 +150,24 @@ class far21 : NextFTCOpMode() {
     }
 
     override fun onUpdate() {
+        val endPose = poses.getValue("shootFar")
+
+        val targetMetrics =
+            if (endPose.roughlyEquals(PedroComponent.follower.pose, 10.0)) {
+                calculateTargetMetrics(
+                    PedroComponent.follower.pose,
+                    PedroComponent.follower.angularVelocity,
+                    PedroComponent.follower.velocity,
+                )
+            } else {
+                calculateTargetMetrics(
+                    Pose(endPose.x, endPose.y, PedroComponent.follower.pose.heading),
+                    0.0,
+                    Vector(),
+                )
+            }
+        val relativeAngleToTarget = targetMetrics.relativeAngleToTarget
+        Turret.setTargetAngle(-relativeAngleToTarget)
         BotState.pose = PedroComponent.follower.pose
         telemetry.addData("X", BotState.pose?.x)
         telemetry.addData("Y", BotState.pose?.y)
