@@ -700,20 +700,7 @@ object AutoConstants {
                             p("shootFar"),
                         )
                     )
-                    .setHeadingInterpolation(
-                        HeadingInterpolator.piecewise(
-                            HeadingInterpolator.PiecewiseNode(
-                                0.0,
-                                0.7,
-                                HeadingInterpolator.tangent.reverse(),
-                            ),
-                            HeadingInterpolator.PiecewiseNode(
-                                0.7,
-                                1.0,
-                                HeadingInterpolator.constant(h("shootFar")),
-                            ),
-                        )
-                    )
+                    .setConstantHeadingInterpolation(h("shootFar"))
                     .build(),
             )
             path(
