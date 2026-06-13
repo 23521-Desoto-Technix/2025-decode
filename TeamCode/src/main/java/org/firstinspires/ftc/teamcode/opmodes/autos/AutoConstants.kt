@@ -700,7 +700,8 @@ object AutoConstants {
                             p("shootFar"),
                         )
                     )
-                    .setConstantHeadingInterpolation(h("shootFar"))
+                    .setTangentHeadingInterpolation()
+                    .setReversed()
                     .build(),
             )
             path(
