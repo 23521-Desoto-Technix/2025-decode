@@ -58,6 +58,8 @@ class near21 : NextFTCOpMode() {
 
     var gateBonk = false
 
+    private lateinit var poses: Map<String, Pose>
+
     private lateinit var allHubs: MutableList<LynxModule?>
 
     override fun onInit() {
@@ -172,7 +174,7 @@ class near21 : NextFTCOpMode() {
     }
 
     override fun onStartButtonPressed() {
-        val poses = AutoConstants.Poses.forAlliance(BotState.alliance)
+        poses = AutoConstants.Poses.forAlliance(BotState.alliance)
         val paths = AutoConstants.Paths.forAlliance(BotState.alliance)
         routine = buildRoutine(paths)
 
@@ -181,12 +183,7 @@ class near21 : NextFTCOpMode() {
     }
 
     override fun onUpdate() {
-        val endPose =
-            if (PedroComponent.follower.currentPath != null) {
-                PedroComponent.follower.currentPath.endPose()
-            } else {
-                Pose(0.0, 0.0, 0.0)
-            }
+        val endPose = poses.getValue("shootMiddle")
 
         val targetMetrics =
             if (targetPose != null) {
