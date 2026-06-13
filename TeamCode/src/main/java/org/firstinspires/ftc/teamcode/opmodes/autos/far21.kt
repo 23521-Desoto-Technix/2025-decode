@@ -71,7 +71,7 @@ class far21 : NextFTCOpMode() {
                 else -> 0.0.deg
             }
         val intake: (Command) -> Command = { path ->
-            SequentialGroup(Tube.intakeAll, path, Delay(400.milliseconds), Tube.shootAll(.70), Delay(510.milliseconds))
+            SequentialGroup(Tube.intakeAll, path, Delay(400.milliseconds), Tube.shootAll(.60), Delay(510.milliseconds))
         }
         return SequentialGroup(
             Flywheel.setSpeed(2_000.0),

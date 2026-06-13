@@ -36,7 +36,7 @@ object AutoConstants {
                 pose("sideSpike3Ctrl", Pose(121.0, 58.0, -90.0.deg.inRad))
                 pose("gateHit", Pose(127.0, 62.0, -90.0.deg.inRad))
                 pose("gateHitCtrl", Pose(120.0, 58.0, -90.0.deg.inRad))
-                pose("gateIntake", Pose(132.0, 58.0, 25.0.deg.inRad))
+                pose("gateIntake", Pose(132.0, 58.0, 25.0.deg.inRad), Pose(132.0, 58.0, 25.0.deg.inRad))
                 pose(
                     "gateIntakeB",
                     Pose(131.81, 59.0, 30.0.deg.inRad),
