@@ -19,7 +19,7 @@ object AutoConstants {
         private val redPoses =
             linkedMapOf<String, Pose>().apply {
                 pose("startNear", Pose(124.88, 123.83, -143.7.deg.inRad))
-                pose("startFar", Pose(79.94, 8.07, 0.0.deg.inRad))
+                pose("startFar", Pose(80.51, 9.72, 0.0.deg.inRad))
                 pose("shootNear", Pose(110.0, 98.0, -90.0.deg.inRad))
                 pose("shootMiddle", Pose(88.0, 80.0, 0.0.deg.inRad))
                 pose("shootFar", Pose(85.0, 22.0, 0.0.deg.inRad))
