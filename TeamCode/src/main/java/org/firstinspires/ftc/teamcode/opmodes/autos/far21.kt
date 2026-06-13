@@ -71,7 +71,7 @@ class far21 : NextFTCOpMode() {
                 else -> 0.0.deg
             }
         val intake: (Command) -> Command = { path ->
-            SequentialGroup(Tube.intakeAll, path, Delay(150.milliseconds), Tube.shootAll(.70), Delay(510.milliseconds))
+            SequentialGroup(Tube.intakeAll, path, Delay(250.milliseconds), Tube.shootAll(.70), Delay(510.milliseconds))
         }
         return SequentialGroup(
             Flywheel.setSpeed(2_000.0),
@@ -101,8 +101,8 @@ class far21 : NextFTCOpMode() {
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToWallIntakeA")),
-                    FollowPath(paths.getValue("wallIntakeAToShootFar")),
+                    FollowPath(paths.getValue("shootFarToWallSweep")),
+                    FollowPath(paths.getValue("wallSweepToFarShoot")),
                 )
             ),
             intake(
@@ -113,8 +113,8 @@ class far21 : NextFTCOpMode() {
             ),
             intake(
                 SequentialGroup(
-                    FollowPath(paths.getValue("shootFarToWallIntakeA")),
-                    FollowPath(paths.getValue("wallIntakeAToShootFar")),
+                    FollowPath(paths.getValue("shootFarToWallSweep")),
+                    FollowPath(paths.getValue("wallSweepToShootFar")),
                 )
 //            ),
 //            intake(

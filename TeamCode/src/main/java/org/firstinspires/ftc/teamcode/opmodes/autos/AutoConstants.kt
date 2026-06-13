@@ -70,7 +70,8 @@ object AutoConstants {
                 pose("wallEndC", Pose(134.5, 24.0, 0.0.deg.inRad))
                 pose("wallEndD", Pose(134.5, 18.0, 0.0.deg.inRad))
                 pose("wallEndE", Pose(134.5, 12.0, 0.0.deg.inRad))
-                pose("wallEndF", Pose(134.5, 10.0, 0.0.deg.inRad))
+                pose("wallSweep", Pose(132.0, 47.0, 0.0.deg.inRad))
+                pose("wallSweepCtrl", Pose(132.0, 22.0, 0.0.deg.inRad))
                 pose("spike3Ctrl", Pose(90.0, 35.0, 0.0.deg.inRad))
                 pose("spike3CtrlFar", Pose(85.0, 35.0, 0.0.deg.inRad))
                 pose("humanIntake", Pose(133.0, 8.5, 0.0.deg.inRad))
@@ -672,6 +673,46 @@ object AutoConstants {
                     .pathBuilder()
                     .addPath(BezierLine(p("wallEndF"), p("shootFar")))
                     .setConstantHeadingInterpolation(p("startFar").heading)
+                    .build(),
+            )
+            path(
+                "shootFarToWallSweep",
+                follower
+                    .pathBuilder()
+                    .addPath(
+                        BezierCurve(
+                            p("shootFar"),
+                            p("wallSweepCtrl"),
+                            p("wallSweep"),
+                        )
+                    )
+                    .setTangentHeadingInterpolation()
+                    .build(),
+            )
+            path(
+                "wallSweepToShootFar",
+                follower
+                    .pathBuilder()
+                    .addPath(
+                        BezierLine(
+                            p("shootFar"),
+                            p("wallSweep"),
+                        )
+                    )
+                    .setHeadingInterpolation(
+                        HeadingInterpolator.piecewise(
+                            HeadingInterpolator.PiecewiseNode(
+                                0.0,
+                                0.7,
+                                HeadingInterpolator.tangent.reverse(),
+                            ),
+                            HeadingInterpolator.PiecewiseNode(
+                                0.7,
+                                1.0,
+                                HeadingInterpolator.constant(h("shootFar")),
+                            ),
+                        )
+                    )
                     .build(),
             )
             path(
