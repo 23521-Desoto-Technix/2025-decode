@@ -160,7 +160,7 @@ class near21 : NextFTCOpMode() {
             telemetry.addData("Do park", parkBadge)
         }
         val gateBonkBadge =
-            if (doPark) {
+            if (gateBonk) {
                 HtmlTelemetryUtils.createColoredBadge("YES", "#00FF00", "black")
             } else {
                 HtmlTelemetryUtils.createColoredBadge("NO", "#FF0000", "white")
