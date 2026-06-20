@@ -114,7 +114,7 @@ class teleop : NextFTCOpMode() {
         return Pair(rotatedForward, rotatedStrafe)
     }
 
-    fun robotCorners(pose: Pose, sideLength: Double = 20.0): List<Point2> {
+    fun robotCorners(pose: Pose, sideLength: Double = 35.0): List<Point2> {
         val halfSide = sideLength / 2.0
         val heading = pose.heading
         val localCorners =
