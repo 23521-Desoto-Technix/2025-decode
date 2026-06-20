@@ -21,17 +21,17 @@ object ShootingConfigInterpolator {
         ZoneConfig(
             minDistance = 20.0,
             maxDistance = 110.0,
-            defaultConfig = ShootingConfig(1_750.0, 0.77),
+            defaultConfig = ShootingConfig(1_770.0, 0.77),
             points =
                 listOf(
-                    ShootingConfigPoint(47.5, ShootingConfig(1_400.0, 0.40)),
-                    ShootingConfigPoint(60.0, ShootingConfig(1_450.0, 0.60)),
-                    ShootingConfigPoint(81.5, ShootingConfig(1_520.0, 0.70)),
-                    ShootingConfigPoint(87.5, ShootingConfig(1_520.0, 0.695)),
-                    ShootingConfigPoint(90.5, ShootingConfig(1_610.0, 0.76)),
-                    ShootingConfigPoint(95.5, ShootingConfig(1_610.0, 0.82)),
-                    ShootingConfigPoint(101.0, ShootingConfig(1_660.0, 0.75)),
-                    ShootingConfigPoint(107.0, ShootingConfig(1_760.0, 0.77)),
+                    ShootingConfigPoint(47.5, ShootingConfig(1_410.0, 0.40)),
+                    ShootingConfigPoint(60.0, ShootingConfig(1_460.0, 0.60)),
+                    ShootingConfigPoint(81.5, ShootingConfig(1_530.0, 0.70)),
+                    ShootingConfigPoint(87.5, ShootingConfig(1_530.0, 0.695)),
+                    ShootingConfigPoint(90.5, ShootingConfig(1_620.0, 0.76)),
+                    ShootingConfigPoint(95.5, ShootingConfig(1_620.0, 0.82)),
+                    ShootingConfigPoint(101.0, ShootingConfig(1_670.0, 0.75)),
+                    ShootingConfigPoint(107.0, ShootingConfig(1_770.0, 0.77)),
                 ),
         )
 

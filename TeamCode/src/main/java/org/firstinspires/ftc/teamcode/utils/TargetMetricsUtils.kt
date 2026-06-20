@@ -63,8 +63,8 @@ fun calculateTargetMetrics(
     val deltaY = targetPose.y - currentY
     val distanceToTarget = hypot(deltaX, deltaY)
 
-    val redAnglePoseA = Pose(141.5, 125.0, 0.0)
-    val redAnglePoseB = Pose(125.0, 141.5, 0.0)
+    val redAnglePoseA = Pose(141.5, 130.0, 0.0)
+    val redAnglePoseB = Pose(120.0, 141.5, 0.0)
     val anglePoseA = if (BotState.alliance == Alliance.BLUE) mirrorPose(redAnglePoseA) else redAnglePoseA
     val anglePoseB = if (BotState.alliance == Alliance.BLUE) mirrorPose(redAnglePoseB) else redAnglePoseB
     val angleToPoseA = atan2(anglePoseA.y - currentY, anglePoseA.x - currentX)
