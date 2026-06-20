@@ -96,8 +96,8 @@ class teleop : NextFTCOpMode() {
 
     // TODO blue references
 
-    val redReferenceNear = Pose(108.7, 131.3386, 90.0.deg.inRad)
-    val blueReferenceNear = mirrorPose(redReferenceNear)
+    val redReferenceNear = Pose(125.866, 78.976, 0.0.deg.inRad)
+    val blueReferenceNear = Pose(18.504, 80.354, 180.0.deg.inRad)
 
     val redReferenceFar = Pose(10.354, 10.3937, -180.0.deg.inRad)
     val blueReferenceFar = mirrorPose(redReferenceFar)
