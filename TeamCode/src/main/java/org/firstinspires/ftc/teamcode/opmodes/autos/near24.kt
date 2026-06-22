@@ -34,8 +34,8 @@ import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator
 import org.firstinspires.ftc.teamcode.utils.calculateTargetMetrics
 import kotlin.time.Duration.Companion.milliseconds
 
-@Autonomous(name = "Near 21", group = "Near", preselectTeleOp = "teleop")
-class near21 : NextFTCOpMode() {
+@Autonomous(name = "Near 24", group = "Near", preselectTeleOp = "teleop")
+class near24 : NextFTCOpMode() {
     init {
         addComponents(
             SubsystemComponent(Flywheel, Hood, Turret, Tube),
@@ -102,8 +102,8 @@ class near21 : NextFTCOpMode() {
                     FollowPath(paths.getValue("startNearToSpike2")),
                 ),
                 SequentialGroup(
-                    InstantCommand { PedroComponent.follower.setMaxPower(0.7) },
-                    Delay(800.milliseconds),
+                    InstantCommand { PedroComponent.follower.setMaxPower(0.6) },
+                    Delay(900.milliseconds),
                     Tube.shootAll(),
                     Delay(100.milliseconds),
                     InstantCommand { PedroComponent.follower.setMaxPower(1.0) },
