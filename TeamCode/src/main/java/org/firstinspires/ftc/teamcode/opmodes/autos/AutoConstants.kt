@@ -62,7 +62,7 @@ object AutoConstants {
                 pose("sotmCtrl1", Pose(88.0, 95.0, 0.0.deg.inRad))
                 pose("sotmCtrl2", Pose(82.0, 60.0, 0.0.deg.inRad))
                 pose("spike3Start", Pose(105.0, 36.0, 0.0.deg.inRad))
-                pose("spike3End", Pose(120.0, 36.0, 0.0.deg.inRad))
+                pose("spike3End", Pose(120.0, 38.0, 0.0.deg.inRad))
                 pose("spike3Wall", Pose(130.0, 36.0, 0.0.deg.inRad))
                 pose("spike3CtrlFarToNear", Pose(95.0, 50.0, 180.0.deg.inRad))
                 pose("wallEndA", Pose(134.5, 36.0, 0.0.deg.inRad))
@@ -74,7 +74,7 @@ object AutoConstants {
                 pose("wallSweep", Pose(132.0, 47.0, 0.0.deg.inRad))
                 pose("wallSweepCtrl", Pose(132.0, 22.0, 0.0.deg.inRad))
                 pose("spike3Ctrl", Pose(90.0, 35.0, 0.0.deg.inRad))
-                pose("spike3CtrlFar", Pose(85.0, 35.0, 0.0.deg.inRad))
+                pose("spike3CtrlFar", Pose(85.0, 37.0, 0.0.deg.inRad))
                 pose("humanIntake", Pose(133.0, 9.5, 0.0.deg.inRad))
                 pose("humanIntakeCtrl", Pose(89.0, 9.5, 0.0.deg.inRad))
             }
