@@ -20,6 +20,7 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
+import kotlin.time.Duration.Companion.milliseconds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.TelemetryImplUpstreamSubmission
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
@@ -32,7 +33,6 @@ import org.firstinspires.ftc.teamcode.utils.BotState
 import org.firstinspires.ftc.teamcode.utils.HtmlTelemetryUtils
 import org.firstinspires.ftc.teamcode.utils.ShootingConfigInterpolator
 import org.firstinspires.ftc.teamcode.utils.calculateTargetMetrics
-import kotlin.time.Duration.Companion.milliseconds
 
 @Autonomous(name = "Near 24", group = "Near", preselectTeleOp = "teleop")
 class near24 : NextFTCOpMode() {
@@ -129,7 +129,10 @@ class near24 : NextFTCOpMode() {
             ),
             FollowPath(paths.getValue("spike2ToShootMiddle")),
             Tube.shootAll(),
-            Delay(200.milliseconds),
+            IfElseCommand(
+                { !do27 },
+                Delay(200.milliseconds),
+            ),
             gateIntake,
             gateIntake,
             intake(FollowPath(paths.getValue("spike1Combined"))),
