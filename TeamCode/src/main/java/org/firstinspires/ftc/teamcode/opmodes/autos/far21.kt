@@ -8,8 +8,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.bindings.BindingManager
 import dev.nextftc.bindings.button
 import dev.nextftc.core.commands.Command
+import dev.nextftc.core.commands.conditionals.IfElseCommand
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.SequentialGroup
+import dev.nextftc.core.commands.instant
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
@@ -50,6 +52,8 @@ class far21 : NextFTCOpMode() {
 
     private lateinit var poses: Map<String, Pose>
 
+    var turretOffset = 0.deg
+
     override fun onInit() {
         allHubs = hardwareMap.getAll<LynxModule?>(LynxModule::class.java)
 
@@ -68,6 +72,11 @@ class far21 : NextFTCOpMode() {
             SequentialGroup(Tube.intakeAll, path, Delay(400.milliseconds), Tube.shootAll(.60), Delay(510.milliseconds))
         }
         return SequentialGroup(
+            IfElseCommand(
+                { BotState.alliance == Alliance.RED },
+                instant { turretOffset = (-2).deg },
+                instant { turretOffset = 0.deg },
+            ),
             Flywheel.setSpeed(2_000.0),
             InstantCommand { Hood.position = 0.85 },
             FollowPath(paths.getValue("startFarToShootFar")),
@@ -167,7 +176,7 @@ class far21 : NextFTCOpMode() {
                 )
             }
         val relativeAngleToTarget = targetMetrics.relativeAngleToTarget
-        Turret.setTargetAngle(-relativeAngleToTarget)
+        Turret.setTargetAngle(-relativeAngleToTarget + turretOffset)
         BotState.pose = PedroComponent.follower.pose
         telemetry.addData("X", BotState.pose?.x)
         telemetry.addData("Y", BotState.pose?.y)
