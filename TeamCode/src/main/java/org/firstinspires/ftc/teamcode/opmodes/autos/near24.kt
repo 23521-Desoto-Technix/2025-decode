@@ -107,8 +107,8 @@ class near24 : NextFTCOpMode() {
                 SequentialGroup(
                     IfElseCommand(
                         { BotState.alliance == Alliance.RED },
-                        instant { turretOffset = 10.deg },
                         instant { turretOffset = (-10).deg },
+                        instant { turretOffset = 10.deg },
                     ),
                     instant { PedroComponent.follower.setMaxPower(0.5) },
                     Delay(900.milliseconds),
