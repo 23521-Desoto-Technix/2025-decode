@@ -59,6 +59,8 @@ class near24 : NextFTCOpMode() {
 
     var gateBonk = false
 
+    var do27 = false
+
     var roughTarget = Pose(0.0, 0.0, 0.0)
 
     var turretOffset = 0.deg
@@ -82,6 +84,7 @@ class near24 : NextFTCOpMode() {
             button { gamepad1.triangle }.whenBecomesTrue { withPartner = !withPartner }
         val togglePark = button { gamepad1.cross }.whenBecomesTrue { doPark = !doPark }
         val toggleGateBonk = button { gamepad1.square }.whenBecomesTrue { gateBonk = !gateBonk }
+        val toggle27 = button { gamepad1.dpad_up }.whenBecomesTrue { do27 = !do27 }
     }
 
     private fun buildRoutine(paths: Map<String, PathChain>, poses: Map<String, Pose>): Command {
@@ -137,6 +140,10 @@ class near24 : NextFTCOpMode() {
                     intake(FollowPath(paths.getValue("sideSpike3Combined"))),
                 ),
             ),
+            IfElseCommand(
+                { !doPark && withPartner && do27 },
+                gateIntake
+            ),
             Delay(200.milliseconds),
             IfElseCommand(
                 { doPark && withPartner },
@@ -157,6 +164,7 @@ class near24 : NextFTCOpMode() {
         telemetry.addLine("Toggle third spike: ▲")
         telemetry.addLine("Toggle park: ✕")
         telemetry.addLine("Toggle gate bonk: ■")
+        telemetry.addLine("Toggle 27: ↑")
         telemetry.addLine("Intake: ●")
 
         val partnerBadge =
@@ -182,6 +190,15 @@ class near24 : NextFTCOpMode() {
             } else {
                 HtmlTelemetryUtils.createColoredBadge("NO", "#FF0000", "white")
             }
+        val do27Badge =
+            if (do27) {
+                HtmlTelemetryUtils.createColoredBadge("YES", "#00FF00", "black")
+            } else {
+                HtmlTelemetryUtils.createColoredBadge("NO", "#FF0000", "white")
+            }
+        if (withPartner && !doPark) {
+            telemetry.addData("Do 27", do27Badge)
+        }
         telemetry.addData("Bonk Gate", gateBonkBadge)
 
         BindingManager.update()

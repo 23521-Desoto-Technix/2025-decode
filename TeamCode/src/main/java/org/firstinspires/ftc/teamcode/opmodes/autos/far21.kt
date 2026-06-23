@@ -74,7 +74,7 @@ class far21 : NextFTCOpMode() {
         return SequentialGroup(
             IfElseCommand(
                 { BotState.alliance == Alliance.RED },
-                instant { turretOffset = (-2).deg },
+                instant { turretOffset = 2.deg },
                 instant { turretOffset = 0.deg },
             ),
             Flywheel.setSpeed(2_000.0),
