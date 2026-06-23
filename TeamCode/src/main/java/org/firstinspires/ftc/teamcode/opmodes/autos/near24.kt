@@ -102,7 +102,7 @@ class near24 : NextFTCOpMode() {
                     FollowPath(paths.getValue("startNearToSpike2")),
                 ),
                 SequentialGroup(
-                    InstantCommand { PedroComponent.follower.setMaxPower(0.6) },
+                    InstantCommand { PedroComponent.follower.setMaxPower(0.5) },
                     Delay(900.milliseconds),
                     Tube.shootAll(),
                     Delay(100.milliseconds),
