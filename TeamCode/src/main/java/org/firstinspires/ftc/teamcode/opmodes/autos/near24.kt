@@ -219,7 +219,7 @@ class near24 : NextFTCOpMode() {
                 ShootingConfigInterpolator.ShootingZone.NEAR,
             )
         if (Flywheel.targetSpeed != config.flywheelSpeed) {
-            Flywheel.setSpeedSafe(config.flywheelSpeed)
+            Flywheel.setSpeedSafe(config.flywheelSpeed + 50)
         }
         if (Hood.position != config.hoodPosition) {
             Hood.position = config.hoodPosition
