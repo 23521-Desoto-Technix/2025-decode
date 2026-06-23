@@ -13,7 +13,6 @@ import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.instant
-import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
@@ -95,7 +94,11 @@ class near24 : NextFTCOpMode() {
             intake(
                 SequentialGroup(
                     FollowPath(paths.getValue("shootMiddleGateIntake")),
-                    Tube.waitForAll(1100.milliseconds),
+                    IfElseCommand(
+                        { do27 },
+                        Tube.waitForAll(800.milliseconds),
+                        Tube.waitForAll(1100.milliseconds),
+                    ),
                     FollowPath(paths.getValue("gateIntakeShootMiddle")),
                 )
             )
@@ -142,7 +145,7 @@ class near24 : NextFTCOpMode() {
             ),
             IfElseCommand(
                 { !doPark && withPartner && do27 },
-                gateIntake
+                gateIntake,
             ),
             Delay(200.milliseconds),
             IfElseCommand(
