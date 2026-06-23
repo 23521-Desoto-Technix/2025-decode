@@ -12,6 +12,7 @@ import dev.nextftc.core.commands.conditionals.IfElseCommand
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
+import dev.nextftc.core.commands.instant
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
@@ -60,6 +61,8 @@ class near24 : NextFTCOpMode() {
 
     var roughTarget = Pose(0.0, 0.0, 0.0)
 
+    var turretOffset = 0.deg
+
     private lateinit var poses: Map<String, Pose>
 
     private lateinit var allHubs: MutableList<LynxModule?>
@@ -94,7 +97,7 @@ class near24 : NextFTCOpMode() {
                 )
             )
         return SequentialGroup(
-            InstantCommand { roughTarget = poses.getValue("shootMiddle") },
+            instant { roughTarget = poses.getValue("shootMiddle") },
             ParallelGroup(
                 IfElseCommand(
                     { gateBonk },
@@ -102,12 +105,18 @@ class near24 : NextFTCOpMode() {
                     FollowPath(paths.getValue("startNearToSpike2")),
                 ),
                 SequentialGroup(
-                    InstantCommand { PedroComponent.follower.setMaxPower(0.5) },
+                    IfElseCommand(
+                        { BotState.alliance == Alliance.RED },
+                        instant { turretOffset = 10.deg },
+                        instant { turretOffset = (-10).deg },
+                    ),
+                    instant { PedroComponent.follower.setMaxPower(0.5) },
                     Delay(900.milliseconds),
                     Tube.shootAll(),
                     Delay(100.milliseconds),
-                    InstantCommand { PedroComponent.follower.setMaxPower(1.0) },
-                    InstantCommand { forceCurrent = false },
+                    instant { PedroComponent.follower.setMaxPower(1.0) },
+                    instant { turretOffset = 0.deg },
+                    instant { forceCurrent = false },
                     Delay(100.milliseconds),
                     Tube.intakeAll,
                 ),
@@ -124,7 +133,7 @@ class near24 : NextFTCOpMode() {
                 { withPartner },
                 gateIntake,
                 SequentialGroup(
-                    InstantCommand { roughTarget = poses.getValue("shootPark") },
+                    instant { roughTarget = poses.getValue("shootPark") },
                     intake(FollowPath(paths.getValue("sideSpike3Combined"))),
                 ),
             ),
@@ -219,12 +228,12 @@ class near24 : NextFTCOpMode() {
                 ShootingConfigInterpolator.ShootingZone.NEAR,
             )
         if (Flywheel.targetSpeed != config.flywheelSpeed) {
-            Flywheel.setSpeedSafe(config.flywheelSpeed + 50)
+            Flywheel.setSpeedSafe(config.flywheelSpeed + 25)
         }
         if (Hood.position != config.hoodPosition) {
             Hood.position = config.hoodPosition
         }
-        Turret.setTargetAngle(-relativeAngleToTarget)
+        Turret.setTargetAngle(-relativeAngleToTarget + turretOffset)
         BotState.pose = PedroComponent.follower.pose
         telemetry.addData("X", BotState.pose?.x)
         telemetry.addData("Y", BotState.pose?.y)
